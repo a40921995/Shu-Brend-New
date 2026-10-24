@@ -1,0 +1,735 @@
+{
+  "users": [
+    {
+      "id": "usr_admin",
+      "name": "Admin Boshqaruvchi",
+      "phone": "+998901234567",
+      "email": "admin@shubrend.uz",
+      "role": "ADMIN",
+      "region": "Toshkent shahri",
+      "city": "Mirobod tumani",
+      "address": "Shahrisabz ko‘chasi, 12-uy",
+      "location": {
+        "lat": 41.311081,
+        "lng": 69.279737,
+        "address": "Toshkent, Mirobod"
+      },
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "usr_abdulaziz",
+      "name": "Abdulaziz",
+      "phone": "+998901234567",
+      "email": "abdulaziz@gmail.com",
+      "role": "CUSTOMER",
+      "region": "Toshkent viloyati",
+      "city": "Toshkent",
+      "address": "Yunusobod tumani, 5-mavze, 14-uy",
+      "location": {
+        "lat": 41.3533,
+        "lng": 69.2872,
+        "address": "Yunusobod tumani, 5-mavze"
+      },
+      "createdAt": "2025-01-10T00:00:00.000Z"
+    },
+    {
+      "id": "usr_islomov",
+      "name": "Islomov Aziz",
+      "phone": "+998909876543",
+      "role": "CUSTOMER",
+      "region": "Toshkent shahri",
+      "city": "Chilonzor tumani",
+      "address": "Bunyodkor shox ko‘chasi, 28-uy",
+      "location": {
+        "lat": 41.2825,
+        "lng": 69.2081,
+        "address": "Chilonzor, Bunyodkor"
+      },
+      "createdAt": "2025-01-15T00:00:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat_all",
+      "name": "HAMMASI",
+      "slug": "all",
+      "sortOrder": 1,
+      "itemCount": 0
+    },
+    {
+      "id": "cat_kurtka",
+      "name": "KURTKA",
+      "slug": "kurtka",
+      "sortOrder": 2,
+      "itemCount": 0,
+      "imageUrl": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "cat_dvoyka",
+      "name": "DVOYKA",
+      "slug": "dvoyka",
+      "sortOrder": 3,
+      "itemCount": 0,
+      "imageUrl": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "cat_koylak",
+      "name": "KO‘YLAK",
+      "slug": "koylak",
+      "sortOrder": 4,
+      "itemCount": 0,
+      "imageUrl": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "cat_shim",
+      "name": "SHIM",
+      "slug": "shim",
+      "sortOrder": 5,
+      "itemCount": 0,
+      "imageUrl": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&auto=format&fit=crop"
+    },
+    {
+      "id": "cat_luk",
+      "name": "LUK KIYIMLAR",
+      "slug": "luk-kiyimlar",
+      "sortOrder": 6,
+      "itemCount": 0,
+      "imageUrl": "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?q=80&w=800&auto=format&fit=crop"
+    }
+  ],
+  "products": [],
+  "orders": [
+    {
+      "id": "ord_1792822686337",
+      "orderNumber": "#1029",
+      "customerName": "Alisher",
+      "customerPhone": "+998901234567",
+      "region": "Toshkent",
+      "city": "Yunusobod",
+      "address": "Amir Temur ko‘chasi 10",
+      "note": "",
+      "items": [
+        {
+          "id": "item_1792822686337_xnv5",
+          "productId": "prod_1",
+          "productName": "Erkaklar kurtkasi",
+          "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000&auto=format&fit=crop",
+          "categoryName": "KURTKA",
+          "size": "L",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 599000,
+          "totalPrice": 599000
+        }
+      ],
+      "subtotal": 599000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 599000,
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA",
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-10-24T06:18:06.337Z",
+          "comment": "Buyurtma tizimga muvaffaqiyatli qabul qilindi"
+        }
+      ],
+      "createdAt": "2026-10-24T06:18:06.337Z",
+      "updatedAt": "2026-10-24T06:18:06.337Z"
+    },
+    {
+      "id": "ord_1792687946557",
+      "orderNumber": "#1028",
+      "userId": "usr_admin",
+      "customerName": "Admin Boshqaruvchi",
+      "customerPhone": "+998901234567",
+      "region": "Toshkent shahri",
+      "city": "Mirobod tumani",
+      "address": "Shahrisabz ko‘chasi, 12-uy",
+      "location": {
+        "lat": 41.311081,
+        "lng": 69.279737,
+        "address": "Toshkent, Mirobod"
+      },
+      "note": "",
+      "items": [
+        {
+          "id": "item_1792687946556_sat5",
+          "productId": "prod_1792687881733",
+          "productName": "Koylak",
+          "productImage": "/uploads/shu-1792687829167-23684004.jpg",
+          "categoryName": "KURTKA",
+          "size": "S",
+          "color": "qizil",
+          "quantity": 3,
+          "unitPrice": 25000,
+          "totalPrice": 75000
+        }
+      ],
+      "subtotal": 75000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 75000,
+      "paymentMethod": "PAYME",
+      "paymentStatus": "KUTILMOQDA",
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-10-22T16:52:26.557Z",
+          "comment": "Buyurtma tizimga muvaffaqiyatli qabul qilindi"
+        }
+      ],
+      "createdAt": "2026-10-22T16:52:26.557Z",
+      "updatedAt": "2026-10-22T16:52:26.557Z"
+    },
+    {
+      "id": "ord_1792571687783",
+      "orderNumber": "#1028",
+      "userId": "usr_abdulaziz",
+      "customerName": "Abdulaziz",
+      "customerPhone": "+998 90 123 45 67",
+      "region": "Toshkent viloyati",
+      "city": "Toshkent",
+      "address": "Yunusobod tumani, 5-mavze, 14-uy",
+      "location": {
+        "lat": 41.3533,
+        "lng": 69.2872,
+        "address": "Yunusobod tumani, 5-mavze"
+      },
+      "note": "",
+      "items": [
+        {
+          "id": "item_1792571687783_ib2j",
+          "productId": "prod_1",
+          "productName": "Erkaklar kurtkasi",
+          "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000&auto=format&fit=crop",
+          "size": "S",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 599000,
+          "totalPrice": 599000
+        }
+      ],
+      "subtotal": 599000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 599000,
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-10-21T08:34:47.783Z",
+          "comment": "Buyurtma tizimga muvaffaqiyatli qabul qilindi"
+        }
+      ],
+      "createdAt": "2026-10-21T08:34:47.783Z",
+      "updatedAt": "2026-10-21T08:34:47.783Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
+    {
+      "id": "ord_1792570002180",
+      "orderNumber": "#1026",
+      "customerName": "Alisher Navoiy",
+      "customerPhone": "+998901112233",
+      "region": "Toshkent shahri",
+      "city": "Yunusobod",
+      "address": "Amir Temur 12",
+      "note": "",
+      "items": [
+        {
+          "id": "item_1792570002180_8rvf",
+          "productId": "prod_1",
+          "productName": "Erkaklar kurtkasi",
+          "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000&auto=format&fit=crop",
+          "size": "XL",
+          "color": "Qora",
+          "quantity": 2,
+          "unitPrice": 599000,
+          "totalPrice": 1198000
+        }
+      ],
+      "subtotal": 1198000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 1198000,
+      "status": "TASDIQLANDI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-10-21T08:06:42.180Z",
+          "comment": "Buyurtma tizimga muvaffaqiyatli qabul qilindi"
+        },
+        {
+          "status": "TASDIQLANDI",
+          "changedAt": "2026-10-21T08:06:54.749Z",
+          "comment": "Mijoz bilan telefon orqali bog‘lanildi va tasdiqlandi"
+        }
+      ],
+      "createdAt": "2026-10-21T08:06:42.180Z",
+      "updatedAt": "2026-10-21T08:06:54.749Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
+    {
+      "id": "ord_1024",
+      "orderNumber": "#1024",
+      "userId": "usr_islomov",
+      "customerName": "Islomov Aziz",
+      "customerPhone": "+998 90 987 65 43",
+      "region": "Toshkent shahri",
+      "city": "Chilonzor tumani",
+      "address": "Bunyodkor shox ko‘chasi, 28-uy",
+      "location": {
+        "lat": 41.2825,
+        "lng": 69.2081,
+        "address": "Bunyodkor shox ko‘chasi 28"
+      },
+      "note": "Kechki 18:00 dan keyin olib kelsangiz yaxshi bo‘lardi.",
+      "items": [
+        {
+          "id": "item_1",
+          "productId": "prod_2",
+          "productName": "Dvoyka kostyum-shim",
+          "productImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop",
+          "size": "52",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 1299000,
+          "totalPrice": 1299000
+        }
+      ],
+      "subtotal": 1299000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 1299000,
+      "status": "YETKAZILMOQDA",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2025-01-25T10:00:00Z"
+        },
+        {
+          "status": "TASDIQLANDI",
+          "changedAt": "2025-01-25T11:15:00Z"
+        },
+        {
+          "status": "TAYYORLANMOQDA",
+          "changedAt": "2025-01-25T13:30:00Z"
+        },
+        {
+          "status": "YETKAZILMOQDA",
+          "changedAt": "2025-01-25T15:00:00Z"
+        }
+      ],
+      "createdAt": "2025-01-25T10:00:00.000Z",
+      "updatedAt": "2025-01-25T15:00:00.000Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
+    {
+      "id": "ord_1023",
+      "orderNumber": "#1023",
+      "customerName": "Karimov Ali",
+      "customerPhone": "+998 91 234 56 78",
+      "region": "Toshkent shahri",
+      "city": "Mirzo Ulug‘bek",
+      "address": "Buyuk Ipak Yo‘li 115",
+      "location": {
+        "lat": 41.3255,
+        "lng": 69.3245,
+        "address": "Buyuk Ipak Yo‘li"
+      },
+      "items": [
+        {
+          "id": "item_2",
+          "productId": "prod_1",
+          "productName": "Erkaklar kurtkasi",
+          "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000&auto=format&fit=crop",
+          "size": "L",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 599000,
+          "totalPrice": 599000
+        }
+      ],
+      "subtotal": 599000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 599000,
+      "status": "TASDIQLANDI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2025-01-24T09:20:00Z"
+        },
+        {
+          "status": "TASDIQLANDI",
+          "changedAt": "2025-01-24T10:05:00Z"
+        }
+      ],
+      "createdAt": "2025-01-24T09:20:00.000Z",
+      "updatedAt": "2025-01-24T10:05:00.000Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
+    {
+      "id": "ord_1022",
+      "orderNumber": "#1022",
+      "customerName": "Davronov Bahrom",
+      "customerPhone": "+998 93 111 22 33",
+      "region": "Samarqand viloyati",
+      "city": "Samarqand shahri",
+      "address": "Registon ko‘chasi, 19-uy",
+      "location": {
+        "lat": 39.6542,
+        "lng": 66.9597,
+        "address": "Samarqand, Registon"
+      },
+      "items": [
+        {
+          "id": "item_3",
+          "productId": "prod_3",
+          "productName": "Klassik oq ko‘ylak",
+          "productImage": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1000&auto=format&fit=crop",
+          "size": "XL",
+          "color": "Oq",
+          "quantity": 1,
+          "unitPrice": 349000,
+          "totalPrice": 349000
+        },
+        {
+          "id": "item_4",
+          "productId": "prod_4",
+          "productName": "Klassik erkaklar shimi",
+          "productImage": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=1000&auto=format&fit=crop",
+          "size": "34",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 499000,
+          "totalPrice": 499000
+        }
+      ],
+      "subtotal": 848000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 848000,
+      "status": "YETKAZILDI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2025-01-23T11:00:00Z"
+        },
+        {
+          "status": "TASDIQLANDI",
+          "changedAt": "2025-01-23T12:00:00Z"
+        },
+        {
+          "status": "YETKAZILMOQDA",
+          "changedAt": "2025-01-24T08:00:00Z"
+        },
+        {
+          "status": "YETKAZILDI",
+          "changedAt": "2025-01-24T17:40:00Z"
+        }
+      ],
+      "createdAt": "2025-01-23T11:00:00.000Z",
+      "updatedAt": "2025-01-24T17:40:00.000Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "TOLANDI"
+    },
+    {
+      "id": "ord_1021",
+      "orderNumber": "#1021",
+      "customerName": "Shodiyorov Umid",
+      "customerPhone": "+998 97 444 55 66",
+      "region": "Farg‘ona viloyati",
+      "city": "Qo‘qon shahri",
+      "address": "Navoiy ko‘chasi, 5",
+      "items": [
+        {
+          "id": "item_5",
+          "productId": "prod_5",
+          "productName": "Luk kiyimlar to‘plami",
+          "productImage": "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?q=80&w=1000&auto=format&fit=crop",
+          "size": "L",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 899000,
+          "totalPrice": 899000
+        }
+      ],
+      "subtotal": 899000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 899000,
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2025-01-22T14:15:00Z"
+        }
+      ],
+      "createdAt": "2025-01-22T14:15:00.000Z",
+      "updatedAt": "2025-01-22T14:15:00.000Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
+    {
+      "id": "ord_1020",
+      "orderNumber": "#1020",
+      "customerName": "Rustamov Sanjar",
+      "customerPhone": "+998 90 777 88 99",
+      "region": "Toshkent shahri",
+      "city": "Olmazor tumani",
+      "address": "Qorasaroy 45-uy",
+      "items": [
+        {
+          "id": "item_6",
+          "productId": "prod_6",
+          "productName": "Charmsimon qora kurtka",
+          "productImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1000&auto=format&fit=crop",
+          "size": "XL",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 649000,
+          "totalPrice": 649000
+        }
+      ],
+      "subtotal": 649000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 649000,
+      "status": "YETKAZILDI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2025-01-21T08:30:00Z"
+        },
+        {
+          "status": "TASDIQLANDI",
+          "changedAt": "2025-01-21T09:10:00Z"
+        },
+        {
+          "status": "YETKAZILDI",
+          "changedAt": "2025-01-21T16:00:00Z"
+        }
+      ],
+      "createdAt": "2025-01-21T08:30:00.000Z",
+      "updatedAt": "2025-01-21T16:00:00.000Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "TOLANDI"
+    },
+    {
+      "id": "ord_1019",
+      "orderNumber": "#1019",
+      "userId": "usr_abdulaziz",
+      "customerName": "Abdulaziz",
+      "customerPhone": "+998 90 123 45 67",
+      "region": "Toshkent viloyati",
+      "city": "Toshkent",
+      "address": "Yunusobod tumani, 5-mavze, 14-uy",
+      "location": {
+        "lat": 41.3533,
+        "lng": 69.2872,
+        "address": "Yunusobod 5-mavze"
+      },
+      "items": [
+        {
+          "id": "item_7",
+          "productId": "prod_1",
+          "productName": "Erkaklar kurtkasi",
+          "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000&auto=format&fit=crop",
+          "size": "XL",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 599000,
+          "totalPrice": 599000
+        },
+        {
+          "id": "item_8",
+          "productId": "prod_2",
+          "productName": "Dvoyka kostyum-shim",
+          "productImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop",
+          "size": "XL",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 1299000,
+          "totalPrice": 1299000
+        },
+        {
+          "id": "item_9",
+          "productId": "prod_4",
+          "productName": "Klassik erkaklar shimi",
+          "productImage": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=1000&auto=format&fit=crop",
+          "size": "M",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 499000,
+          "totalPrice": 499000
+        }
+      ],
+      "subtotal": 2397000,
+      "discount": 300000,
+      "deliveryFee": 0,
+      "total": 2097000,
+      "status": "YETKAZILDI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2025-01-20T12:00:00Z"
+        },
+        {
+          "status": "TASDIQLANDI",
+          "changedAt": "2025-01-20T13:00:00Z"
+        },
+        {
+          "status": "YETKAZILDI",
+          "changedAt": "2025-01-21T18:00:00Z"
+        }
+      ],
+      "createdAt": "2025-01-20T12:00:00.000Z",
+      "updatedAt": "2025-01-21T18:00:00.000Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "TOLANDI"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev_1",
+      "productId": "prod_1",
+      "productName": "Erkaklar kurtkasi",
+      "userId": "usr_abdulaziz",
+      "userName": "Abdulaziz",
+      "rating": 5,
+      "comment": "Sifati juda zo‘r, matosi nihoyatda pishiq va issiq. Tavsiya qilaman!",
+      "isApproved": true,
+      "createdAt": "2025-01-18T14:30:00Z"
+    },
+    {
+      "id": "rev_2",
+      "productId": "prod_2",
+      "productName": "Dvoyka kostyum-shim",
+      "userId": "usr_islomov",
+      "userName": "Azizbek",
+      "rating": 5,
+      "comment": "Kastyum ideal o‘tirdi. Rangi to‘q va juda hashamatli.",
+      "isApproved": true,
+      "createdAt": "2025-01-19T10:20:00Z"
+    },
+    {
+      "id": "rev_3",
+      "productId": "prod_3",
+      "productName": "Klassik oq ko‘ylak",
+      "userId": "usr_karimov",
+      "userName": "Javohir",
+      "rating": 4,
+      "comment": "Paxtasi yumshoq, dazmollanishi ham oson.",
+      "isApproved": true,
+      "createdAt": "2025-01-20T11:45:00Z"
+    }
+  ],
+  "banners": [
+    {
+      "id": "ban_1",
+      "title": "Har bir erkak uchun o‘z uslubi!",
+      "subtitle": "Zamonaviy kiyimlar • Sifat • Ishonch",
+      "buttonText": "Kolleksiyani ko‘rish",
+      "buttonLink": "/clothing",
+      "imageUrl": "/banners/hero-banner-1.png",
+      "badge": "SHU BREND — STYLE QUALITY CONFIDENCE",
+      "isActive": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "ban_2",
+      "title": "KUZ-QISH KOLLEKSIYASI",
+      "subtitle": "Sifat va uslub birga! Erkaklar uchun eng so‘nggi moda trendlari",
+      "buttonText": "Kolleksiyani ko‘rish",
+      "buttonLink": "/clothing?category=kurtka",
+      "imageUrl": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1600&auto=format&fit=crop",
+      "badge": "YANGI MAVSUM",
+      "isActive": true,
+      "sortOrder": 2
+    }
+  ],
+  "settings": {
+    "storeName": "SHU BREND",
+    "storeTagline": "Sifat • Stil • Erkaklar uchun",
+    "phone": "+998 90 123 45 67",
+    "telegramUrl": "https://t.me/shubrend",
+    "instagramUrl": "https://instagram.com/shubrend",
+    "address": "Toshkent shahar, Yunusobod tumani, 5-mavze",
+    "workingHours": "09:00 - 22:00",
+    "location": {
+      "lat": 41.3533,
+      "lng": 69.2872,
+      "address": "Toshkent shahar, Yunusobod tumani, 5-mavze"
+    },
+    "headerNotice": "Yetkazib berish butun O‘zbekiston bo‘ylab tekinga amalga oshiriladi!",
+    "currency": "so‘m",
+    "deliveryFreeAbove": 0,
+    "standardDeliveryFee": 0,
+    "heroBadge1": "Tez yetkazib berish",
+    "heroBadge2": "Sifat kafolati",
+    "heroBadge3": "Qulay to‘lov",
+    "heroBadge4": "24/7 qo‘llab-quvvatlash",
+    "aboutText": "SHU BREND — zamonaviy erkaklar uchun individual uslub, oliy darajadagi sifat va qulaylikni o‘zida mujassam etgan premium kiyimlar do‘koni. Har bir tikuv, mato tanlovi va dizayn erkak kishining obro‘si va o‘ziga bo‘lgan ishonchini oshirishga xizmat qiladi.",
+    "themePrimaryColor": "#0b0f17",
+    "themeAccentColor": "#d4af37",
+    "cardSettings": {
+      "cardType": "HUMO",
+      "cardNumber": "9860 3501 2458 7789",
+      "cardHolder": "SHU BREND MCHJ",
+      "bankName": "Kapitalbank ATB",
+      "telegramUsername": "@shubrend_admin",
+      "instructions": "Iltimos, to‘lovni amalga oshirgach, to‘lov chekini administratorning Telegramiga (@shubrend_admin) yuboring. To‘lov tekshirilgach buyurtmangiz tasdiqlanadi."
+    },
+    "paymentSettings": {
+      "click": {
+        "enabled": true,
+        "testMode": true,
+        "serviceId": "12345",
+        "merchantId": "98765",
+        "merchantUserId": "4321",
+        "secretKey": "shu_click_secret_key_prod"
+      },
+      "payme": {
+        "enabled": true,
+        "testMode": true,
+        "merchantId": "64d2f80c5b3e1a001a123456",
+        "secretKey": "shu_payme_secret_key_prod"
+      },
+      "cash": {
+        "enabled": false
+      }
+    },
+    "telegramSettings": {
+      "enabled": false,
+      "status": "DISCONNECTED",
+      "botToken": "aes-gcm:b1af0c00e8db213b0e166db9:d620665bdc5eaea7f1e3bffd32e2dac0:b1b6e33f44caa04c2138582bc478d59e83104894369bcdf51e81107d8f9e3da9a282c067c5a3f7a8cfa18d",
+      "chatId": "-1001234567890"
+    }
+  },
+  "transactions": [
+    {
+      "id": "tx_unit_1792659513841",
+      "orderId": "ord_1028",
+      "orderNumber": "#1028",
+      "provider": "CLICK",
+      "amount": 599000,
+      "transactionId": "click_trans_unit_1",
+      "status": "SUCCESS",
+      "createdAt": "2026-10-22T08:58:33.841Z"
+    }
+  ],
+  "adminSecurity": {
+    "username": "admin.1212",
+    "passwordHash": "scrypt:0c001d4d3a07aaaf715719b70ae2a8c8:aafff55e334e29ac213d593b803329a5d45b39b2540541bc01f85ba4d25a8b6b0cfd5a4808fffafc4c8b0879f9acab2414b751bab5ebe3d736ceb7ef6c35d4ac",
+    "sessionTokenVersion": 2,
+    "lastPasswordChange": "2026-10-24T07:29:14.456Z"
+  }
+}

@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --gold: #d4af37;
+    --gold-light: #f3e5ab;
+    --gold-dark: #aa820a;
+    --bg-dark: #0b0f17;
+    --bg-card: #131b2a;
+    --bg-surface: #1a2438;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #0b0f17;
+    color: #f1f5f9;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  .font-brand {
+    font-family: 'Cinzel', 'Plus Jakarta Sans', serif;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* Custom gold gradient and glow utilities */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #fff3c4 0%, #d4af37 50%, #aa820a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-gradient-bg {
+  background: linear-gradient(135deg, #d4af37 0%, #c49b29 50%, #997306 100%);
+}
+
+.gold-border-glow {
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+}
+
+.dark-card-blur {
+  background: rgba(19, 27, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Leaflet dark theme tweaks */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+  border-radius: 0.75rem;
+}
+
+/* Hide scrollbar for clean luxury horizontal product sliders */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

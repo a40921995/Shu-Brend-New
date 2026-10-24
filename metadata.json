@@ -1,0 +1,6 @@
+{
+  "name": "SHU BREND — Erkaklar Kiyim Do'koni",
+  "description": "Erkaklar uchun zamonaviy, sifatli va premium kiyimlar internet do'koni. Kurtkalar, dvoykalar, ko'ylaklar, shimlar va eksklyuziv to'plamlar.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
