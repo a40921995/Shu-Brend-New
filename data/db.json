@@ -710,7 +710,7 @@
     "telegramSettings": {
       "enabled": false,
       "status": "DISCONNECTED",
-      "botToken": "aes-gcm:b1af0c00e8db213b0e166db9:d620665bdc5eaea7f1e3bffd32e2dac0:b1b6e33f44caa04c2138582bc478d59e83104894369bcdf51e81107d8f9e3da9a282c067c5a3f7a8cfa18d",
+      "botToken": "aes-gcm:2234d5ef8b462ec99b1d20f3:33a576842293b49d7adc975a3ff07cea:b7ff79b8592516841475d9ca4d10ec4666168f12ea2f113874c089f173c32eacbc1003543738258f2ce949",
       "chatId": "-1001234567890"
     }
   },
@@ -728,8 +728,8 @@
   ],
   "adminSecurity": {
     "username": "admin.1212",
-    "passwordHash": "scrypt:0c001d4d3a07aaaf715719b70ae2a8c8:aafff55e334e29ac213d593b803329a5d45b39b2540541bc01f85ba4d25a8b6b0cfd5a4808fffafc4c8b0879f9acab2414b751bab5ebe3d736ceb7ef6c35d4ac",
+    "passwordHash": "scrypt:ac314a6fd8367ad81e9ea39a44387242:41f24da666f02f68856ce432a372172444e2a9e9b09cbdae302b7e509bb02c51543f0c7472761c5e8bd08a0a304e5d29ba8fa6b299bb16e48bd1eaaf85c142a3",
     "sessionTokenVersion": 2,
-    "lastPasswordChange": "2026-10-24T07:29:14.456Z"
+    "lastPasswordChange": "2026-10-24T10:11:44.397Z"
   }
 }
