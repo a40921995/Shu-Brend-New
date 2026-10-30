@@ -1,6 +1,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Banner, Category, Order, PaymentTransaction, Product, Review, SiteSettings, User } from '../src/types/index.ts';
+import type {
+  Banner,
+  BillzSettings,
+  BillzSyncLog,
+  BillzSyncStatus,
+  Branch,
+  Category,
+  InventoryActionType,
+  InventoryLog,
+  LowStockVariantInfo,
+  Order,
+  PaymentTransaction,
+  Product,
+  ProductVariant,
+  Review,
+  SiteSettings,
+  User,
+  WarehouseStats,
+} from '../src/types/index.ts';
 import { decryptSecret, encryptSecret, hashPassword, maskToken } from './security.ts';
 
 const DATA_DIR = process.env.DATA_DIR
@@ -15,6 +33,22 @@ export interface AdminSecurityConfig {
   lastPasswordChange?: string;
 }
 
+export interface BillzStorageConfig {
+  apiUrl: string;
+  encryptedApiKey?: string;
+  encryptedPlatformId?: string;
+  autoSyncEnabled: boolean;
+  syncIntervalMinutes: number;
+  lastSyncAt?: string;
+  lastSyncStatus?: 'SUCCESS' | 'FAILED' | 'PARTIAL' | 'IDLE';
+  lastError?: string;
+  status: BillzSyncStatus;
+  centralShopId?: string;
+  syncImages: boolean;
+  syncPrices: boolean;
+  syncStock: boolean;
+}
+
 export interface DatabaseSchema {
   users: User[];
   categories: Category[];
@@ -25,10 +59,15 @@ export interface DatabaseSchema {
   settings: SiteSettings;
   transactions?: PaymentTransaction[];
   adminSecurity?: AdminSecurityConfig;
+  inventoryLogs?: InventoryLog[];
+  branches?: Branch[];
+  billzConfig?: BillzStorageConfig;
+  billzLogs?: BillzSyncLog[];
 }
 
 // Initial seed matching user requirements and design screenshot perfectly
 const INITIAL_DATA: DatabaseSchema = {
+  inventoryLogs: [],
 
   users: [
     {
@@ -508,12 +547,36 @@ class Database {
         return {
           users: Array.isArray(parsed.users) ? parsed.users : INITIAL_DATA.users,
           categories: Array.isArray(parsed.categories) ? parsed.categories : INITIAL_DATA.categories,
-          products: Array.isArray(parsed.products) ? parsed.products : [],
+          products: (Array.isArray(parsed.products) ? parsed.products : []).map((p: Product) => this.sanitizeProduct(p)),
           orders: sanitizedOrders,
           reviews: Array.isArray(parsed.reviews) ? parsed.reviews : INITIAL_DATA.reviews,
           banners: Array.isArray(parsed.banners) ? parsed.banners : INITIAL_DATA.banners,
           settings: currentSettings,
           transactions: parsed.transactions || [],
+          inventoryLogs: Array.isArray(parsed.inventoryLogs) ? parsed.inventoryLogs : [],
+          branches: Array.isArray(parsed.branches) && parsed.branches.length > 0 ? parsed.branches : [
+            {
+              id: 'branch_central',
+              name: 'SHU BREND — Markaziy Filial & Do‘kon',
+              billzShopId: 'shop_tashkent_central',
+              address: 'Toshkent shahri, Mirobod tumani, Shahrisabz ko‘chasi, 12-uy',
+              phone: '+998 90 123 45 67',
+              isActive: true,
+              isCentral: true,
+              createdAt: new Date('2025-01-01').toISOString(),
+            },
+          ],
+          billzConfig: parsed.billzConfig || {
+            apiUrl: 'https://api-admin.billz.ai',
+            autoSyncEnabled: false,
+            syncIntervalMinutes: 60,
+            status: 'UNCONFIGURED',
+            centralShopId: 'shop_tashkent_central',
+            syncImages: true,
+            syncPrices: true,
+            syncStock: true,
+          },
+          billzLogs: Array.isArray(parsed.billzLogs) ? parsed.billzLogs : [],
         };
       }
     } catch (err) {
@@ -527,9 +590,19 @@ class Database {
   public saveData(customData?: DatabaseSchema) {
     try {
       const dataToSave = customData || this.data;
-      fs.writeFileSync(DB_FILE, JSON.stringify(dataToSave, null, 2), 'utf-8');
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      const tmpFile = path.join(DATA_DIR, `.db.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`);
+      fs.writeFileSync(tmpFile, JSON.stringify(dataToSave, null, 2), 'utf-8');
+      fs.renameSync(tmpFile, DB_FILE);
     } catch (err) {
-      console.error('Error saving database:', err);
+      console.error('Error saving database atomically:', err);
+      try {
+        fs.writeFileSync(DB_FILE, JSON.stringify(customData || this.data, null, 2), 'utf-8');
+      } catch (fallbackErr) {
+        console.error('Fatal fallback database save error:', fallbackErr);
+      }
     }
   }
 
@@ -552,50 +625,506 @@ class Database {
   }
 
   // Categories
-  getCategories() {
-    return this.data.categories.map((c) => {
+  getCategories(includeHidden = true) {
+    const categories = [...this.data.categories]
+      .filter((c) => includeHidden || !c.isHidden)
+      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+    return categories.map((c) => {
       if (c.slug === 'all') {
-        return { ...c, itemCount: this.data.products.length };
+        const visibleProductsCount = includeHidden
+          ? this.data.products.length
+          : this.data.products.filter(p => {
+              const cat = this.data.categories.find(cc => cc.slug === p.categorySlug);
+              return !cat?.isHidden;
+            }).length;
+        return { ...c, itemCount: visibleProductsCount };
       }
       const count = this.data.products.filter((p) => p.categorySlug === c.slug).length;
       return { ...c, itemCount: count };
     });
   }
+
   saveCategory(category: Category) {
     const idx = this.data.categories.findIndex(c => c.id === category.id);
     if (idx >= 0) {
-      this.data.categories[idx] = category;
+      this.data.categories[idx] = { ...this.data.categories[idx], ...category };
     } else {
       this.data.categories.push(category);
     }
     this.saveData();
     return category;
   }
+
   deleteCategory(id: string) {
     this.data.categories = this.data.categories.filter(c => c.id !== id);
     this.saveData();
   }
 
+  moveProductsCategory(sourceSlug: string, targetSlug: string, targetName: string): number {
+    let count = 0;
+    for (const p of this.data.products) {
+      if (p.categorySlug === sourceSlug) {
+        p.categorySlug = targetSlug;
+        p.categoryName = targetName;
+        count++;
+      }
+    }
+    if (count > 0) {
+      this.saveData();
+    }
+    return count;
+  }
+
   // Products
-  getProducts() { return this.data.products; }
-  getProductById(id: string) { return this.data.products.find(p => p.id === id); }
+  sanitizeProduct(product: Product): Product {
+    const colors = Array.isArray(product.colors) && product.colors.length > 0 ? product.colors : ['Qora'];
+    const sizes = Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ['S', 'M', 'L', 'XL'];
+    let variants: ProductVariant[] = Array.isArray(product.variants) ? [...product.variants] : [];
+
+    // Ensure all color x size combinations exist in variants
+    const initialVariantsEmpty = variants.length === 0;
+    const defaultStockPerVariant = initialVariantsEmpty && product.stock > 0
+      ? Math.max(0, Math.floor(product.stock / (colors.length * sizes.length)))
+      : 0;
+
+    for (const c of colors) {
+      for (const s of sizes) {
+        const found = variants.find(
+          v => v.color.trim().toLowerCase() === c.trim().toLowerCase() &&
+               v.size.trim().toLowerCase() === s.trim().toLowerCase()
+        );
+        if (!found) {
+          variants.push({
+            id: `${c}_${s}`,
+            color: c,
+            size: s,
+            stock: defaultStockPerVariant,
+            barcode: product.barcode,
+            sku: product.sku,
+          });
+        }
+      }
+    }
+
+    // Clean duplicate variants if any
+    const uniqueMap = new Map<string, ProductVariant>();
+    for (const v of variants) {
+      const key = `${v.color.trim().toLowerCase()}:::${v.size.trim().toLowerCase()}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, {
+          ...v,
+          stock: Math.max(0, Number(v.stock) || 0),
+        });
+      }
+    }
+    const cleanVariants = Array.from(uniqueMap.values());
+    const totalStock = cleanVariants.reduce((sum, v) => sum + v.stock, 0);
+
+    return {
+      ...product,
+      colors,
+      sizes,
+      variants: cleanVariants,
+      stock: totalStock,
+    };
+  }
+
+  getProducts() {
+    return this.data.products.map(p => this.sanitizeProduct(p));
+  }
+
+  getProductById(id: string) {
+    const prod = this.data.products.find(p => p.id === id);
+    return prod ? this.sanitizeProduct(prod) : undefined;
+  }
+
   saveProduct(product: Product) {
-    const idx = this.data.products.findIndex(p => p.id === product.id);
+    const sanitized = this.sanitizeProduct(product);
+    const idx = this.data.products.findIndex(p => p.id === sanitized.id);
     if (idx >= 0) {
-      this.data.products[idx] = product;
+      this.data.products[idx] = sanitized;
     } else {
-      this.data.products.unshift(product);
+      this.data.products.unshift(sanitized);
     }
     this.saveData();
-    return product;
+    return sanitized;
   }
+
   deleteProduct(id: string) {
     this.data.products = this.data.products.filter(p => p.id !== id);
     this.saveData();
   }
+
   clearAllProducts() {
     this.data.products = [];
     this.saveData();
+  }
+
+  // --- OMBOR (WAREHOUSE) INVENTORY METHODS ---
+
+  getInventoryLogs(limit = 100): InventoryLog[] {
+    const logs = this.data.inventoryLogs || [];
+    return [...logs].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, limit);
+  }
+
+  adjustVariantStock(
+    productId: string,
+    color: string,
+    size: string,
+    delta: number,
+    type: InventoryActionType,
+    note?: string,
+    price?: number,
+    operator = 'Admin'
+  ): { product: Product; log: InventoryLog } {
+    const product = this.getProductById(productId);
+    if (!product) {
+      throw new Error('Mahsulot topilmadi');
+    }
+
+    const sanitized = this.sanitizeProduct(product);
+    const targetColor = color.trim().toLowerCase();
+    const targetSize = size.trim().toLowerCase();
+
+    let variant = sanitized.variants!.find(
+      v => v.color.trim().toLowerCase() === targetColor && v.size.trim().toLowerCase() === targetSize
+    );
+
+    if (!variant) {
+      variant = {
+        id: `${color}_${size}`,
+        color,
+        size,
+        stock: 0,
+      };
+      sanitized.variants!.push(variant);
+    }
+
+    const prevStock = variant.stock;
+    const newStock = Math.max(0, prevStock + delta);
+    variant.stock = newStock;
+    sanitized.stock = sanitized.variants!.reduce((sum, v) => sum + v.stock, 0);
+
+    const savedProduct = this.saveProduct(sanitized);
+
+    const log: InventoryLog = {
+      id: 'inv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      timestamp: new Date().toISOString(),
+      productId: savedProduct.id,
+      productName: savedProduct.name,
+      productImage: savedProduct.images[0] || '/banners/hero-banner-1.png',
+      color: variant.color,
+      size: variant.size,
+      delta: newStock - prevStock,
+      previousStock: prevStock,
+      newStock,
+      type,
+      price: price !== undefined ? price : (type === 'OFFLINE_SALE' ? savedProduct.price : undefined),
+      note: note || (type === 'OFFLINE_SALE' ? 'Do‘konda oflayn sotildi' : type === 'RESTOCK' ? 'Omborga mahsulot qo‘shildi' : 'Ombor qoldig‘i yangilandi'),
+      operator,
+    };
+
+    if (!this.data.inventoryLogs) {
+      this.data.inventoryLogs = [];
+    }
+    this.data.inventoryLogs.unshift(log);
+    this.saveData();
+
+    return { product: savedProduct, log };
+  }
+
+  setVariantStock(
+    productId: string,
+    color: string,
+    size: string,
+    exactStock: number,
+    type: InventoryActionType = 'MANUAL_ADJUST',
+    note?: string,
+    operator = 'Admin'
+  ): { product: Product; log: InventoryLog } {
+    const product = this.getProductById(productId);
+    if (!product) throw new Error('Mahsulot topilmadi');
+
+    const sanitized = this.sanitizeProduct(product);
+    const targetColor = color.trim().toLowerCase();
+    const targetSize = size.trim().toLowerCase();
+
+    let variant = sanitized.variants!.find(
+      v => v.color.trim().toLowerCase() === targetColor && v.size.trim().toLowerCase() === targetSize
+    );
+
+    if (!variant) {
+      variant = { id: `${color}_${size}`, color, size, stock: 0 };
+      sanitized.variants!.push(variant);
+    }
+
+    const prevStock = variant.stock;
+    const newStock = Math.max(0, exactStock);
+    variant.stock = newStock;
+    sanitized.stock = sanitized.variants!.reduce((sum, v) => sum + v.stock, 0);
+
+    const savedProduct = this.saveProduct(sanitized);
+
+    const log: InventoryLog = {
+      id: 'inv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      timestamp: new Date().toISOString(),
+      productId: savedProduct.id,
+      productName: savedProduct.name,
+      productImage: savedProduct.images[0] || '/banners/hero-banner-1.png',
+      color: variant.color,
+      size: variant.size,
+      delta: newStock - prevStock,
+      previousStock: prevStock,
+      newStock,
+      type,
+      note: note || 'Qoldiq to‘g‘ridan-to‘g‘ri kiritildi',
+      operator,
+    };
+
+    if (!this.data.inventoryLogs) {
+      this.data.inventoryLogs = [];
+    }
+    this.data.inventoryLogs.unshift(log);
+    this.saveData();
+
+    return { product: savedProduct, log };
+  }
+
+  addVariant(productId: string, color: string, size: string, stock = 0): Product {
+    const product = this.getProductById(productId);
+    if (!product) throw new Error('Mahsulot topilmadi');
+
+    const sanitized = this.sanitizeProduct(product);
+    const cleanColor = color.trim();
+    const cleanSize = size.trim();
+
+    if (!sanitized.colors.includes(cleanColor)) {
+      sanitized.colors.push(cleanColor);
+    }
+    if (!sanitized.sizes.includes(cleanSize)) {
+      sanitized.sizes.push(cleanSize);
+    }
+
+    const existing = sanitized.variants!.find(
+      v => v.color.trim().toLowerCase() === cleanColor.toLowerCase() &&
+           v.size.trim().toLowerCase() === cleanSize.toLowerCase()
+    );
+
+    if (existing) {
+      existing.stock = Math.max(0, Number(stock) || 0);
+    } else {
+      sanitized.variants!.push({
+        id: `${cleanColor}_${cleanSize}`,
+        color: cleanColor,
+        size: cleanSize,
+        stock: Math.max(0, Number(stock) || 0),
+      });
+    }
+
+    sanitized.stock = sanitized.variants!.reduce((sum, v) => sum + v.stock, 0);
+    return this.saveProduct(sanitized);
+  }
+
+  cancelInventoryLog(logId: string): { success: boolean; message: string; restoredProduct?: Product } {
+    if (!this.data.inventoryLogs) {
+      throw new Error('Harakatlar tarixi bo‘sh');
+    }
+    const log = this.data.inventoryLogs.find(l => l.id === logId);
+    if (!log) {
+      throw new Error('Harakat topilmadi');
+    }
+    if (log.cancelled) {
+      throw new Error('Ushbu amal allaqachon bekor qilingan');
+    }
+
+    const invertedDelta = -log.delta;
+    const product = this.getProductById(log.productId);
+
+    let restoredProduct: Product | undefined;
+    if (product) {
+      const sanitized = this.sanitizeProduct(product);
+      const variant = sanitized.variants!.find(
+        v => v.color.trim().toLowerCase() === log.color.trim().toLowerCase() &&
+             v.size.trim().toLowerCase() === log.size.trim().toLowerCase()
+      );
+      if (variant) {
+        variant.stock = Math.max(0, variant.stock + invertedDelta);
+        sanitized.stock = sanitized.variants!.reduce((sum, v) => sum + v.stock, 0);
+        restoredProduct = this.saveProduct(sanitized);
+      }
+    }
+
+    log.cancelled = true;
+
+    const cancelLog: InventoryLog = {
+      id: 'inv_cancel_' + Date.now(),
+      timestamp: new Date().toISOString(),
+      productId: log.productId,
+      productName: log.productName,
+      productImage: log.productImage,
+      color: log.color,
+      size: log.size,
+      delta: invertedDelta,
+      previousStock: log.newStock,
+      newStock: log.newStock + invertedDelta,
+      type: 'OFFLINE_SALE_CANCEL',
+      note: `Bekor qilindi: Log #${log.id.slice(-6)} (${log.productName} ${log.color} ${log.size})`,
+      operator: 'Admin',
+    };
+    this.data.inventoryLogs.unshift(cancelLog);
+    this.saveData();
+
+    return {
+      success: true,
+      message: `Sotuv muvaffaqiyatli bekor qilindi. ${log.productName} (${log.color}, ${log.size}) omborga qaytarildi.`,
+      restoredProduct,
+    };
+  }
+
+  getWarehouseStats(): WarehouseStats {
+    const products = this.data.products.map(p => this.sanitizeProduct(p));
+    const logs = this.data.inventoryLogs || [];
+    const orders = this.data.orders || [];
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+    let totalStockUnits = 0;
+    let outOfStockVariantsCount = 0;
+    let lowStockVariantsCount = 0;
+    const lowStockVariants: LowStockVariantInfo[] = [];
+    const outOfStockVariants: LowStockVariantInfo[] = [];
+
+    for (const prod of products) {
+      totalStockUnits += prod.stock;
+      if (prod.variants) {
+        for (const v of prod.variants) {
+          if (v.stock <= 0) {
+            outOfStockVariantsCount++;
+            outOfStockVariants.push({
+              productId: prod.id,
+              productName: prod.name,
+              productImage: prod.images[0] || '/banners/hero-banner-1.png',
+              color: v.color,
+              size: v.size,
+              stock: v.stock,
+              price: prod.price,
+            });
+          } else if (v.stock <= 2) {
+            lowStockVariantsCount++;
+            lowStockVariants.push({
+              productId: prod.id,
+              productName: prod.name,
+              productImage: prod.images[0] || '/banners/hero-banner-1.png',
+              color: v.color,
+              size: v.size,
+              stock: v.stock,
+              price: prod.price,
+            });
+          }
+        }
+      }
+    }
+
+    let todayOfflineSalesCount = 0;
+    let todayOfflineSalesRevenue = 0;
+    let monthlyOfflineRevenue = 0;
+
+    const productSalesMap = new Map<string, { name: string; quantity: number; revenue: number }>();
+    const sizeSalesMap = new Map<string, number>();
+    const colorSalesMap = new Map<string, number>();
+
+    for (const log of logs) {
+      if (log.type === 'OFFLINE_SALE' && !log.cancelled) {
+        const logTime = new Date(log.timestamp).getTime();
+        const salePrice = log.price || 0;
+        const count = Math.abs(log.delta);
+
+        if (logTime >= startOfToday) {
+          todayOfflineSalesCount += count;
+          todayOfflineSalesRevenue += salePrice * count;
+        }
+        if (logTime >= startOfMonth) {
+          monthlyOfflineRevenue += salePrice * count;
+        }
+
+        const pEntry = productSalesMap.get(log.productId) || { name: log.productName, quantity: 0, revenue: 0 };
+        pEntry.quantity += count;
+        pEntry.revenue += salePrice * count;
+        productSalesMap.set(log.productId, pEntry);
+
+        sizeSalesMap.set(log.size, (sizeSalesMap.get(log.size) || 0) + count);
+        colorSalesMap.set(log.color, (colorSalesMap.get(log.color) || 0) + count);
+      }
+    }
+
+    let todayOnlineSalesCount = 0;
+    let todayOnlineSalesRevenue = 0;
+    let monthlyOnlineRevenue = 0;
+
+    for (const order of orders) {
+      if (order.status !== 'BEKOR_QILINDI') {
+        const orderTime = new Date(order.createdAt).getTime();
+        const itemCount = order.items.reduce((s, it) => s + it.quantity, 0);
+
+        if (orderTime >= startOfToday) {
+          todayOnlineSalesCount += itemCount;
+          todayOnlineSalesRevenue += order.total;
+        }
+        if (orderTime >= startOfMonth) {
+          monthlyOnlineRevenue += order.total;
+        }
+
+        for (const item of order.items) {
+          const pEntry = productSalesMap.get(item.productId) || { name: item.productName, quantity: 0, revenue: 0 };
+          pEntry.quantity += item.quantity;
+          pEntry.revenue += item.totalPrice;
+          productSalesMap.set(item.productId, pEntry);
+
+          if (item.size) {
+            sizeSalesMap.set(item.size, (sizeSalesMap.get(item.size) || 0) + item.quantity);
+          }
+          if (item.color) {
+            colorSalesMap.set(item.color, (colorSalesMap.get(item.color) || 0) + item.quantity);
+          }
+        }
+      }
+    }
+
+    const topSellingProducts = Array.from(productSalesMap.entries())
+      .map(([productId, val]) => ({ productId, name: val.name, quantity: val.quantity, revenue: val.revenue }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 5);
+
+    const topSellingSizes = Array.from(sizeSalesMap.entries())
+      .map(([size, quantity]) => ({ size, quantity }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 6);
+
+    const topSellingColors = Array.from(colorSalesMap.entries())
+      .map(([color, quantity]) => ({ color, quantity }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 6);
+
+    return {
+      totalStockUnits,
+      totalProductsCount: products.length,
+      outOfStockVariantsCount,
+      lowStockVariantsCount,
+      todayOfflineSalesCount,
+      todayOfflineSalesRevenue,
+      todayOnlineSalesCount,
+      todayOnlineSalesRevenue,
+      totalTodayRevenue: todayOfflineSalesRevenue + todayOnlineSalesRevenue,
+      monthlyRevenue: monthlyOfflineRevenue + monthlyOnlineRevenue,
+      topSellingProducts,
+      topSellingSizes,
+      topSellingColors,
+      lowStockVariants: lowStockVariants.slice(0, 20),
+      outOfStockVariants: outOfStockVariants.slice(0, 20),
+    };
   }
 
   // Orders
@@ -889,6 +1418,121 @@ class Database {
         { label: 'Aprel', amount: 16500000 },
       ],
     };
+  }
+
+  // --- BRANCHES MANAGEMENT (Preserve branch architecture) ---
+
+  getBranches(): Branch[] {
+    if (!this.data.branches || this.data.branches.length === 0) {
+      this.data.branches = [
+        {
+          id: 'branch_central',
+          name: 'SHU BREND — Markaziy Filial & Do‘kon',
+          billzShopId: 'shop_tashkent_central',
+          address: 'Toshkent shahri, Mirobod tumani, Shahrisabz ko‘chasi, 12-uy',
+          phone: '+998 90 123 45 67',
+          isActive: true,
+          isCentral: true,
+          createdAt: new Date('2025-01-01').toISOString(),
+        },
+      ];
+      this.saveData();
+    }
+    return this.data.branches;
+  }
+
+  getBranchById(id: string): Branch | undefined {
+    return this.getBranches().find(b => b.id === id);
+  }
+
+  saveBranch(branch: Branch): Branch {
+    if (!this.data.branches) this.data.branches = [];
+    const idx = this.data.branches.findIndex(b => b.id === branch.id);
+    if (idx >= 0) {
+      this.data.branches[idx] = { ...this.data.branches[idx], ...branch };
+    } else {
+      this.data.branches.push(branch);
+    }
+    this.saveData();
+    return branch;
+  }
+
+  deleteBranch(id: string): boolean {
+    if (!this.data.branches) return false;
+    const initialLen = this.data.branches.length;
+    // Don't delete central branch if it's the only one
+    const target = this.data.branches.find(b => b.id === id);
+    if (target?.isCentral && this.data.branches.length === 1) {
+      return false;
+    }
+    this.data.branches = this.data.branches.filter(b => b.id !== id);
+    if (this.data.branches.length < initialLen) {
+      this.saveData();
+      return true;
+    }
+    return false;
+  }
+
+  // --- BILLZ INTEGRATION STORAGE & LOGS ---
+
+  getBillzConfig(): BillzStorageConfig {
+    if (!this.data.billzConfig) {
+      this.data.billzConfig = {
+        apiUrl: 'https://api-admin.billz.ai',
+        autoSyncEnabled: false,
+        syncIntervalMinutes: 60,
+        status: 'UNCONFIGURED',
+        centralShopId: 'shop_tashkent_central',
+        syncImages: true,
+        syncPrices: true,
+        syncStock: true,
+      };
+      this.saveData();
+    }
+    return this.data.billzConfig;
+  }
+
+  updateBillzConfig(config: Partial<BillzStorageConfig>): BillzStorageConfig {
+    const current = this.getBillzConfig();
+    this.data.billzConfig = {
+      ...current,
+      ...config,
+    };
+    this.saveData();
+    return this.data.billzConfig;
+  }
+
+  getBillzLogs(limit = 100): BillzSyncLog[] {
+    const logs = this.data.billzLogs || [];
+    return [...logs].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, limit);
+  }
+
+  addBillzLog(log: Omit<BillzSyncLog, 'id' | 'timestamp'>): BillzSyncLog {
+    if (!this.data.billzLogs) this.data.billzLogs = [];
+    const entry: BillzSyncLog = {
+      id: `blog_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      timestamp: new Date().toISOString(),
+      ...log,
+    };
+    this.data.billzLogs.unshift(entry);
+    if (this.data.billzLogs.length > 500) {
+      this.data.billzLogs = this.data.billzLogs.slice(0, 500);
+    }
+    this.saveData();
+    return entry;
+  }
+
+  findProductByBillzId(billzId: string): Product | undefined {
+    return this.data.products.find(p => p.billzId === billzId);
+  }
+
+  findProductBySkuOrBarcode(sku?: string, barcode?: string): Product | undefined {
+    if (!sku && !barcode) return undefined;
+    return this.data.products.find(p => {
+      if (sku && (p.sku === sku || p.variants?.some(v => v.sku === sku))) return true;
+      if (barcode && (p.barcode === barcode || p.variants?.some(v => v.barcode === barcode))) return true;
+      return false;
+    });
   }
 }
 

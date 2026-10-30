@@ -1,4 +1,21 @@
-import type { Banner, Category, Order, OrderStatus, PaymentStatus, PaymentTransaction, Product, Review, SiteSettings, User } from '../types/index.ts';
+import type {
+  Banner,
+  BillzSettings,
+  BillzSyncLog,
+  Branch,
+  Category,
+  InventoryActionType,
+  InventoryLog,
+  Order,
+  OrderStatus,
+  PaymentStatus,
+  PaymentTransaction,
+  Product,
+  Review,
+  SiteSettings,
+  User,
+  WarehouseStats,
+} from '../types/index.ts';
 
 export const api = {
   // Settings
@@ -47,8 +64,8 @@ export const api = {
   },
 
   // Categories
-  async getCategories(): Promise<Category[]> {
-    const res = await fetch('/api/categories');
+  async getCategories(includeHidden = false): Promise<Category[]> {
+    const res = await fetch(`/api/categories${includeHidden ? '?includeHidden=true' : ''}`);
     if (!res.ok) throw new Error('Kategoriyalarni yuklab bo‘lmadi');
     return res.json();
   },
@@ -58,12 +75,45 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(cat),
     });
-    if (!res.ok) throw new Error('Kategoriyani saqlab bo‘lmadi');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Kategoriyani saqlab bo‘lmadi');
+    }
     return res.json();
   },
-  async deleteCategory(id: string): Promise<void> {
-    const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Kategoriyani o‘chirib bo‘lmadi');
+  async updateCategory(id: string, cat: Partial<Category>): Promise<Category> {
+    const res = await fetch(`/api/categories/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cat),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Kategoriyani yangilab bo‘lmadi');
+    }
+    return res.json();
+  },
+  async deleteCategory(id: string, force = false): Promise<void> {
+    const res = await fetch(`/api/categories/${id}${force ? '?force=true' : ''}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      const error: any = new Error(err.error || 'Kategoriyani o‘chirib bo‘lmadi');
+      error.hasProducts = err.hasProducts;
+      error.productCount = err.productCount;
+      throw error;
+    }
+  },
+  async moveCategoryProducts(id: string, targetCategorySlug: string): Promise<{ success: boolean; movedCount: number }> {
+    const res = await fetch(`/api/categories/${id}/move-products`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetCategorySlug }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Mahsulotlarni ko‘chirib bo‘lmadi');
+    }
+    return res.json();
   },
 
   // Products
@@ -75,6 +125,7 @@ export const api = {
     size?: string;
     color?: string;
     sort?: string;
+    includeHidden?: boolean;
   }): Promise<Product[]> {
     const url = new URL('/api/products', window.location.origin);
     if (params) {
@@ -85,6 +136,7 @@ export const api = {
       if (params.size) url.searchParams.set('size', params.size);
       if (params.color) url.searchParams.set('color', params.color);
       if (params.sort) url.searchParams.set('sort', params.sort);
+      if (params.includeHidden) url.searchParams.set('includeHidden', 'true');
     }
     const res = await fetch(url.toString());
     if (!res.ok) throw new Error('Mahsulotlarni yuklab bo‘lmadi');
@@ -456,6 +508,198 @@ export const api = {
     });
     if (!res.ok) throw new Error('Profilni saqlab bo‘lmadi');
     return res.json();
+  },
+
+  // --- OMBOR (WAREHOUSE) ---
+  async getInventoryStats(): Promise<WarehouseStats> {
+    const res = await fetch('/api/inventory/stats');
+    if (!res.ok) throw new Error('Ombor statistikasini yuklab bo‘lmadi');
+    return res.json();
+  },
+  async getInventoryLogs(limit = 100): Promise<InventoryLog[]> {
+    const res = await fetch(`/api/inventory/logs?limit=${limit}`);
+    if (!res.ok) throw new Error('Ombor harakatlari tarixini yuklab bo‘lmadi');
+    return res.json();
+  },
+  async adjustInventoryStock(data: {
+    productId: string;
+    color: string;
+    size: string;
+    delta: number;
+    type?: InventoryActionType;
+    note?: string;
+    price?: number;
+    operator?: string;
+  }): Promise<{ success: boolean; product: Product; log: InventoryLog }> {
+    const res = await fetch('/api/inventory/adjust', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Ombor qoldig‘ini o‘zgartirib bo‘lmadi');
+    }
+    return res.json();
+  },
+  async setInventoryStock(data: {
+    productId: string;
+    color: string;
+    size: string;
+    stock: number;
+    type?: InventoryActionType;
+    note?: string;
+    operator?: string;
+  }): Promise<{ success: boolean; product: Product; log: InventoryLog }> {
+    const res = await fetch('/api/inventory/set-stock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Qoldiqni saqlab bo‘lmadi');
+    }
+    return res.json();
+  },
+  async addInventoryVariant(data: {
+    productId: string;
+    color: string;
+    size: string;
+    stock: number;
+  }): Promise<{ success: boolean; product: Product }> {
+    const res = await fetch('/api/inventory/add-variant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Variant qo‘shishda xatolik');
+    }
+    return res.json();
+  },
+  async cancelInventoryLog(logId: string): Promise<{ success: boolean; message: string; restoredProduct?: Product }> {
+    const res = await fetch(`/api/inventory/cancel-log/${logId}`, {
+      method: 'POST',
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Harakatni bekor qilib bo‘lmadi');
+    }
+    return res.json();
+  },
+
+  // --- BILLZ INTEGRATION ---
+  async getBillzSettings(): Promise<BillzSettings> {
+    const res = await fetch('/api/billz/settings');
+    if (!res.ok) throw new Error('BILLZ sozlamalarini yuklab bo‘lmadi');
+    return res.json();
+  },
+  async updateBillzSettings(data: {
+    apiUrl?: string;
+    apiKey?: string;
+    platformId?: string;
+    autoSyncEnabled?: boolean;
+    syncIntervalMinutes?: number;
+    centralShopId?: string;
+    syncImages?: boolean;
+    syncPrices?: boolean;
+    syncStock?: boolean;
+  }): Promise<{ success: boolean; message: string; settings: BillzSettings }> {
+    const res = await fetch('/api/billz/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'BILLZ sozlamalarini saqlab bo‘lmadi');
+    }
+    return res.json();
+  },
+  async testBillzConnection(data?: { apiUrl?: string; apiKey?: string; platformId?: string }): Promise<{
+    success: boolean;
+    status: string;
+    message: string;
+    statusCode?: number;
+    productsFound?: number;
+    error?: string;
+  }> {
+    const res = await fetch('/api/billz/test-connection', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data || {}),
+    });
+    return res.json();
+  },
+  async syncBillzProducts(): Promise<{
+    success: boolean;
+    message: string;
+    importedCount: number;
+    updatedCount: number;
+    skippedCount: number;
+    totalCatalogCount: number;
+    errors: string[];
+    durationMs: number;
+  }> {
+    const res = await fetch('/api/billz/sync-products', { method: 'POST' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || err.error || 'Sinxronizatsiyada xatolik yuz berdi');
+    }
+    return res.json();
+  },
+  async getBillzLogs(limit = 100): Promise<BillzSyncLog[]> {
+    const res = await fetch(`/api/billz/logs?limit=${limit}`);
+    if (!res.ok) throw new Error('BILLZ jurnallarini yuklab bo‘lmadi');
+    return res.json();
+  },
+  async syncOrderToBillz(orderId: string): Promise<{ success: boolean; billzSaleId?: string; message: string }> {
+    const res = await fetch(`/api/billz/sync-order/${orderId}`, { method: 'POST' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Buyurtmani BILLZ ga uzatib bo‘lmadi');
+    }
+    return res.json();
+  },
+
+  // --- BRANCHES ---
+  async getBranches(): Promise<Branch[]> {
+    const res = await fetch('/api/branches');
+    if (!res.ok) throw new Error('Filiallarni yuklab bo‘lmadi');
+    return res.json();
+  },
+  async createBranch(branch: Partial<Branch>): Promise<Branch> {
+    const res = await fetch('/api/branches', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(branch),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Filialni saqlab bo‘lmadi');
+    }
+    return res.json();
+  },
+  async updateBranch(id: string, branch: Partial<Branch>): Promise<Branch> {
+    const res = await fetch(`/api/branches/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(branch),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Filialni yangilab bo‘lmadi');
+    }
+    return res.json();
+  },
+  async deleteBranch(id: string): Promise<void> {
+    const res = await fetch(`/api/branches/${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Filialni o‘chirib bo‘lmadi');
+    }
   },
 };
 

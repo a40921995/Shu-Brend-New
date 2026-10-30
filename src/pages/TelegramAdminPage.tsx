@@ -26,7 +26,8 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api.ts';
 import { useApp } from '../context/AppContext.tsx';
-import type { Order, OrderStatus, PaymentStatus } from '../types/index.ts';
+import { AdminInventoryManager } from '../components/AdminInventoryManager.tsx';
+import type { Order, OrderStatus, PaymentStatus, Product } from '../types/index.ts';
 
 // Declare Telegram WebApp global interface
 declare global {
@@ -72,6 +73,8 @@ export const TelegramAdminPage: React.FC = () => {
   const { user, adminLogin, logout, setActiveTab, showToast } = useApp();
 
   const [orders, setOrders] = useState<Order[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [mobileTab, setMobileTab] = useState<'orders' | 'inventory'>('orders');
   const [stats, setStats] = useState<any>(null);
   const [tgStatus, setTgStatus] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -106,14 +109,16 @@ export const TelegramAdminPage: React.FC = () => {
   const loadData = async () => {
     try {
       setRefreshing(true);
-      const [fetchedOrders, fetchedStats, fetchedTg] = await Promise.all([
+      const [fetchedOrders, fetchedStats, fetchedTg, fetchedProducts] = await Promise.all([
         api.getOrders(),
         api.getAdminStats().catch(() => null),
         api.getTelegramStatus().catch(() => null),
+        api.getProducts().catch(() => []),
       ]);
       setOrders(fetchedOrders);
       setStats(fetchedStats);
       setTgStatus(fetchedTg);
+      setProducts(fetchedProducts);
     } catch (err: any) {
       console.error('Failed to load Telegram Admin data:', err);
       showToast(err.message || 'Ma‘lumotlarni yuklashda xatolik', 'error');
@@ -360,10 +365,47 @@ export const TelegramAdminPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="max-w-2xl mx-auto px-4 py-4 space-y-4">
-        {/* Quick Stats Grid */}
-        <div className="grid grid-cols-3 gap-2.5">
+      {/* Mobile Top Tabs: Buyurtmalar vs OMBOR */}
+      <div className="max-w-2xl mx-auto px-4 pt-3">
+        <div className="grid grid-cols-2 gap-2 bg-[#0e131f] p-1.5 rounded-2xl border border-slate-800">
+          <button
+            onClick={() => setMobileTab('orders')}
+            className={`py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+              mobileTab === 'orders'
+                ? 'gold-gradient-bg text-black shadow font-black'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>Buyurtmalar ({orders.length})</span>
+          </button>
+          <button
+            onClick={() => setMobileTab('inventory')}
+            className={`py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+              mobileTab === 'inventory'
+                ? 'gold-gradient-bg text-black shadow font-black'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            <span>📦 OMBOR ({products.length})</span>
+          </button>
+        </div>
+      </div>
+
+      {mobileTab === 'inventory' ? (
+        <div className="max-w-2xl mx-auto px-4 py-3">
+          <AdminInventoryManager
+            products={products}
+            onRefresh={loadData}
+            showToast={showToast}
+          />
+        </div>
+      ) : (
+        /* Main Content Area */
+        <main className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-3 gap-2.5">
           <div className="bg-[#0e131f] border border-slate-800 rounded-xl p-3">
             <div className="text-[11px] text-slate-400">Yangi</div>
             <div className="text-xl font-extrabold text-amber-400 mt-0.5">
@@ -571,6 +613,7 @@ export const TelegramAdminPage: React.FC = () => {
           </div>
         )}
       </main>
+      )}
 
       {/* Floating Bottom Quick Action Bar for Mini App */}
       <nav className="fixed bottom-0 inset-x-0 bg-[#0e131f]/95 backdrop-blur-md border-t border-slate-800 px-4 py-2.5 z-40">

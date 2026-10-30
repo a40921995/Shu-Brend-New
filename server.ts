@@ -6,7 +6,8 @@ import { fileURLToPath } from 'node:url';
 import multer from 'multer';
 import { db } from './server/db.ts';
 import { decryptSecret, encryptSecret, hashPassword, maskToken, verifyPassword } from './server/security.ts';
-import type { Banner, Category, Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus, PaymentTransaction, Product, Review, User } from './src/types/index.ts';
+import { billzService } from './server/billz.ts';
+import type { Banner, Branch, Category, Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus, PaymentTransaction, Product, Review, User } from './src/types/index.ts';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -178,32 +179,66 @@ app.delete('/api/banners/:id', (req: Request, res: Response) => {
 });
 
 // Categories
-app.get('/api/categories', (_req: Request, res: Response) => {
-  res.json(db.getCategories());
+app.get('/api/categories', (req: Request, res: Response) => {
+  const includeHidden = req.query.includeHidden === 'true';
+  res.json(db.getCategories(includeHidden));
 });
 
 app.post('/api/categories', (req: Request, res: Response) => {
-  const slug = req.body.slug || req.body.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const name = String(req.body.name || '').trim();
+  if (!name) return res.status(400).json({ error: 'Kategoriya nomi kiritilishi shart' });
+  const slug = req.body.slug ? String(req.body.slug).trim() : name.toLowerCase().replace(/[^a-z0-9]/g, '-');
   const newCat: Category = {
     id: 'cat_' + Date.now(),
-    name: req.body.name,
+    name,
     slug,
-    imageUrl: req.body.imageUrl,
-    sortOrder: Number(req.body.sortOrder) || db.getCategories().length + 1,
+    imageUrl: req.body.imageUrl || '',
+    sortOrder: Number(req.body.sortOrder) || db.getCategories(true).length + 1,
+    isHidden: Boolean(req.body.isHidden),
   };
   const saved = db.saveCategory(newCat);
   res.status(201).json(saved);
 });
 
 app.put('/api/categories/:id', (req: Request, res: Response) => {
-  const cat = db.getCategories().find(c => c.id === req.params.id);
+  const cat = db.getCategories(true).find(c => c.id === req.params.id);
   if (!cat) return res.status(404).json({ error: 'Kategoriya topilmadi' });
-  const updated: Category = { ...cat, ...req.body };
+  const updated: Category = {
+    ...cat,
+    name: req.body.name !== undefined ? String(req.body.name).trim() : cat.name,
+    slug: req.body.slug !== undefined ? String(req.body.slug).trim() : cat.slug,
+    imageUrl: req.body.imageUrl !== undefined ? req.body.imageUrl : cat.imageUrl,
+    sortOrder: req.body.sortOrder !== undefined ? Number(req.body.sortOrder) : cat.sortOrder,
+    isHidden: req.body.isHidden !== undefined ? Boolean(req.body.isHidden) : cat.isHidden,
+  };
   db.saveCategory(updated);
   res.json(updated);
 });
 
+app.post('/api/categories/:id/move-products', (req: Request, res: Response) => {
+  const { targetCategorySlug } = req.body;
+  const sourceCat = db.getCategories(true).find(c => c.id === req.params.id);
+  if (!sourceCat) return res.status(404).json({ error: 'Asosiy kategoriya topilmadi' });
+  const targetCat = db.getCategories(true).find(c => c.slug === targetCategorySlug);
+  if (!targetCat) return res.status(400).json({ error: 'Ko‘chiriladigan target kategoriya topilmadi' });
+
+  const movedCount = db.moveProductsCategory(sourceCat.slug, targetCat.slug, targetCat.name);
+  res.json({ success: true, movedCount });
+});
+
 app.delete('/api/categories/:id', (req: Request, res: Response) => {
+  const cat = db.getCategories(true).find(c => c.id === req.params.id);
+  if (!cat) return res.status(404).json({ error: 'Kategoriya topilmadi' });
+
+  const productsInCat = db.getProducts().filter(p => p.categorySlug === cat.slug);
+  if (productsInCat.length > 0 && req.query.force !== 'true') {
+    return res.status(400).json({
+      error: `Ushbu kategoriyada ${productsInCat.length} ta mahsulot mavjud! Mahsulotlar yo‘qolib ketmasligi uchun avval ularni boshqa kategoriyaga o‘tkazing yoki kategoriyani vaqtincha yashiring.`,
+      productCount: productsInCat.length,
+      hasProducts: true
+    });
+  }
+
   db.deleteCategory(req.params.id);
   res.json({ success: true });
 });
@@ -212,7 +247,13 @@ app.delete('/api/categories/:id', (req: Request, res: Response) => {
 app.get('/api/products', (req: Request, res: Response) => {
   let products = db.getProducts();
 
-  const { category, search, minPrice, maxPrice, size, color, sort } = req.query;
+  const { category, search, minPrice, maxPrice, size, color, sort, includeHidden } = req.query;
+
+  // For customer views (when includeHidden !== 'true'), hide products from hidden seasonal categories
+  if (includeHidden !== 'true') {
+    const hiddenSlugs = new Set(db.getCategories(true).filter(c => c.isHidden).map(c => c.slug));
+    products = products.filter(p => !hiddenSlugs.has(p.categorySlug));
+  }
 
   if (category && category !== 'all') {
     products = products.filter(p => p.categorySlug === category);
@@ -261,6 +302,10 @@ app.get('/api/products', (req: Request, res: Response) => {
 app.get('/api/products/:id', (req: Request, res: Response) => {
   const prod = db.getProductById(req.params.id);
   if (!prod) return res.status(404).json({ error: 'Mahsulot topilmadi' });
+  const isHiddenCat = db.getCategories(true).some(c => c.slug === prod.categorySlug && c.isHidden);
+  if (isHiddenCat && req.query.includeHidden !== 'true') {
+    return res.status(404).json({ error: 'Ushbu mahsulot hozirgi mavsumda onlayn sotuvga yopiq' });
+  }
   res.json(prod);
 });
 
@@ -353,6 +398,224 @@ app.delete('/api/products/:id', (req: Request, res: Response) => {
 app.delete('/api/products-clear-all', (_req: Request, res: Response) => {
   db.clearAllProducts();
   res.json({ success: true, message: 'Barcha mahsulotlar muvaffaqiyatli o‘chirildi' });
+});
+
+// --- OMBOR (WAREHOUSE & INVENTORY) API ENDPOINTS ---
+
+app.get('/api/inventory/stats', (_req: Request, res: Response) => {
+  try {
+    const stats = db.getWarehouseStats();
+    res.json(stats);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Ombor statistikasini olishda xatolik: ' + err.message });
+  }
+});
+
+app.get('/api/inventory/logs', (req: Request, res: Response) => {
+  try {
+    const limit = Math.min(500, Math.max(1, Number(req.query.limit) || 100));
+    const logs = db.getInventoryLogs(limit);
+    res.json(logs);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Ombor harakatlari tarixini olishda xatolik: ' + err.message });
+  }
+});
+
+app.post('/api/inventory/adjust', (req: Request, res: Response) => {
+  try {
+    const { productId, color, size, delta, type, note, price, operator } = req.body;
+    if (!productId || !color || !size || delta === undefined) {
+      return res.status(400).json({ error: 'Mahsulot ID, rang, razmer va soni (delta) talab qilinadi' });
+    }
+
+    const numDelta = Number(delta);
+    if (isNaN(numDelta) || numDelta === 0) {
+      return res.status(400).json({ error: 'O‘zgarish soni nol bo‘lmagan raqam bo‘lishi kerak' });
+    }
+
+    const actionType = type || (numDelta < 0 ? 'OFFLINE_SALE' : 'RESTOCK');
+    const result = db.adjustVariantStock(
+      productId,
+      String(color).trim(),
+      String(size).trim(),
+      numDelta,
+      actionType,
+      note,
+      price ? Number(price) : undefined,
+      operator || 'Admin'
+    );
+
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Ombor qoldig‘ini o‘zgartirib bo‘lmadi' });
+  }
+});
+
+app.post('/api/inventory/set-stock', (req: Request, res: Response) => {
+  try {
+    const { productId, color, size, stock, type, note, operator } = req.body;
+    if (!productId || !color || !size || stock === undefined) {
+      return res.status(400).json({ error: 'Mahsulot ID, rang, razmer va qoldiq soni talab qilinadi' });
+    }
+
+    const numStock = Number(stock);
+    if (isNaN(numStock) || numStock < 0) {
+      return res.status(400).json({ error: 'Qoldiq soni manfiy bo‘lmasligi kerak' });
+    }
+
+    const result = db.setVariantStock(
+      productId,
+      String(color).trim(),
+      String(size).trim(),
+      numStock,
+      type || 'MANUAL_ADJUST',
+      note,
+      operator || 'Admin'
+    );
+
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Qoldiqni saqlab bo‘lmadi' });
+  }
+});
+
+app.post('/api/inventory/add-variant', (req: Request, res: Response) => {
+  try {
+    const { productId, color, size, stock } = req.body;
+    if (!productId || !color || !size) {
+      return res.status(400).json({ error: 'Mahsulot ID, rang va razmer talab qilinadi' });
+    }
+
+    const numStock = Math.max(0, Number(stock) || 0);
+    const updated = db.addVariant(productId, String(color).trim(), String(size).trim(), numStock);
+    res.json({ success: true, product: updated });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Variant qo‘shishda xatolik' });
+  }
+});
+
+app.post('/api/inventory/cancel-log/:id', (req: Request, res: Response) => {
+  try {
+    const result = db.cancelInventoryLog(req.params.id);
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message || 'Harakatni bekor qilib bo‘lmadi' });
+  }
+});
+
+// --- BILLZ INTEGRATION API ENDPOINTS ---
+
+app.get('/api/billz/settings', (_req: Request, res: Response) => {
+  try {
+    const settings = billzService.getPublicSettings();
+    res.json(settings);
+  } catch (err: any) {
+    res.status(500).json({ error: 'BILLZ sozlamalarini olishda xatolik: ' + err.message });
+  }
+});
+
+app.put('/api/billz/settings', (req: Request, res: Response) => {
+  try {
+    const updated = billzService.updateSettings(req.body);
+    res.json({ success: true, message: 'BILLZ sozlamalari muvaffaqiyatli saqlandi', settings: updated });
+  } catch (err: any) {
+    res.status(400).json({ error: 'BILLZ sozlamalarini saqlashda xatolik: ' + err.message });
+  }
+});
+
+app.post('/api/billz/test-connection', async (req: Request, res: Response) => {
+  try {
+    const result = await billzService.testConnection(req.body);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, status: 'ERROR', message: err.message });
+  }
+});
+
+app.post('/api/billz/sync-products', async (_req: Request, res: Response) => {
+  try {
+    const result = await billzService.syncProducts();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message, errors: [err.message] });
+  }
+});
+
+app.get('/api/billz/logs', (req: Request, res: Response) => {
+  try {
+    const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
+    const logs = db.getBillzLogs(limit);
+    res.json(logs);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/billz/sync-order/:id', async (req: Request, res: Response) => {
+  const order = db.getOrderById(req.params.id);
+  if (!order) return res.status(404).json({ error: 'Buyurtma topilmadi' });
+  try {
+    const result = await billzService.syncSaleOrder(order);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- BRANCHES MANAGEMENT API ENDPOINTS ---
+
+app.get('/api/branches', (_req: Request, res: Response) => {
+  try {
+    res.json(db.getBranches());
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/branches', (req: Request, res: Response) => {
+  try {
+    const { name, billzShopId, address, phone, isCentral } = req.body;
+    if (!name || !address) {
+      return res.status(400).json({ error: 'Filial nomi va manzili kiritilishi shart' });
+    }
+    const newBranch: Branch = {
+      id: `branch_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: String(name).trim(),
+      billzShopId: billzShopId ? String(billzShopId).trim() : undefined,
+      address: String(address).trim(),
+      phone: phone ? String(phone).trim() : undefined,
+      isActive: true,
+      isCentral: Boolean(isCentral),
+      createdAt: new Date().toISOString(),
+    };
+    db.saveBranch(newBranch);
+    res.status(201).json(newBranch);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/branches/:id', (req: Request, res: Response) => {
+  try {
+    const existing = db.getBranchById(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Filial topilmadi' });
+    const updated = db.saveBranch({ ...existing, ...req.body, id: existing.id });
+    res.json(updated);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/branches/:id', (req: Request, res: Response) => {
+  try {
+    const success = db.deleteBranch(req.params.id);
+    if (!success) {
+      return res.status(400).json({ error: 'Yagona markaziy filialni o‘chirib bo‘lmaydi' });
+    }
+    res.json({ success: true, message: 'Filial muvaffaqiyatli o‘chirildi' });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 // Orders
@@ -706,7 +969,46 @@ app.post('/api/orders', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Iltimos, ism, telefon va buyurtma mahsulotlarini kiriting' });
   }
 
-  // Calculate pricing & freeze prices in OrderItem
+  // Validate that items do not belong to seasonally hidden categories
+  const hiddenSlugs = new Set(db.getCategories(true).filter(c => c.isHidden).map(c => c.slug));
+  for (const item of items) {
+    const product = db.getProductById(item.productId);
+    if (product && hiddenSlugs.has(product.categorySlug)) {
+      return res.status(400).json({
+        error: `"${product.name}" mahsuloti hozirgi mavsumda onlayn sotuvga yopiq!`
+      });
+    }
+  }
+
+  // 1. Validate available stock per color and size variant before proceeding
+  for (const item of items) {
+    const product = db.getProductById(item.productId);
+    if (product) {
+      const sanitized = db.sanitizeProduct(product);
+      const chosenColor = (item.color || sanitized.colors[0] || 'Qora').trim();
+      const chosenSize = (item.size || sanitized.sizes[0] || 'L').trim();
+      const qty = Math.max(1, Number(item.quantity) || 1);
+
+      const variant = sanitized.variants?.find(
+        v => v.color.trim().toLowerCase() === chosenColor.toLowerCase() &&
+             v.size.trim().toLowerCase() === chosenSize.toLowerCase()
+      );
+
+      const availableStock = variant !== undefined ? variant.stock : sanitized.stock;
+      if (availableStock < qty) {
+        return res.status(400).json({
+          error: `"${product.name}" (${chosenColor}, ${chosenSize}) omborda yetarli emas! Omborda mavjud: ${availableStock} ta, siz so‘ragan: ${qty} ta.`
+        });
+      }
+    }
+  }
+
+  const existingOrders = db.getOrders();
+  const nextNumber = existingOrders.length > 0
+    ? '#' + (1020 + existingOrders.length)
+    : '#1025';
+
+  // 2. Calculate pricing & freeze prices in OrderItem, then safely deduct from warehouse
   let subtotal = 0;
   const processedItems: OrderItem[] = [];
 
@@ -717,30 +1019,40 @@ app.post('/api/orders', async (req: Request, res: Response) => {
     const itemTotal = unitPrice * qty;
     subtotal += itemTotal;
 
+    const chosenColor = item.color || (product ? product.colors[0] : 'Qora');
+    const chosenSize = item.size || (product ? product.sizes[0] : 'L');
+
     processedItems.push({
       id: 'item_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
       productId: item.productId,
       productName: product ? product.name : (item.productName || 'Kiyim'),
       productImage: product && product.images[0] ? product.images[0] : (item.productImage || '/banners/hero-banner-1.png'),
       categoryName: product ? product.categoryName : (item.categoryName || 'Erkaklar kiyimi'),
-      size: item.size || 'L',
-      color: item.color || 'Qora',
+      size: chosenSize,
+      color: chosenColor,
       quantity: qty,
       unitPrice,
       totalPrice: itemTotal,
     });
 
-    // Reduce stock safely
+    // Safely deduct from unified warehouse variant & record log
     if (product) {
-      product.stock = Math.max(0, product.stock - qty);
-      db.saveProduct(product);
+      try {
+        db.adjustVariantStock(
+          item.productId,
+          chosenColor,
+          chosenSize,
+          -qty,
+          'ONLINE_ORDER_RESERVED',
+          `Onlayn buyurtma ${nextNumber} uchun band qilindi`,
+          unitPrice,
+          customerName
+        );
+      } catch (err: any) {
+        console.warn('Ombor zaxirasini kamaytirishda ogohlantirish:', err.message);
+      }
     }
   }
-
-  const existingOrders = db.getOrders();
-  const nextNumber = existingOrders.length > 0
-    ? '#' + (1020 + existingOrders.length)
-    : '#1025';
 
   const selectedPaymentMethod: PaymentMethod =
     paymentMethod === 'PAYNET_CARD'
@@ -797,6 +1109,8 @@ const handleUpdateOrderStatus = (req: Request, res: Response) => {
   const order = db.getOrderById(req.params.id);
   if (!order) return res.status(404).json({ error: 'Buyurtma topilmadi' });
 
+  const oldStatus = order.status;
+
   if (status) {
     order.status = status as OrderStatus;
     order.statusHistory.push({
@@ -804,6 +1118,44 @@ const handleUpdateOrderStatus = (req: Request, res: Response) => {
       changedAt: new Date().toISOString(),
       comment: comment || `Holat o‘zgartirildi: ${status}`,
     });
+
+    // If order is cancelled, return reserved items back to warehouse
+    if (status === 'BEKOR_QILINDI' && oldStatus !== 'BEKOR_QILINDI') {
+      for (const it of order.items) {
+        try {
+          db.adjustVariantStock(
+            it.productId,
+            it.color,
+            it.size,
+            it.quantity,
+            'ONLINE_ORDER_CANCELLED',
+            `Buyurtma ${order.orderNumber} bekor qilingani sababli omborga qaytarildi`,
+            it.unitPrice,
+            'Admin'
+          );
+        } catch (err: any) {
+          console.warn('Omborga mahsulotni qaytarishda ogohlantirish:', err.message);
+        }
+      }
+    } else if (oldStatus === 'BEKOR_QILINDI' && status !== 'BEKOR_QILINDI') {
+      // Re-activated order from cancelled, re-reserve items
+      for (const it of order.items) {
+        try {
+          db.adjustVariantStock(
+            it.productId,
+            it.color,
+            it.size,
+            -it.quantity,
+            'ONLINE_ORDER_RESERVED',
+            `Buyurtma ${order.orderNumber} qayta tiklangani sababli band qilindi`,
+            it.unitPrice,
+            'Admin'
+          );
+        } catch (err: any) {
+          console.warn('Mahsulotni qayta band qilishda ogohlantirish:', err.message);
+        }
+      }
+    }
   }
 
   if (paymentStatus) {
@@ -812,6 +1164,14 @@ const handleUpdateOrderStatus = (req: Request, res: Response) => {
 
   order.updatedAt = new Date().toISOString();
   db.saveOrder(order);
+
+  // Sync sale to BILLZ upon order confirmation if not already synced
+  if ((status === 'TASDIQLANDI' || status === 'TAYYORLANMOQDA' || status === 'YETKAZILDI') && !order.billzSaleId) {
+    billzService.syncSaleOrder(order).catch((syncErr) => {
+      console.warn('BILLZ auto-sync sale error:', syncErr.message);
+    });
+  }
+
   res.json(order);
 };
 
@@ -1479,14 +1839,18 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Telefon raqam va parol kiritilmadi' });
   }
 
-  // Check admin shortcut or phone
+  // Check admin username or phone with secure password verification
   const cleanPhone = phone.replace(/\D/g, '');
-  if ((phone === 'admin' || cleanPhone === '998901234567') && (password === 'admin' || password === 'admin123' || password === 'password123')) {
-    const adminUser = db.getUsers().find(u => u.role === 'ADMIN') || db.getUsers()[0];
-    return res.json({
-      user: adminUser,
-      token: 'admin-session-token-' + Date.now(),
-    });
+  const sec = db.getAdminSecurity();
+  const validAdminIdentifiers = [sec.username.toLowerCase(), 'admin', 'shubrend_admin', '998901234567'];
+  if (validAdminIdentifiers.includes(phone.toLowerCase()) || validAdminIdentifiers.includes(cleanPhone)) {
+    if (verifyPassword(password, sec.passwordHash)) {
+      const adminUser = db.getUsers().find(u => u.role === 'ADMIN') || db.getUsers()[0];
+      return res.json({
+        user: adminUser,
+        token: `admin-token-v${sec.sessionTokenVersion || 1}-${Date.now()}`,
+      });
+    }
   }
 
   const user = db.getUserByPhone(phone);

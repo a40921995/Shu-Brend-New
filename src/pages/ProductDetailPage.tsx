@@ -163,9 +163,23 @@ export const ProductDetailPage: React.FC = () => {
             <img
               src={product.images[activeImageIdx] || product.images[0]}
               alt={product.name}
-              className="w-full h-full object-cover object-center transition-all duration-300"
+              className={`w-full h-full object-cover object-center transition-all duration-300 ${
+                product.stock <= 0 ? 'grayscale-[35%] opacity-85' : ''
+              }`}
             />
-            {product.discountPrice && (
+            {/* Out of stock overlay banner */}
+            {product.stock <= 0 && (
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
+                <div className="bg-rose-600/95 text-white px-5 py-2.5 rounded-2xl font-black text-base sm:text-lg tracking-wider shadow-2xl border border-rose-400/40 flex items-center gap-2">
+                  <span className="text-xl">❌</span>
+                  <span>SOTUVDA YO‘Q</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-xs font-medium">
+                  Ushbu mahsulot barcha rang va o‘lchamlarda vaqtincha tugadi. Yangi partiya keltirilganda sotuvga chiqadi.
+                </p>
+              </div>
+            )}
+            {product.discountPrice && product.stock > 0 && (
               <span className="absolute top-4 left-4 px-3 py-1 rounded-xl text-xs font-black bg-rose-600 text-white shadow-lg">
                 -{Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}% CHEGIRMA
               </span>
@@ -212,21 +226,49 @@ export const ProductDetailPage: React.FC = () => {
                   Rang: <strong className="text-white">{selectedColor}</strong>
                 </span>
               </div>
-              <div className="flex items-center gap-2.5">
-                {product.colors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                      selectedColor === color
-                        ? 'gold-gradient-bg text-black shadow'
-                        : 'bg-slate-900 text-slate-300 border border-slate-700 hover:bg-slate-800'
-                    }`}
-                  >
-                    {selectedColor === color && <Check className="w-3.5 h-3.5" />}
-                    <span>{color}</span>
-                  </button>
-                ))}
+              <div className="flex flex-wrap items-center gap-2.5">
+                {product.colors.map((color) => {
+                  const colorHasStock = !product.variants || product.variants.length === 0
+                    ? product.stock > 0
+                    : product.variants.some(
+                        v => v.color.trim().toLowerCase() === color.trim().toLowerCase() && v.stock > 0
+                      );
+
+                  return (
+                    <button
+                      key={color}
+                      onClick={() => {
+                        setSelectedColor(color);
+                        // Auto-select first available size in this color if current size is 0 stock
+                        if (product.variants && product.variants.length > 0) {
+                          const currV = product.variants.find(
+                            v => v.color.trim().toLowerCase() === color.trim().toLowerCase() &&
+                                 v.size.trim().toLowerCase() === selectedSize.trim().toLowerCase()
+                          );
+                          if (!currV || currV.stock <= 0) {
+                            const firstAvail = product.variants.find(
+                              v => v.color.trim().toLowerCase() === color.trim().toLowerCase() && v.stock > 0
+                            );
+                            if (firstAvail) setSelectedSize(firstAvail.size);
+                          }
+                        }
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                        selectedColor === color
+                          ? 'gold-gradient-bg text-black shadow'
+                          : !colorHasStock
+                          ? 'bg-slate-900/60 text-slate-500 border border-rose-900/50'
+                          : 'bg-slate-900 text-slate-300 border border-slate-700 hover:bg-slate-800'
+                      }`}
+                    >
+                      {selectedColor === color && <Check className="w-3.5 h-3.5" />}
+                      <span>{color}</span>
+                      {!colorHasStock && (
+                        <span className="text-[10px] text-rose-500 font-extrabold" title="Ushbu rang barcha razmerlarda tugagan">❌</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -243,69 +285,201 @@ export const ProductDetailPage: React.FC = () => {
                   O‘lcham jadvali
                 </button>
               </div>
-              <div className="grid grid-cols-5 gap-2">
-                {product.sizes.map((sz) => (
-                  <button
-                    key={sz}
-                    onClick={() => setSelectedSize(sz)}
-                    className={`py-2.5 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
-                      selectedSize === sz
-                        ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/30 scale-102'
-                        : 'bg-slate-900 text-slate-200 border border-slate-700 hover:bg-slate-800'
-                    }`}
-                  >
-                    {sz}
-                  </button>
-                ))}
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                {product.sizes.map((sz) => {
+                  const variant = product.variants?.find(
+                    v => v.size.trim().toLowerCase() === sz.trim().toLowerCase() &&
+                         v.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()
+                  );
+                  const szStock = variant !== undefined ? variant.stock : product.stock;
+                  const isAvailable = szStock > 0;
+
+                  return (
+                    <button
+                      key={sz}
+                      disabled={!isAvailable}
+                      onClick={() => {
+                        if (isAvailable) {
+                          setSelectedSize(sz);
+                          setQuantity(1);
+                        }
+                      }}
+                      className={`relative py-2.5 px-2 rounded-xl text-xs font-bold transition flex flex-col items-center justify-center gap-0.5 ${
+                        !isAvailable
+                          ? 'bg-slate-900/40 text-slate-500 border border-rose-900/40 cursor-not-allowed opacity-75'
+                          : selectedSize === sz
+                          ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/30 scale-102 cursor-pointer font-black'
+                          : 'bg-slate-900 text-slate-200 border border-slate-700 hover:bg-slate-800 cursor-pointer'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span className={!isAvailable ? 'line-through text-slate-400' : ''}>{sz}</span>
+                        {!isAvailable && <span className="text-[10px] text-rose-500 font-bold">❌</span>}
+                      </div>
+                      <span className={`text-[9px] ${!isAvailable ? 'text-rose-400' : selectedSize === sz ? 'text-black/80 font-bold' : 'text-slate-400'}`}>
+                        {isAvailable ? `${szStock} ta` : 'Tugagan'}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
+            {/* Live Variant Stock Status Box */}
+            {(() => {
+              const currentVariant = product.variants?.find(
+                v => v.size.trim().toLowerCase() === selectedSize.trim().toLowerCase() &&
+                     v.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()
+              );
+              const activeStock = currentVariant !== undefined ? currentVariant.stock : product.stock;
+              const hasStock = activeStock > 0;
+
+              return (
+                <div className={`mt-5 p-3 rounded-xl border flex items-center justify-between text-xs transition ${
+                  hasStock
+                    ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300'
+                    : 'bg-rose-950/20 border-rose-800/50 text-rose-300'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${hasStock ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
+                    <span>
+                      Omborda mavjud ({selectedColor}, {selectedSize}):
+                    </span>
+                  </div>
+                  <div className="font-extrabold flex items-center gap-1 text-sm">
+                    {hasStock ? (
+                      <span className="text-emerald-400">{activeStock} ta</span>
+                    ) : (
+                      <span className="text-rose-400 flex items-center gap-1 font-bold">
+                        <span>❌</span>
+                        <span>Tugagan (0 ta)</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Product Identifiers & Branch info (SKU, Barcode, Brand) */}
+            {(product.sku || product.barcode || product.brand || product.billzId) && (
+              <div className="mt-3 py-2 px-3 rounded-xl bg-slate-900/40 border border-slate-800/60 flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                {product.brand && (
+                  <span>Brend: <strong className="text-slate-200">{product.brand}</strong></span>
+                )}
+                {product.sku && (
+                  <span>Artikul / SKU: <code className="text-amber-300 font-mono">{product.sku}</code></span>
+                )}
+                {product.barcode && (
+                  <span>Shtrix-kod: <code className="text-slate-300 font-mono">{product.barcode}</code></span>
+                )}
+                <span className="text-emerald-400/90 font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                  Markaziy filialda mavjud
+                </span>
+              </div>
+            )}
 
             {/* Quantity selector */}
-            <div className="mt-6 flex items-center gap-4">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                Miqdor:
-              </span>
-              <div className="flex items-center bg-slate-900 rounded-xl border border-slate-700 p-1">
-                <button
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="w-10 text-center font-bold text-sm text-white">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+            {(() => {
+              const currentVariant = product.variants?.find(
+                v => v.size.trim().toLowerCase() === selectedSize.trim().toLowerCase() &&
+                     v.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()
+              );
+              const maxAvailable = currentVariant !== undefined ? currentVariant.stock : product.stock;
+              const canOrder = maxAvailable > 0;
+
+              return (
+                <div className="mt-5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                      Miqdor:
+                    </span>
+                    <div className="flex items-center bg-slate-900 rounded-xl border border-slate-700 p-1">
+                      <button
+                        disabled={!canOrder || quantity <= 1}
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-10 text-center font-bold text-sm text-white">
+                        {quantity}
+                      </span>
+                      <button
+                        disabled={!canOrder || quantity >= maxAvailable}
+                        onClick={() => {
+                          if (quantity < maxAvailable) {
+                            setQuantity((q) => q + 1);
+                          } else {
+                            showToast(`Omborda faqat ${maxAvailable} ta mahsulot mavjud!`, 'info');
+                          }
+                        }}
+                        className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {canOrder && (
+                    <span className="text-[11px] text-slate-400">
+                      Maksimal: {maxAvailable} ta
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Add to Cart & Favorite CTAs */}
-            <div className="mt-8 flex items-center gap-3">
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 py-4 rounded-xl gold-gradient-bg text-black font-extrabold text-sm sm:text-base tracking-wider uppercase shadow-xl shadow-[#d4af37]/20 hover:brightness-110 active:scale-98 transition flex items-center justify-center gap-2.5 cursor-pointer"
-              >
-                <ShoppingBag className="w-5 h-5 stroke-[2.3]" />
-                <span>Savatga qo‘shish</span>
-              </button>
+            {(() => {
+              const currentVariant = product.variants?.find(
+                v => v.size.trim().toLowerCase() === selectedSize.trim().toLowerCase() &&
+                     v.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()
+              );
+              const maxAvailable = currentVariant !== undefined ? currentVariant.stock : product.stock;
+              const canOrder = maxAvailable > 0;
 
-              <button
-                onClick={() => toggleFavorite(product.id)}
-                className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-white hover:bg-slate-800 transition active:scale-95 cursor-pointer"
-                aria-label="Yoqtirish"
-              >
-                <Heart
-                  className={`w-6 h-6 transition-colors ${
-                    favorited ? 'text-rose-500 fill-rose-500' : 'text-slate-400'
-                  }`}
-                />
-              </button>
-            </div>
+              return (
+                <div className="mt-7 flex items-center gap-3">
+                  <button
+                    disabled={!canOrder}
+                    onClick={() => {
+                      if (!canOrder) {
+                        showToast('Ushbu o‘lcham va rang omborda tugagan!', 'error');
+                        return;
+                      }
+                      handleAddToCart();
+                    }}
+                    className={`flex-1 py-4 rounded-xl font-extrabold text-sm sm:text-base tracking-wider uppercase shadow-xl transition flex items-center justify-center gap-2.5 ${
+                      !canOrder
+                        ? 'bg-slate-800/80 text-slate-500 border border-slate-700/60 cursor-not-allowed'
+                        : 'gold-gradient-bg text-black shadow-[#d4af37]/20 hover:brightness-110 active:scale-98 cursor-pointer'
+                    }`}
+                  >
+                    <ShoppingBag className="w-5 h-5 stroke-[2.3]" />
+                    <span>
+                      {product.stock <= 0
+                        ? '❌ Sotuvda yo‘q'
+                        : !canOrder
+                        ? '❌ Ushbu razmer tugagan'
+                        : 'Savatga qo‘shish'}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => toggleFavorite(product.id)}
+                    className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-white hover:bg-slate-800 transition active:scale-95 cursor-pointer"
+                    aria-label="Yoqtirish"
+                  >
+                    <Heart
+                      className={`w-6 h-6 transition-colors ${
+                        favorited ? 'text-rose-500 fill-rose-500' : 'text-slate-400'
+                      }`}
+                    />
+                  </button>
+                </div>
+              );
+            })()}
 
             {/* Guarantees / Badges */}
             <div className="mt-8 grid grid-cols-3 gap-2.5 pt-6 border-t border-slate-800">

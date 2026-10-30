@@ -61,8 +61,9 @@
       "name": "KURTKA",
       "slug": "kurtka",
       "sortOrder": 2,
-      "itemCount": 0,
-      "imageUrl": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=800&auto=format&fit=crop"
+      "itemCount": 2,
+      "imageUrl": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=800&auto=format&fit=crop",
+      "isHidden": true
     },
     {
       "id": "cat_dvoyka",
@@ -94,11 +95,1328 @@
       "slug": "luk-kiyimlar",
       "sortOrder": 6,
       "itemCount": 0,
-      "imageUrl": "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?q=80&w=800&auto=format&fit=crop"
+      "imageUrl": "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?q=80&w=800&auto=format&fit=crop",
+      "isHidden": true
     }
   ],
-  "products": [],
+  "products": [
+    {
+      "id": "prod_seasonal_1793357010664",
+      "name": "Mavsumiy Alyaska Kurtka",
+      "slug": "mavsumiy-alyaska-kurtka-1793357010664",
+      "price": 850000,
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "stock": 12,
+      "images": [
+        "/banners/hero-banner-1.png"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora"
+      ],
+      "description": "Mavsumiy sinov kiyimi",
+      "rating": 5,
+      "reviewCount": 1,
+      "createdAt": "2026-10-30T10:43:30.664Z",
+      "variants": [
+        {
+          "id": "v1",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "v2",
+          "color": "Qora",
+          "size": "L",
+          "stock": 4
+        },
+        {
+          "id": "v3",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 4
+        }
+      ]
+    },
+    {
+      "id": "prod_ombor_test_1793357010625",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-30T10:43:30.625Z"
+    },
+    {
+      "id": "prod_seasonal_1793356890123",
+      "name": "Mavsumiy Alyaska Kurtka",
+      "price": 850000,
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "stock": 12,
+      "images": [
+        "/banners/hero-banner-1.png"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora"
+      ],
+      "description": "Mavsumiy sinov kiyimi",
+      "createdAt": "2026-10-30T10:41:30.123Z",
+      "variants": [
+        {
+          "id": "v1",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "v2",
+          "color": "Qora",
+          "size": "L",
+          "stock": 4
+        },
+        {
+          "id": "v3",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 4
+        }
+      ]
+    },
+    {
+      "id": "prod_ombor_test_1793356890093",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-30T10:41:30.093Z"
+    },
+    {
+      "id": "prod_seasonal_1793356820579",
+      "name": "Mavsumiy Alyaska Kurtka",
+      "price": 850000,
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "stock": 12,
+      "images": [
+        "/banners/hero-banner-1.png"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora"
+      ],
+      "description": "Mavsumiy sinov kiyimi",
+      "createdAt": "2026-10-30T10:40:20.579Z",
+      "variants": [
+        {
+          "id": "v1",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "v2",
+          "color": "Qora",
+          "size": "L",
+          "stock": 4
+        },
+        {
+          "id": "v3",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 4
+        }
+      ]
+    },
+    {
+      "id": "prod_ombor_test_1793356820552",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-30T10:40:20.552Z"
+    },
+    {
+      "id": "prod_seasonal_1793356804227",
+      "name": "Mavsumiy Alyaska Kurtka",
+      "price": 850000,
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "stock": 12,
+      "images": [
+        "/banners/hero-banner-1.png"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora"
+      ],
+      "description": "Mavsumiy sinov kiyimi",
+      "createdAt": "2026-10-30T10:40:04.227Z",
+      "variants": [
+        {
+          "id": "v1",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "v2",
+          "color": "Qora",
+          "size": "L",
+          "stock": 4
+        },
+        {
+          "id": "v3",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 4
+        }
+      ]
+    },
+    {
+      "id": "prod_ombor_test_1793356804202",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-30T10:40:04.202Z"
+    },
+    {
+      "id": "prod_seasonal_1793356057701",
+      "name": "Mavsumiy Alyaska Kurtka",
+      "price": 850000,
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "stock": 12,
+      "images": [
+        "/banners/hero-banner-1.png"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora"
+      ],
+      "description": "Mavsumiy sinov kiyimi",
+      "createdAt": "2026-10-30T10:27:37.701Z",
+      "variants": [
+        {
+          "id": "v1",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "v2",
+          "color": "Qora",
+          "size": "L",
+          "stock": 4
+        },
+        {
+          "id": "v3",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 4
+        }
+      ]
+    },
+    {
+      "id": "prod_ombor_test_1793356057680",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-30T10:27:37.680Z"
+    },
+    {
+      "id": "prod_seasonal_1793355918185",
+      "name": "Mavsumiy Alyaska Kurtka",
+      "price": 850000,
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "stock": 12,
+      "images": [
+        "/banners/hero-banner-1.png"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora"
+      ],
+      "description": "Mavsumiy sinov kiyimi",
+      "createdAt": "2026-10-30T10:25:18.185Z",
+      "variants": [
+        {
+          "id": "v1",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "v2",
+          "color": "Qora",
+          "size": "L",
+          "stock": 4
+        },
+        {
+          "id": "v3",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 4
+        }
+      ]
+    },
+    {
+      "id": "prod_ombor_test_1793355918158",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-30T10:25:18.158Z"
+    },
+    {
+      "id": "prod_ombor_test_1793355885884",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-30T10:24:45.884Z"
+    },
+    {
+      "id": "prod_ombor_test_1792986948224",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-26T03:55:48.224Z"
+    },
+    {
+      "id": "prod_ombor_test_1792986906749",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-26T03:55:06.749Z"
+    },
+    {
+      "id": "prod_ombor_test_1792986874636",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-26T03:54:34.636Z"
+    },
+    {
+      "id": "prod_ombor_test_1792923235289",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-25T10:13:55.289Z"
+    },
+    {
+      "id": "prod_ombor_test_1792923200416",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-10-25T10:13:20.416Z",
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ]
+    }
+  ],
   "orders": [
+    {
+      "id": "ord_billz_sync_test_1793357010738",
+      "orderNumber": "#1099",
+      "customerName": "Sardor Rahimxon",
+      "customerPhone": "+998 90 777 88 99",
+      "region": "Toshkent shahri",
+      "city": "Yakkasaroy",
+      "address": "Shota Rustaveli ko‘chasi, 45-uy",
+      "items": [
+        {
+          "id": "item_billz_1",
+          "productId": "prod_2",
+          "productName": "Dvoyka kostyum-shim",
+          "productImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop",
+          "size": "52",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 1299000,
+          "totalPrice": 1299000
+        }
+      ],
+      "subtotal": 1299000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 1299000,
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-10-30T10:43:30.738Z"
+        }
+      ],
+      "createdAt": "2026-10-30T10:43:30.738Z",
+      "updatedAt": "2026-10-30T10:43:30.738Z",
+      "billzSaleId": "billz_sale_test_888",
+      "billzSyncedAt": "2026-10-30T10:43:30.739Z"
+    },
+    {
+      "id": "ord_billz_sync_test_1793356890189",
+      "orderNumber": "#1099",
+      "customerName": "Sardor Rahimxon",
+      "customerPhone": "+998 90 777 88 99",
+      "region": "Toshkent shahri",
+      "city": "Yakkasaroy",
+      "address": "Shota Rustaveli ko‘chasi, 45-uy",
+      "items": [
+        {
+          "id": "item_billz_1",
+          "productId": "prod_2",
+          "productName": "Dvoyka kostyum-shim",
+          "productImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop",
+          "size": "52",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 1299000,
+          "totalPrice": 1299000
+        }
+      ],
+      "subtotal": 1299000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 1299000,
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-10-30T10:41:30.189Z"
+        }
+      ],
+      "createdAt": "2026-10-30T10:41:30.189Z",
+      "updatedAt": "2026-10-30T10:41:30.189Z",
+      "billzSaleId": "billz_sale_test_888",
+      "billzSyncedAt": "2026-10-30T10:41:30.189Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
+    {
+      "id": "ord_billz_sync_test_1793356820644",
+      "orderNumber": "#1099",
+      "customerName": "Sardor Rahimxon",
+      "customerPhone": "+998 90 777 88 99",
+      "region": "Toshkent shahri",
+      "city": "Yakkasaroy",
+      "address": "Shota Rustaveli ko‘chasi, 45-uy",
+      "items": [
+        {
+          "id": "item_billz_1",
+          "productId": "prod_2",
+          "productName": "Dvoyka kostyum-shim",
+          "productImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop",
+          "size": "52",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 1299000,
+          "totalPrice": 1299000
+        }
+      ],
+      "subtotal": 1299000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 1299000,
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-10-30T10:40:20.644Z"
+        }
+      ],
+      "createdAt": "2026-10-30T10:40:20.644Z",
+      "updatedAt": "2026-10-30T10:40:20.644Z",
+      "billzSaleId": "billz_sale_test_888",
+      "billzSyncedAt": "2026-10-30T10:40:20.645Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
+    {
+      "id": "ord_billz_sync_test_1793356804282",
+      "orderNumber": "#1099",
+      "customerName": "Sardor Rahimxon",
+      "customerPhone": "+998 90 777 88 99",
+      "region": "Toshkent shahri",
+      "city": "Yakkasaroy",
+      "address": "Shota Rustaveli ko‘chasi, 45-uy",
+      "items": [
+        {
+          "id": "item_billz_1",
+          "productId": "prod_2",
+          "productName": "Dvoyka kostyum-shim",
+          "productImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop",
+          "size": "52",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 1299000,
+          "totalPrice": 1299000
+        }
+      ],
+      "subtotal": 1299000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 1299000,
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-10-30T10:40:04.282Z"
+        }
+      ],
+      "createdAt": "2026-10-30T10:40:04.282Z",
+      "updatedAt": "2026-10-30T10:40:04.282Z",
+      "billzSaleId": "billz_sale_test_888",
+      "billzSyncedAt": "2026-10-30T10:40:04.282Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
     {
       "id": "ord_1792822686337",
       "orderNumber": "#1029",
@@ -710,7 +2028,7 @@
     "telegramSettings": {
       "enabled": false,
       "status": "DISCONNECTED",
-      "botToken": "aes-gcm:2234d5ef8b462ec99b1d20f3:33a576842293b49d7adc975a3ff07cea:b7ff79b8592516841475d9ca4d10ec4666168f12ea2f113874c089f173c32eacbc1003543738258f2ce949",
+      "botToken": "aes-gcm:161076a6b8cc66f8598c1a6c:ead9423ba99716418372b98a4f20e656:dee1a5819ae446ae2c9764ba22e939384eb498fa38096296112e38f25650323716f64b56ed64cbb2273fe5",
       "chatId": "-1001234567890"
     }
   },
@@ -726,10 +2044,2498 @@
       "createdAt": "2026-10-22T08:58:33.841Z"
     }
   ],
+  "inventoryLogs": [
+    {
+      "id": "inv_cancel_1793357010662",
+      "timestamp": "2026-10-30T10:43:30.662Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #0_a6m0 (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010660_a6m0",
+      "timestamp": "2026-10-30T10:43:30.660Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793357010658_bqbu",
+      "timestamp": "2026-10-30T10:43:30.658Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010653_4er7",
+      "timestamp": "2026-10-30T10:43:30.653Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010647_1677",
+      "timestamp": "2026-10-30T10:43:30.647Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010646_3g1c",
+      "timestamp": "2026-10-30T10:43:30.646Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010644_w321",
+      "timestamp": "2026-10-30T10:43:30.644Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010641_6vv4",
+      "timestamp": "2026-10-30T10:43:30.641Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010639_edr8",
+      "timestamp": "2026-10-30T10:43:30.639Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010638_h0yp",
+      "timestamp": "2026-10-30T10:43:30.638Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010636_cpak",
+      "timestamp": "2026-10-30T10:43:30.636Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010634_k4qp",
+      "timestamp": "2026-10-30T10:43:30.634Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793357010627_21t2",
+      "timestamp": "2026-10-30T10:43:30.627Z",
+      "productId": "prod_ombor_test_1793357010625",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1793356890122",
+      "timestamp": "2026-10-30T10:41:30.122Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #0_mlsv (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890120_mlsv",
+      "timestamp": "2026-10-30T10:41:30.120Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793356890116_ooum",
+      "timestamp": "2026-10-30T10:41:30.116Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890114_nctx",
+      "timestamp": "2026-10-30T10:41:30.114Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890112_p9u6",
+      "timestamp": "2026-10-30T10:41:30.112Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890110_m1x2",
+      "timestamp": "2026-10-30T10:41:30.110Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890108_v7md",
+      "timestamp": "2026-10-30T10:41:30.108Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890106_1rnj",
+      "timestamp": "2026-10-30T10:41:30.106Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890105_hli2",
+      "timestamp": "2026-10-30T10:41:30.105Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890103_nke5",
+      "timestamp": "2026-10-30T10:41:30.103Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890101_fo70",
+      "timestamp": "2026-10-30T10:41:30.101Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890098_c6fn",
+      "timestamp": "2026-10-30T10:41:30.098Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356890096_65d9",
+      "timestamp": "2026-10-30T10:41:30.096Z",
+      "productId": "prod_ombor_test_1793356890093",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1793356820577",
+      "timestamp": "2026-10-30T10:40:20.577Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #5_pcth (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820575_pcth",
+      "timestamp": "2026-10-30T10:40:20.575Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793356820573_wczw",
+      "timestamp": "2026-10-30T10:40:20.573Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820571_y0f2",
+      "timestamp": "2026-10-30T10:40:20.571Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820569_20ng",
+      "timestamp": "2026-10-30T10:40:20.569Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820568_4ph1",
+      "timestamp": "2026-10-30T10:40:20.568Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820567_b27z",
+      "timestamp": "2026-10-30T10:40:20.567Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820564_1h04",
+      "timestamp": "2026-10-30T10:40:20.564Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820563_9m3v",
+      "timestamp": "2026-10-30T10:40:20.563Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820561_0yb3",
+      "timestamp": "2026-10-30T10:40:20.561Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820560_z5mj",
+      "timestamp": "2026-10-30T10:40:20.560Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820558_wv6g",
+      "timestamp": "2026-10-30T10:40:20.558Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356820555_vrrc",
+      "timestamp": "2026-10-30T10:40:20.555Z",
+      "productId": "prod_ombor_test_1793356820552",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1793356804225",
+      "timestamp": "2026-10-30T10:40:04.225Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #4_y6ee (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804224_y6ee",
+      "timestamp": "2026-10-30T10:40:04.224Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793356804222_5dmv",
+      "timestamp": "2026-10-30T10:40:04.222Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804221_rpoa",
+      "timestamp": "2026-10-30T10:40:04.221Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804219_8ltw",
+      "timestamp": "2026-10-30T10:40:04.219Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804218_1nlv",
+      "timestamp": "2026-10-30T10:40:04.218Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804217_067o",
+      "timestamp": "2026-10-30T10:40:04.217Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804215_zo44",
+      "timestamp": "2026-10-30T10:40:04.215Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804212_kbtl",
+      "timestamp": "2026-10-30T10:40:04.212Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804210_uun3",
+      "timestamp": "2026-10-30T10:40:04.210Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804209_h0bj",
+      "timestamp": "2026-10-30T10:40:04.209Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804207_v8b8",
+      "timestamp": "2026-10-30T10:40:04.207Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356804204_r3sj",
+      "timestamp": "2026-10-30T10:40:04.204Z",
+      "productId": "prod_ombor_test_1793356804202",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1793356057700",
+      "timestamp": "2026-10-30T10:27:37.700Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #7_lm5m (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057697_lm5m",
+      "timestamp": "2026-10-30T10:27:37.697Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793356057696_umzz",
+      "timestamp": "2026-10-30T10:27:37.696Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057694_1rc3",
+      "timestamp": "2026-10-30T10:27:37.694Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057693_rqmn",
+      "timestamp": "2026-10-30T10:27:37.693Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057692_hh1w",
+      "timestamp": "2026-10-30T10:27:37.692Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057690_dvqo",
+      "timestamp": "2026-10-30T10:27:37.690Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057689_u2eg",
+      "timestamp": "2026-10-30T10:27:37.689Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057688_7adn",
+      "timestamp": "2026-10-30T10:27:37.688Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057687_qjrm",
+      "timestamp": "2026-10-30T10:27:37.687Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057686_vdys",
+      "timestamp": "2026-10-30T10:27:37.686Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057684_dmlv",
+      "timestamp": "2026-10-30T10:27:37.684Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793356057683_4vd8",
+      "timestamp": "2026-10-30T10:27:37.683Z",
+      "productId": "prod_ombor_test_1793356057680",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1793355918181",
+      "timestamp": "2026-10-30T10:25:18.181Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #0_hrhe (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918180_hrhe",
+      "timestamp": "2026-10-30T10:25:18.180Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793355918179_899t",
+      "timestamp": "2026-10-30T10:25:18.179Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918178_81rc",
+      "timestamp": "2026-10-30T10:25:18.178Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918176_m0ym",
+      "timestamp": "2026-10-30T10:25:18.176Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918175_jip2",
+      "timestamp": "2026-10-30T10:25:18.175Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918174_aigr",
+      "timestamp": "2026-10-30T10:25:18.174Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918173_j4i9",
+      "timestamp": "2026-10-30T10:25:18.173Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918172_w0wj",
+      "timestamp": "2026-10-30T10:25:18.172Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918170_y0lj",
+      "timestamp": "2026-10-30T10:25:18.170Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918169_ieag",
+      "timestamp": "2026-10-30T10:25:18.169Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918168_pbjv",
+      "timestamp": "2026-10-30T10:25:18.168Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355918160_hjej",
+      "timestamp": "2026-10-30T10:25:18.160Z",
+      "productId": "prod_ombor_test_1793355918158",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1793355885899",
+      "timestamp": "2026-10-30T10:24:45.899Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #8_b33n (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885898_b33n",
+      "timestamp": "2026-10-30T10:24:45.898Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793355885897_y69w",
+      "timestamp": "2026-10-30T10:24:45.897Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885895_9h4o",
+      "timestamp": "2026-10-30T10:24:45.895Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885894_4kik",
+      "timestamp": "2026-10-30T10:24:45.894Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885893_5wgz",
+      "timestamp": "2026-10-30T10:24:45.893Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885892_5q92",
+      "timestamp": "2026-10-30T10:24:45.892Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885891_ogtu",
+      "timestamp": "2026-10-30T10:24:45.891Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885890_cz8c",
+      "timestamp": "2026-10-30T10:24:45.890Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885889_w1xe",
+      "timestamp": "2026-10-30T10:24:45.889Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885888_gqti",
+      "timestamp": "2026-10-30T10:24:45.888Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885886_1gw5",
+      "timestamp": "2026-10-30T10:24:45.886Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793355885885_ouon",
+      "timestamp": "2026-10-30T10:24:45.885Z",
+      "productId": "prod_ombor_test_1793355885884",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1792986948237",
+      "timestamp": "2026-10-26T03:55:48.237Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #6_e78y (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948236_e78y",
+      "timestamp": "2026-10-26T03:55:48.236Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1792986948235_nn8y",
+      "timestamp": "2026-10-26T03:55:48.235Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948234_8exf",
+      "timestamp": "2026-10-26T03:55:48.234Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948233_4wi8",
+      "timestamp": "2026-10-26T03:55:48.233Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948233_ow2x",
+      "timestamp": "2026-10-26T03:55:48.233Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948232_yzay",
+      "timestamp": "2026-10-26T03:55:48.232Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948230_se47",
+      "timestamp": "2026-10-26T03:55:48.230Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948229_o23y",
+      "timestamp": "2026-10-26T03:55:48.229Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948228_t23t",
+      "timestamp": "2026-10-26T03:55:48.228Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948227_cc3j",
+      "timestamp": "2026-10-26T03:55:48.227Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948227_6r43",
+      "timestamp": "2026-10-26T03:55:48.227Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986948225_g5fi",
+      "timestamp": "2026-10-26T03:55:48.225Z",
+      "productId": "prod_ombor_test_1792986948224",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1792986906777",
+      "timestamp": "2026-10-26T03:55:06.777Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #6_po89 (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906776_po89",
+      "timestamp": "2026-10-26T03:55:06.776Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1792986906775_5dp4",
+      "timestamp": "2026-10-26T03:55:06.775Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906774_1lax",
+      "timestamp": "2026-10-26T03:55:06.774Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906773_ive2",
+      "timestamp": "2026-10-26T03:55:06.773Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906772_iclk",
+      "timestamp": "2026-10-26T03:55:06.772Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906769_eb8n",
+      "timestamp": "2026-10-26T03:55:06.769Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906767_c1nr",
+      "timestamp": "2026-10-26T03:55:06.768Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906765_ady1",
+      "timestamp": "2026-10-26T03:55:06.765Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906763_c9jt",
+      "timestamp": "2026-10-26T03:55:06.763Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906761_eysj",
+      "timestamp": "2026-10-26T03:55:06.761Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906757_ppra",
+      "timestamp": "2026-10-26T03:55:06.757Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986906753_y4fa",
+      "timestamp": "2026-10-26T03:55:06.753Z",
+      "productId": "prod_ombor_test_1792986906749",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1792986874649",
+      "timestamp": "2026-10-26T03:54:34.649Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #8_ik7o (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874648_ik7o",
+      "timestamp": "2026-10-26T03:54:34.648Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1792986874647_lzgw",
+      "timestamp": "2026-10-26T03:54:34.647Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874646_y6w7",
+      "timestamp": "2026-10-26T03:54:34.646Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874645_wadi",
+      "timestamp": "2026-10-26T03:54:34.645Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874644_yh5e",
+      "timestamp": "2026-10-26T03:54:34.644Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874643_dylb",
+      "timestamp": "2026-10-26T03:54:34.643Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874642_aonv",
+      "timestamp": "2026-10-26T03:54:34.642Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874641_z4wy",
+      "timestamp": "2026-10-26T03:54:34.641Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874640_a4lv",
+      "timestamp": "2026-10-26T03:54:34.640Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874639_x5gt",
+      "timestamp": "2026-10-26T03:54:34.639Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874638_u5mx",
+      "timestamp": "2026-10-26T03:54:34.638Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792986874637_2xsb",
+      "timestamp": "2026-10-26T03:54:34.637Z",
+      "productId": "prod_ombor_test_1792986874636",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1792923235299",
+      "timestamp": "2026-10-25T10:13:55.299Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #9_or3w (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235299_or3w",
+      "timestamp": "2026-10-25T10:13:55.299Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1792923235298_z5eg",
+      "timestamp": "2026-10-25T10:13:55.298Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235297_djt5",
+      "timestamp": "2026-10-25T10:13:55.297Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235296_3222",
+      "timestamp": "2026-10-25T10:13:55.296Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235296_u56i",
+      "timestamp": "2026-10-25T10:13:55.296Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235295_93vl",
+      "timestamp": "2026-10-25T10:13:55.295Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235295_n3ax",
+      "timestamp": "2026-10-25T10:13:55.295Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235294_rnww",
+      "timestamp": "2026-10-25T10:13:55.294Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235293_h0lj",
+      "timestamp": "2026-10-25T10:13:55.293Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235292_hkhf",
+      "timestamp": "2026-10-25T10:13:55.292Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235291_cru1",
+      "timestamp": "2026-10-25T10:13:55.291Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923235290_9sgw",
+      "timestamp": "2026-10-25T10:13:55.290Z",
+      "productId": "prod_ombor_test_1792923235289",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_cancel_1792923200426",
+      "timestamp": "2026-10-25T10:13:20.426Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #5_zkjz (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200425_zkjz",
+      "timestamp": "2026-10-25T10:13:20.425Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1792923200424_klpk",
+      "timestamp": "2026-10-25T10:13:20.424Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200423_7ps8",
+      "timestamp": "2026-10-25T10:13:20.423Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200423_1i60",
+      "timestamp": "2026-10-25T10:13:20.423Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200422_fx8n",
+      "timestamp": "2026-10-25T10:13:20.422Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200421_0j74",
+      "timestamp": "2026-10-25T10:13:20.421Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200421_p1iw",
+      "timestamp": "2026-10-25T10:13:20.421Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200420_ofqk",
+      "timestamp": "2026-10-25T10:13:20.420Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200420_b54u",
+      "timestamp": "2026-10-25T10:13:20.420Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200419_3l2u",
+      "timestamp": "2026-10-25T10:13:20.419Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200419_p5v5",
+      "timestamp": "2026-10-25T10:13:20.419Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1792923200418_3b3l",
+      "timestamp": "2026-10-25T10:13:20.418Z",
+      "productId": "prod_ombor_test_1792923200416",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 0,
+      "previousStock": 0,
+      "newStock": 0,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    }
+  ],
+  "branches": [
+    {
+      "id": "branch_central",
+      "name": "SHU BREND — Markaziy Filial & Do‘kon",
+      "billzShopId": "shop_tashkent_central",
+      "address": "Toshkent shahri, Mirobod tumani, Shahrisabz ko‘chasi, 12-uy",
+      "phone": "+998 90 123 45 67",
+      "isActive": true,
+      "isCentral": true,
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "billzConfig": {
+    "apiUrl": "https://api-admin.billz.ai",
+    "autoSyncEnabled": true,
+    "syncIntervalMinutes": 30,
+    "status": "ERROR",
+    "centralShopId": "shop_tashkent_central",
+    "syncImages": true,
+    "syncPrices": true,
+    "syncStock": true,
+    "encryptedApiKey": "aes-gcm:e99c099a6de84ccd3381a1ee:b0289fffa23d50f43cb2422b8b9ecfc2:416b07b4224338e05a47e5c2b2b88fe48f99978eaebe9daa16944ee5c2ae26f95f86e4928c246b",
+    "encryptedPlatformId": "aes-gcm:98f95b3ec5c7598728ec1fe4:b9541914da218c828c7ce6242b3c05ea:5cb2117e8f528ac3050ea252dad1c71fa1a56ce5a0966d2b8615",
+    "lastError": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+    "lastSyncAt": "2026-10-30T10:41:21.395Z",
+    "lastSyncStatus": "FAILED"
+  },
+  "billzLogs": [
+    {
+      "id": "blog_1793357011549_wgw8k",
+      "timestamp": "2026-10-30T10:43:31.549Z",
+      "type": "TEST_CONNECTION",
+      "status": "FAILED",
+      "details": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+      "error": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+      "durationMs": 871
+    },
+    {
+      "id": "blog_1793357010741_cw1pd",
+      "timestamp": "2026-10-30T10:43:30.741Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "SUCCESS",
+      "details": "Test avtomatik sinxronizatsiya: 45 ta tovar yangilandi",
+      "itemsCount": 45,
+      "durationMs": 320
+    },
+    {
+      "id": "blog_1793356891002_5pvne",
+      "timestamp": "2026-10-30T10:41:31.002Z",
+      "type": "TEST_CONNECTION",
+      "status": "FAILED",
+      "details": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+      "error": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+      "durationMs": 867
+    },
+    {
+      "id": "blog_1793356890192_vewre",
+      "timestamp": "2026-10-30T10:41:30.192Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "SUCCESS",
+      "details": "Test avtomatik sinxronizatsiya: 45 ta tovar yangilandi",
+      "itemsCount": 45,
+      "durationMs": 320
+    },
+    {
+      "id": "blog_1793356881397_ey59y",
+      "timestamp": "2026-10-30T10:41:21.397Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "FAILED",
+      "details": "BILLZ sinxronizatsiya xatosi: BILLZ API xatosi (HTTP 500): {\"error\":{\"code\":\"INTERNAL\",\"message\":\"platform-id\"}}",
+      "error": "BILLZ sinxronizatsiya xatosi: BILLZ API xatosi (HTTP 500): {\"error\":{\"code\":\"INTERNAL\",\"message\":\"platform-id\"}}",
+      "durationMs": 807
+    },
+    {
+      "id": "blog_1793356821425_upaza",
+      "timestamp": "2026-10-30T10:40:21.425Z",
+      "type": "TEST_CONNECTION",
+      "status": "FAILED",
+      "details": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+      "error": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+      "durationMs": 834
+    },
+    {
+      "id": "blog_1793356820648_yqx62",
+      "timestamp": "2026-10-30T10:40:20.648Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "SUCCESS",
+      "details": "Test avtomatik sinxronizatsiya: 45 ta tovar yangilandi",
+      "itemsCount": 45,
+      "durationMs": 320
+    },
+    {
+      "id": "blog_1793356805111_iq322",
+      "timestamp": "2026-10-30T10:40:05.111Z",
+      "type": "TEST_CONNECTION",
+      "status": "FAILED",
+      "details": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+      "error": "BILLZ API xatolik qaytardi (HTTP 500): [object Object]",
+      "durationMs": 872
+    },
+    {
+      "id": "blog_1793356804283_abecn",
+      "timestamp": "2026-10-30T10:40:04.283Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "SUCCESS",
+      "details": "Test avtomatik sinxronizatsiya: 45 ta tovar yangilandi",
+      "itemsCount": 45,
+      "durationMs": 320
+    }
+  ],
   "adminSecurity": {
     "username": "admin.1212",
-    "passwordHash": "scrypt:ac314a6fd8367ad81e9ea39a44387242:41f24da666f02f68856ce432a372172444e2a9e9b09cbdae302b7e509bb02c51543f0c7472761c5e8bd08a0a304e5d29ba8fa6b299bb16e48bd1eaaf85c142a3",
+    "passwordHash": "scrypt:8fea78be54b77f7650e89b30f1f12e61:d8b85fd1ff6a70a599e332f7e81aa9095ea785162afca69f499b5440c787b8e31ea47243d78b39e241b55a4e2b0723c9e8fff50946b3679e2e1aed037129d324",
     "sessionTokenVersion": 2,
-    "lastPasswordChange": "2026-10-24T10:11:44.397Z"
+    "lastPasswordChange": "2026-10-30T10:43:30.536Z"
   }
 }

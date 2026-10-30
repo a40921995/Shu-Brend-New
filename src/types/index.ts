@@ -42,12 +42,18 @@ export interface Category {
   itemCount?: number;
   imageUrl?: string;
   sortOrder: number;
+  isHidden?: boolean;
 }
 
 export interface ProductVariant {
+  id?: string;
   size: string;
   color: string;
   stock: number;
+  imageUrl?: string;
+  barcode?: string;
+  sku?: string;
+  billzVariantId?: string;
 }
 
 export interface Product {
@@ -63,11 +69,19 @@ export interface Product {
   sizes: string[];
   colors: string[];
   stock: number;
+  variants?: ProductVariant[];
   rating: number;
   reviewCount: number;
   isNew?: boolean;
   isTrending?: boolean;
   isFeatured?: boolean;
+  brand?: string;
+  sku?: string;
+  barcode?: string;
+  billzId?: string;
+  billzShopId?: string;
+  lastBillzSync?: string;
+  branchAvailability?: { branchId: string; branchName: string; stock: number }[];
   details?: {
     material?: string;
     season?: string;
@@ -130,6 +144,9 @@ export interface Order {
     changedAt: string;
     comment?: string;
   }[];
+  billzSaleId?: string;
+  billzSyncedAt?: string;
+  assignedBranchId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -249,11 +266,107 @@ export interface SiteSettings {
   aboutTitle?: string;
   aboutText: string;
   themePrimaryColor: string;
-  themeAccentColor: string;
+  themeAccentColor?: string;
   paymentSettings?: PaymentProviderSettings;
   telegramSettings?: TelegramSettings;
   cardSettings?: CardPaymentSettings;
 }
 
+export type InventoryActionType =
+  | 'OFFLINE_SALE'
+  | 'OFFLINE_SALE_CANCEL'
+  | 'RESTOCK'
+  | 'MANUAL_ADJUST'
+  | 'ONLINE_ORDER_RESERVED'
+  | 'ONLINE_ORDER_CANCELLED';
 
+export interface InventoryLog {
+  id: string;
+  timestamp: string;
+  productId: string;
+  productName: string;
+  productImage?: string;
+  color: string;
+  size: string;
+  delta: number;
+  previousStock: number;
+  newStock: number;
+  type: InventoryActionType;
+  orderId?: string;
+  orderNumber?: string;
+  price?: number;
+  note?: string;
+  operator?: string;
+  cancelled?: boolean;
+}
 
+export interface LowStockVariantInfo {
+  productId: string;
+  productName: string;
+  productImage: string;
+  color: string;
+  size: string;
+  stock: number;
+  price: number;
+}
+
+export interface WarehouseStats {
+  totalStockUnits: number;
+  totalProductsCount: number;
+  outOfStockVariantsCount: number;
+  lowStockVariantsCount: number;
+  todayOfflineSalesCount: number;
+  todayOfflineSalesRevenue: number;
+  todayOnlineSalesCount: number;
+  todayOnlineSalesRevenue: number;
+  totalTodayRevenue: number;
+  monthlyRevenue: number;
+  topSellingProducts: { productId: string; name: string; quantity: number; revenue: number }[];
+  topSellingSizes: { size: string; quantity: number }[];
+  topSellingColors: { color: string; quantity: number }[];
+  lowStockVariants: LowStockVariantInfo[];
+  outOfStockVariants: LowStockVariantInfo[];
+}
+
+export interface Branch {
+  id: string;
+  name: string;
+  billzShopId?: string;
+  address: string;
+  phone?: string;
+  isActive: boolean;
+  isCentral: boolean;
+  createdAt: string;
+}
+
+export type BillzSyncStatus = 'CONNECTED' | 'DISCONNECTED' | 'ERROR' | 'UNCONFIGURED';
+
+export interface BillzSettings {
+  apiUrl: string;
+  hasApiKey: boolean;
+  apiKeyMasked?: string;
+  hasPlatformId: boolean;
+  platformIdMasked?: string;
+  autoSyncEnabled: boolean;
+  syncIntervalMinutes: number;
+  lastSyncAt?: string;
+  lastSyncStatus?: 'SUCCESS' | 'FAILED' | 'PARTIAL' | 'IDLE';
+  lastError?: string;
+  status: BillzSyncStatus;
+  centralShopId?: string;
+  syncImages: boolean;
+  syncPrices: boolean;
+  syncStock: boolean;
+  totalSyncedProducts?: number;
+}
+
+export interface BillzSyncLog {
+  id: string;
+  timestamp: string;
+  type: 'TEST_CONNECTION' | 'IMPORT_PRODUCTS' | 'STOCK_SYNC' | 'ORDER_SYNC';
+  status: 'SUCCESS' | 'FAILED' | 'PARTIAL';
+  itemsCount?: number;
+  details: string;
+  error?: string;
+  durationMs?: number;
+}

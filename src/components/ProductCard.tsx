@@ -18,10 +18,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [selectedColor, setSelectedColor] = useState<string>(colors[0] || 'Qora');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
 
+  const isOutOfStock = product.stock <= 0;
   const favorited = isFavorite(product.id);
+
+  const isSizeAvailable = (size: string) => {
+    if (!product.variants || product.variants.length === 0) {
+      return product.stock > 0;
+    }
+    const matchingVariant = product.variants.find(
+      v => v.size.trim().toLowerCase() === size.trim().toLowerCase() &&
+           v.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()
+    );
+    if (matchingVariant) return matchingVariant.stock > 0;
+    return product.variants.some(v => v.size.trim().toLowerCase() === size.trim().toLowerCase() && v.stock > 0);
+  };
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isOutOfStock) return;
     addToCart(product, selectedSize, selectedColor, 1);
     setShowQuickAdd(false);
   };
@@ -37,17 +51,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           src={images[0]}
           alt={product.name || 'SHU BREND kiyim'}
           loading="lazy"
-          className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-108"
+          className={`w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-108 ${
+            isOutOfStock ? 'grayscale-[40%] opacity-85' : ''
+          }`}
         />
+
+        {/* Out of Stock Overlay */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-3 text-center">
+            <div className="bg-rose-600/95 text-white px-3 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm tracking-wide shadow-xl border border-rose-400/40 flex items-center gap-1.5">
+              <span>❌</span>
+              <span>SOTUVDA YO‘Q</span>
+            </div>
+            <span className="text-[10px] text-slate-300 mt-1.5 font-medium">Omborda vaqtincha tugadi</span>
+          </div>
+        )}
 
         {/* Top badges */}
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
-          {product.discountPrice && (
+          {product.discountPrice && !isOutOfStock && (
             <span className="px-2 py-0.5 rounded-lg text-[11px] font-black bg-rose-600 text-white shadow-md">
               -{Math.round(((product.discountPrice - product.price) / product.discountPrice) * 100)}%
             </span>
           )}
-          {product.isNew && (
+          {product.isNew && !isOutOfStock && (
             <span className="px-2 py-0.5 rounded-lg text-[10px] font-extrabold bg-[#d4af37] text-black shadow-md">
               YANGI
             </span>
@@ -121,22 +148,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
           {/* Quick size selection chips */}
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
-            {sizes.slice(0, 3).map((size) => (
-              <button
-                key={size}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedSize(size);
-                }}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-bold transition ${
-                  selectedSize === size
-                    ? 'bg-[#d4af37] text-black'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-              >
-                {size}
-              </button>
-            ))}
+            {sizes.slice(0, 3).map((size) => {
+              const available = isSizeAvailable(size);
+              return (
+                <button
+                  key={size}
+                  disabled={!available}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (available) setSelectedSize(size);
+                  }}
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold transition flex items-center gap-0.5 ${
+                    !available
+                      ? 'bg-slate-800/50 text-slate-500 line-through cursor-not-allowed border border-rose-900/40'
+                      : selectedSize === size
+                      ? 'bg-[#d4af37] text-black font-extrabold'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  }`}
+                  title={!available ? 'Razmer tugagan' : size}
+                >
+                  <span>{size}</span>
+                  {!available && <span className="text-[9px] text-rose-500 no-underline font-normal">❌</span>}
+                </button>
+              );
+            })}
             {sizes.length > 3 && (
               <span className="text-[9px] text-slate-500">+{sizes.length - 3}</span>
             )}
@@ -144,12 +179,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Cart add icon button */}
           <button
+            disabled={isOutOfStock}
             onClick={handleQuickAdd}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl gold-gradient-bg text-black font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#d4af37]/20 hover:brightness-110 active:scale-95 transition cursor-pointer"
-            title="Savatga qo‘shish"
+            className={`p-2 sm:px-3 sm:py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md transition ${
+              isOutOfStock
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/60'
+                : 'gold-gradient-bg text-black shadow-[#d4af37]/20 hover:brightness-110 active:scale-95 cursor-pointer'
+            }`}
+            title={isOutOfStock ? 'Sotuvda yo‘q' : 'Savatga qo‘shish'}
           >
             <ShoppingBag className="w-3.5 h-3.5 stroke-[2.2]" />
-            <span className="hidden sm:inline">Savatga</span>
+            <span className="hidden sm:inline">{isOutOfStock ? 'Tugagan' : 'Savatga'}</span>
           </button>
         </div>
       </div>

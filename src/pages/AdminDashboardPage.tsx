@@ -46,9 +46,14 @@ import {
   Radio,
   Sparkles,
   Globe,
+  Folder,
+  Zap,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext.tsx';
 import { api, formatUzbekPrice } from '../lib/api.ts';
+import { AdminBillzManager } from '../components/AdminBillzManager.tsx';
+import { AdminInventoryManager } from '../components/AdminInventoryManager.tsx';
+import { AdminCategoriesManager } from '../components/AdminCategoriesManager.tsx';
 import type { Banner, Category, Order, OrderStatus, PaymentMethod, PaymentStatus, PaymentTransaction, Product, SiteSettings, User } from '../types/index.ts';
 
 
@@ -56,8 +61,8 @@ export const AdminDashboardPage: React.FC = () => {
   const { user, logout, settings, refreshSettings, showToast, setActiveTab, setIsAdminLoginModalOpen } = useApp();
 
   const [activeAdminTab, setActiveAdminTab] = useState<
-    'dashboard' | 'products' | 'orders' | 'telegram' | 'security' | 'homepage' | 'payments' | 'settings' | 'banners' | 'customers'
-  >('dashboard');
+    'billz' | 'dashboard' | 'inventory' | 'categories' | 'products' | 'orders' | 'telegram' | 'security' | 'homepage' | 'payments' | 'settings' | 'banners' | 'customers'
+  >('billz');
 
   // Stats
   const [stats, setStats] = useState<any>(null);
@@ -624,9 +629,11 @@ export const AdminDashboardPage: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        {/* Navigation Tabs (Dashboard, Mahsulotlar, Buyurtmalar, Telegram Bot, Xavfsizlik, To‘lov, Sayt, Bannerlar) */}
+        {/* Navigation Tabs (BILLZ, Kategoriyalar, Dashboard, Mahsulotlar, Buyurtmalar, Telegram Bot, Xavfsizlik, To‘lov, Sayt, Bannerlar) */}
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-3 border-b border-slate-800/80 mb-6">
           {[
+            { id: 'billz', label: '⚡ BILLZ INTEGRATSIYA', icon: Zap },
+            { id: 'categories', label: '📁 KATEGORIYALAR', icon: Folder, badge: categories.filter((c) => c.slug !== 'all').length },
             { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { id: 'products', label: 'Mahsulotlar', icon: Shirt, badge: products.length },
             { id: 'orders', label: 'Buyurtmalar', icon: ShoppingBag, badge: orders.length },
@@ -649,7 +656,7 @@ export const AdminDashboardPage: React.FC = () => {
                 onClick={() => setActiveAdminTab(tab.id as any)}
                 className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? 'gold-gradient-bg text-black shadow-lg shadow-[#d4af37]/20'
+                    ? 'gold-gradient-bg text-black shadow-lg shadow-[#d4af37]/20 font-black'
                     : 'bg-[#131b2a] text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800'
                 }`}
               >
@@ -672,6 +679,23 @@ export const AdminDashboardPage: React.FC = () => {
           })}
         </div>
 
+        {/* --- BILLZ INTEGRATSIYA (SUPER ADMIN SECTION) --- */}
+        {activeAdminTab === 'billz' && (
+          <AdminBillzManager
+            onRefreshCatalog={loadAdminData}
+            showToast={showToast}
+          />
+        )}
+
+        {/* --- KATEGORIYALAR BOSHQARUVI TAB (User Requirement 3 & 4) --- */}
+        {activeAdminTab === 'categories' && (
+          <AdminCategoriesManager
+            categories={categories}
+            products={products}
+            onRefresh={loadAdminData}
+            showToast={showToast}
+          />
+        )}
 
         {/* --- 1. DASHBOARD TAB (Screenshot 7) --- */}
         {activeAdminTab === 'dashboard' && (
