@@ -26,9 +26,13 @@ import {
   HelpCircle,
   Server,
   ArrowRight,
+  StopCircle,
+  Camera,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { api, formatUzbekPrice } from '../lib/api.ts';
-import type { BillzSettings, BillzSyncLog, Branch } from '../types/index.ts';
+import type { BillzSettings, BillzSyncLog, Branch, Product } from '../types/index.ts';
+import { AdminProductPhotosManager } from './AdminProductPhotosManager.tsx';
 
 interface AdminBillzManagerProps {
   onRefreshCatalog?: () => void;
@@ -43,6 +47,9 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
   const [settings, setSettings] = useState<BillzSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [photosFilter, setPhotosFilter] = useState<'ALL' | 'MISSING' | 'HAS_IMAGES' | 'BILLZ'>('ALL');
+  const [stoppingSync, setStoppingSync] = useState(false);
 
   // Form Inputs
   const [apiUrl, setApiUrl] = useState('https://api-admin.billz.ai');
@@ -50,7 +57,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
   const [platformIdInput, setPlatformIdInput] = useState('');
   const [centralShopId, setCentralShopId] = useState('shop_tashkent_central');
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
-  const [syncIntervalMinutes, setSyncIntervalMinutes] = useState(60);
+  const [syncIntervalMinutes, setSyncIntervalMinutes] = useState(30);
   const [syncImages, setSyncImages] = useState(true);
   const [syncPrices, setSyncPrices] = useState(true);
   const [syncStock, setSyncStock] = useState(true);
@@ -93,23 +100,25 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
   const [savingBranch, setSavingBranch] = useState(false);
 
   // Active sub-tab
-  const [activeTab, setActiveTab] = useState<'config' | 'sync' | 'branches' | 'logs'>('config');
+  const [activeTab, setActiveTab] = useState<'config' | 'sync' | 'photos' | 'branches' | 'logs'>('config');
 
-  // Load Settings and Logs
+  // Load Settings, Logs, Branches and Products
   const loadData = async () => {
     try {
       setLoading(true);
-      const [st, lg, br] = await Promise.all([
+      const [st, lg, br, prods] = await Promise.all([
         api.getBillzSettings(),
         api.getBillzLogs(100),
         api.getBranches(),
+        api.getProducts(),
       ]);
 
       setSettings(st);
+      setProducts(prods || []);
       setApiUrl(st.apiUrl || 'https://api-admin.billz.ai');
       setCentralShopId(st.centralShopId || 'shop_tashkent_central');
       setAutoSyncEnabled(st.autoSyncEnabled);
-      setSyncIntervalMinutes(st.syncIntervalMinutes || 60);
+      setSyncIntervalMinutes(st.syncIntervalMinutes || 30);
       setSyncImages(st.syncImages ?? true);
       setSyncPrices(st.syncPrices ?? true);
       setSyncStock(st.syncStock ?? true);
@@ -120,6 +129,20 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
       showToast(err.message || 'BILLZ ma’lumotlarini yuklashda xatolik', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStopSync = async () => {
+    try {
+      setStoppingSync(true);
+      const res = await api.stopBillzSync();
+      showToast(res.message, res.stopped ? 'info' : 'info');
+      setSyncingProducts(false);
+      loadData();
+    } catch (err: any) {
+      showToast(err.message || 'Sinxronizatsiyani to‘xtatib bo‘lmadi', 'error');
+    } finally {
+      setStoppingSync(false);
     }
   };
 
@@ -321,9 +344,9 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
           </div>
 
           {/* Status Badge & Fast Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <div
-              className={`px-4 py-2 rounded-2xl border flex items-center gap-2.5 text-xs font-black transition ${
+              className={`px-3.5 py-2 rounded-2xl border flex items-center gap-2 text-xs font-black transition ${
                 isConnected
                   ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                   : isError
@@ -349,61 +372,183 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
               </span>
             </div>
 
+            {/* Button 1: Test Connection */}
             <button
               onClick={handleTestConnection}
               disabled={testingConnection}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-2 transition disabled:opacity-50 cursor-pointer"
+              className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-2 transition disabled:opacity-50 cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${testingConnection ? 'animate-spin' : ''}`} />
               <span>{testingConnection ? 'Tekshirilmoqda...' : 'Ulanishni tekshirish'}</span>
             </button>
 
+            {/* Button 2: Sync Products */}
             <button
               onClick={handleSyncProducts}
               disabled={syncingProducts}
-              className="px-4 py-2.5 rounded-xl gold-gradient-bg text-black font-black text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition disabled:opacity-50 cursor-pointer"
+              className="px-3.5 py-2.5 rounded-xl gold-gradient-bg text-black font-black text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition disabled:opacity-50 cursor-pointer"
             >
               <Sparkles className={`w-3.5 h-3.5 ${syncingProducts ? 'animate-spin' : ''}`} />
               <span>{syncingProducts ? 'Sinxronlanmoqda...' : 'Mahsulotlarni sinxronlash'}</span>
             </button>
+
+            {/* Button 3: Stop Sync (When syncing or active) */}
+            {(syncingProducts || settings?.isSyncing) && (
+              <button
+                onClick={handleStopSync}
+                disabled={stoppingSync}
+                className="px-3.5 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white border border-rose-500/40 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+              >
+                <StopCircle className="w-3.5 h-3.5" />
+                <span>{stoppingSync ? 'To‘xtatilmoqda...' : 'Sinxronizatsiyani to‘xtatish'}</span>
+              </button>
+            )}
+
+            {/* Button 4: View Missing Photos */}
+            <button
+              onClick={() => {
+                setActiveTab('photos');
+                setPhotosFilter('MISSING');
+              }}
+              className="px-3.5 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+            >
+              <Camera className="w-3.5 h-3.5 text-rose-400" />
+              <span>Rasmsiz mahsulotlar ({settings?.productsWithoutImages ?? 0})</span>
+            </button>
+
+            {/* Button 5: View Sync History / Logs */}
+            <button
+              onClick={() => setActiveTab('logs')}
+              className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+            >
+              <FileText className="w-3.5 h-3.5 text-slate-400" />
+              <span>Sinxronizatsiya tarixi</span>
+            </button>
           </div>
         </div>
 
-        {/* Mini KPI Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-slate-800/80">
+        {/* 11 KPIs Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mt-6 pt-5 border-t border-slate-800/80 text-xs">
+          {/* 1. Auth Status */}
           <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[11px] font-bold text-slate-400 block">Sinxronlangan tovarlar</span>
-            <span className="text-base sm:text-lg font-black text-white">
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">1. Autentifikatsiya</span>
+            <span className="text-xs font-black text-amber-300 truncate block mt-0.5">
+              {settings?.authStatus || 'Kutilmoqda'}
+            </span>
+          </div>
+
+          {/* 2. BILLZ Synced Products */}
+          <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">2. BILLZ tovarlari</span>
+            <span className="text-sm sm:text-base font-black text-white mt-0.5 block">
               {settings?.totalSyncedProducts ?? 0} ta
             </span>
           </div>
+
+          {/* 3. Catalog Products */}
           <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[11px] font-bold text-slate-400 block">Avtomatik rejim</span>
-            <span
-              className={`text-base sm:text-lg font-black ${
-                settings?.autoSyncEnabled ? 'text-emerald-400' : 'text-slate-500'
-              }`}
-            >
-              {settings?.autoSyncEnabled ? `Har ${settings.syncIntervalMinutes} daqiqada` : 'O‘chirilgan'}
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">3. Sayt katalogi</span>
+            <span className="text-sm sm:text-base font-black text-white mt-0.5 block">
+              {settings?.totalCatalogProducts ?? products.length} ta
             </span>
           </div>
+
+          {/* 4. Products With Images */}
+          <div
+            onClick={() => {
+              setActiveTab('photos');
+              setPhotosFilter('HAS_IMAGES');
+            }}
+            className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 cursor-pointer hover:border-emerald-500/40 transition"
+          >
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">4. Rasmli tovarlar</span>
+            <span className="text-sm sm:text-base font-black text-emerald-400 mt-0.5 block">
+              {settings?.productsWithImages ?? 0} ta
+            </span>
+          </div>
+
+          {/* 5. Products Without Images */}
+          <div
+            onClick={() => {
+              setActiveTab('photos');
+              setPhotosFilter('MISSING');
+            }}
+            className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 cursor-pointer hover:border-rose-500/40 transition"
+          >
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">5. Rasmsizlar (Yuklash)</span>
+            <span className="text-sm sm:text-base font-black text-rose-400 mt-0.5 block">
+              {settings?.productsWithoutImages ?? 0} ta →
+            </span>
+          </div>
+
+          {/* 6. Last Sync */}
           <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[11px] font-bold text-slate-400 block">Oxirgi sinxronizatsiya</span>
-            <span className="text-xs sm:text-sm font-bold text-slate-300 truncate block">
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">6. Oxirgi sinxronizatsiya</span>
+            <span className="text-xs font-bold text-slate-200 truncate block mt-0.5">
               {settings?.lastSyncAt
-                ? new Date(settings.lastSyncAt).toLocaleString('uz-UZ', {
-                    day: '2-digit',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-                : 'Hali bajarilmagan'}
+                ? new Date(settings.lastSyncAt).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
+                : 'Bajarilmagan'}
             </span>
           </div>
+
+          {/* 7. Next Sync */}
           <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[11px] font-bold text-slate-400 block">Filiallar soni</span>
-            <span className="text-base sm:text-lg font-black text-amber-300">
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">7. Keyingi rejadagi</span>
+            <span className="text-xs font-bold text-blue-300 truncate block mt-0.5">
+              {settings?.nextSyncAt
+                ? new Date(settings.nextSyncAt).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
+                : settings?.autoSyncEnabled ? `Har ${settings.syncIntervalMinutes}m` : 'O‘chiq'}
+            </span>
+          </div>
+
+          {/* 8. Auto Sync Interval */}
+          <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">8. Avtomatik rejim</span>
+            <span className="text-xs font-black text-emerald-300 truncate block mt-0.5">
+              {settings?.autoSyncEnabled ? `Har ${settings.syncIntervalMinutes || 30} daqiqada` : 'O‘chirilgan'}
+            </span>
+          </div>
+
+          {/* 9. Branches */}
+          <div
+            onClick={() => setActiveTab('branches')}
+            className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 cursor-pointer hover:border-amber-400/40 transition"
+          >
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">9. Filiallar</span>
+            <span className="text-sm sm:text-base font-black text-amber-300 mt-0.5 block">
               {branches.length} ta
+            </span>
+          </div>
+
+          {/* 10. Mingbuloq Filiali va Qoldig'i */}
+          <div className="bg-slate-900/60 rounded-2xl p-3 border border-amber-500/30">
+            <span className="text-[10px] font-bold text-amber-400 block uppercase">10. Shu brand Mingbuloq</span>
+            <span className="text-sm sm:text-base font-black text-amber-300 mt-0.5 block">
+              {settings?.mingbuloqTotalStock ?? 0} dona
+            </span>
+            <span className="text-[10px] font-mono text-slate-400 truncate block mt-0.5" title={settings?.mingbuloqShopId || 'Kutilmoqda'}>
+              ID: {settings?.mingbuloqShopId || 'Aniqlanmoqda'}
+            </span>
+          </div>
+
+          {/* 11. Sayt Eski Mahsulotlari */}
+          <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">11. Sayt eski tovarlari</span>
+            <span className="text-sm sm:text-base font-black text-slate-200 mt-0.5 block">
+              {settings?.legacyProductsCount ?? 32} ta (Saqlangan)
+            </span>
+          </div>
+
+          {/* 11. Last Error / Status */}
+          <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 sm:col-span-2">
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">11. Sinxronizatsiya holati</span>
+            <span
+              className={`text-xs font-bold truncate block mt-0.5 ${
+                settings?.lastError ? 'text-rose-400' : isConnected ? 'text-emerald-400' : 'text-slate-400'
+              }`}
+              title={settings?.lastError || 'Tizim barqaror ishlamoqda'}
+            >
+              {settings?.lastError || (isConnected ? 'Hammasi soz va barqaror' : 'Kalit kiritilishi kutilmoqda')}
             </span>
           </div>
         </div>
@@ -471,7 +616,8 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
       {/* --- SUB-NAVIGATION TABS --- */}
       <div className="flex items-center gap-2 border-b border-slate-800 pb-3 overflow-x-auto no-scrollbar">
         {[
-          { id: 'config', label: '⚙️ API Sozlamalari', desc: 'Kalitlar va ulanish' },
+          { id: 'config', label: '⚙️ API Sozlamalari', desc: 'Secret Token va URL' },
+          { id: 'photos', label: `📸 Mahsulot Rasmlari (${settings?.productsWithoutImages ?? 0} rasmsiz)`, desc: 'Galereya va biriktirish' },
           { id: 'sync', label: '🔄 Sinxronizatsiya & Jadval', desc: 'Avtomatik yangilanish' },
           { id: 'branches', label: '🏢 Filiallar & Do‘konlar', desc: 'Shop ID moslashuvi' },
           { id: 'logs', label: '📜 Tarix & Xatoliklar jurnali', desc: 'Harakatlar audit' },
@@ -494,6 +640,16 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
         })}
       </div>
 
+      {/* --- TAB: PRODUCT PHOTOS MANAGER --- */}
+      {activeTab === 'photos' && (
+        <AdminProductPhotosManager
+          products={products}
+          onRefreshProducts={loadData}
+          showToast={showToast}
+          initialFilter={photosFilter}
+        />
+      )}
+
       {/* --- TAB 1: API CONFIGURATION --- */}
       {activeTab === 'config' && (
         <form onSubmit={handleSaveSettings} className="space-y-6">
@@ -504,7 +660,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
                 Rasmiy BILLZ API Ulanish Parametrlari
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                BILLZ shaxsiy kabinetingizdan (Sozlamalar → Integratsiya / API) olingan ma’lumotlarni kiriting.
+                BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) olingan Secret Tokenni kiriting.
                 Barcha kalitlar backendda AES-256-GCM shifrlash orqali xavfsiz saqlanadi va brauzerga hech qachon to‘liq ko‘rsatilmaydi.
               </p>
             </div>
@@ -529,11 +685,11 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
                 </div>
               </div>
 
-              {/* API Bearer Token */}
+              {/* BILLZ Secret Token */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                    <span>API Token (Bearer)</span>
+                    <span>BILLZ Secret Token</span>
                     <span className="text-rose-400">*</span>
                   </label>
                   {settings?.hasApiKey && (
@@ -548,7 +704,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
                     type={showApiKey ? 'text' : 'password'}
                     value={apiKeyInput}
                     onChange={(e) => setApiKeyInput(e.target.value)}
-                    placeholder={settings?.hasApiKey ? "O‘zgartirish uchun yangisini kiriting..." : "BILLZ Bearer Tokenni kiriting..."}
+                    placeholder={settings?.hasApiKey ? "O‘zgartirish uchun yangisini kiriting..." : "BILLZ Secret Tokenni kiriting..."}
                     className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs sm:text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-400 font-mono transition"
                   />
                   <button
@@ -560,7 +716,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
                   </button>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  HTTP so‘rov sarlavhasida <code className="text-amber-300/80">Authorization: Bearer &lt;token&gt;</code> sifatida yuboriladi.
+                  BILLZ kabineti: <span className="text-slate-400">Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari</span> orqali olingan Secret Token. Tizim uni avtomatik rasmiy <code className="text-amber-300/80">/v1/auth/login</code> orqali Bearer tokenga almashtiradi.
                 </p>
               </div>
 
@@ -569,7 +725,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
                     <span>Platform ID</span>
-                    <span className="text-rose-400">*</span>
+                    <span className="text-slate-500 font-normal text-[11px]">(ixtiyoriy UUID)</span>
                   </label>
                   {settings?.hasPlatformId && (
                     <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
@@ -583,7 +739,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
                     type={showPlatformId ? 'text' : 'password'}
                     value={platformIdInput}
                     onChange={(e) => setPlatformIdInput(e.target.value)}
-                    placeholder={settings?.hasPlatformId ? "O‘zgartirish uchun yangisini kiriting..." : "BILLZ Platform ID raqamini kiriting..."}
+                    placeholder="Standart: 7d4a4c38-dd84-4902-b744-0488b80a4c01"
                     className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs sm:text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-400 font-mono transition"
                   />
                   <button
@@ -595,7 +751,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
                   </button>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  HTTP so‘rov sarlavhasida <code className="text-amber-300/80">platform-id: &lt;id&gt;</code> sifatida yuboriladi.
+                  Bo‘sh qoldirilsa, avtomatik rasmiy BILLZ Platform ID (<code className="text-amber-300/80">7d4a4c38-dd84-4902-b744-0488b80a4c01</code>) ishlatiladi.
                 </p>
               </div>
             </div>

@@ -1,74 +1,76 @@
-# SHU BREND — Render Hostingga Joylashtirish Bo‘yicha Qo‘llanma
+# SHU BREND — Render Hostingga Joylashtirish Bo‘yicha Mukammal Qo‘llanma
 
-Ushbu loyiha **Render.com** platformasida **Web Service** sifatida 100% muammosiz ishlashga to‘liq tayyorlandi.
+Ushbu hujjat **SHU BREND erkaklar kiyim do‘koni** internet-do‘koni platformasini **Render.com** bulutli hosting xizmatiga muvaffaqiyatli, xavfsiz va to‘liq avtomatlashtirilgan tarzda joylashtirish (deploy) jarayonini tushuntiradi.
 
 ---
 
-## 1. Asosiy Sozlamalar (Render Dashboard)
+## 1. Asosiy Xizmat Parametrlari (Render Dashboard)
 
-Render boshqaruv panelida yangi xizmat oching:
+Render boshqaruv panelida (**dashboard.render.com**) yangi xizmat yarating:
+
 - **Service Type:** `Web Service`
 - **Environment / Runtime:** `Node`
-- **Region:** Frankfurt (Frankfurt, EU) yoki Singapore (O‘zbekistonga eng yaqin)
-- **Branch:** `main`
+- **Region:** Frankfurt (EU) yoki Singapore (O‘zbekiston hududiga eng past kechikish / ping)
+- **Branch:** `main` (yoki `master`)
+- **Health Check Path:** `/health` (yoki `/api/health`)
 
-### ⚙️ Buyruqlar (Commands)
+### ⚙️ Build va Start Buyruqlari
 | Parametr | Qiymati |
 | :--- | :--- |
 | **Build Command** | `npm install && npm run build` |
-| **Start Command** | `npm start` |
+| **Start Command** | `npm run start` |
 
-> Izoh: `npm start` buyrug‘i `package.json` dagi `"start": "tsx server.ts"` orqali Express backendni va `dist/` frontendini birgalikda ishga tushiradi.
+> **Eslatma:** `npm run start` buyrug‘i `package.json` orqali `tsx server.ts` ni ishga tushiradi. Server ishlab chiqarish (production) rejimida avtomatik ravishda `dist/` papkasidagi kompillatsiya qilingan React frontendini taqdim etadi va `0.0.0.0` hostida Render belgilagan `PORT` (odatda 10000) orqali tinglaydi.
 
 ---
 
 ## 2. Muhit O‘zgaruvchilari (Environment Variables)
 
-Render-da **Environment** bo‘limiga quyidagi o‘zgaruvchilarni kiriting:
+Render boshqaruv panelidagi **Environment** bo‘limiga quyidagi kalitlarni kiriting:
 
-| Kalit (Key) | Tavsiya etilgan qiymat | Tavsifi |
+| Kalit (Key) | Standart / Tavsiya etilgan qiymat | Tavsifi |
 | :--- | :--- | :--- |
-| `NODE_ENV` | `production` | Saytni ishlab chiqarish rejimida ishlatish |
-| `PORT` | `10000` | Render o‘zi avtomatik belgilaydi (yoki 10000) |
-| `TELEGRAM_BOT_TOKEN` | `1234567890:ABCdef...` | @BotFather dan olingan bot tokeni |
-| `TELEGRAM_CHAT_ID` | `123456789` yoki `-100...` | Xabarlar boradigan admin yoki guruh ID si |
-| `ADMIN_USERNAME` | `admin` | Admin panel uchun login |
-| `ADMIN_PASSWORD` | `KattaHarf_12_BelgiliParol!` | Admin xavfsiz paroli (kamida 12 belgi) |
-| `SERVER_SECRET` | `shu_brend_32_harfli_maxfiy_kalit_2025` | Shifrlash kalitlari uchun maxfiy so‘z |
-| `DATA_DIR` | `/var/data` (Disk ulangan bo‘lsa) | Doimiy baza katalogi |
-| `UPLOADS_DIR` | `/var/data/uploads` (Disk bo‘lsa) | Doimiy yuklangan rasmlar katalogi |
+| `NODE_ENV` | `production` | Ishlab chiqarish rejimini faollashtiradi (Vite dev server o‘rniga to‘g‘ridan-to‘g‘ri static frontend uzatiladi) |
+| `PORT` | `10000` | Render server porti |
+| `ADMIN_USERNAME` | `admin.1212` | Super Admin panel logini |
+| `ADMIN_PASSWORD` | `shubrend.2026` | Super Admin panel paroli |
+| `SERVER_SECRET` | `shu_brend_ultra_secure_server_secret_2026_xyz` | AES-256-GCM shifrlash kaliti (kamida 32 ta tasodifiy belgi) |
+| `DATA_DIR` | `/var/data` | Ma'lumotlar bazasi saqlanadigan doimiy katalog (Persistent Disk) |
+| `UPLOADS_DIR` | `/var/data/uploads` | Yuklangan tovar rasmlari saqlanadigan doimiy katalog (Persistent Disk) |
+| `TELEGRAM_BOT_TOKEN` | *(Ixtiyoriy)* | Telegram bot tokeni (@BotFather dan olingan) |
+| `TELEGRAM_CHAT_ID` | *(Ixtiyoriy)* | Yangi buyurtmalar keladigan admin Telegram chat ID |
+| `BILLZ_API_URL` | `https://api-admin.billz.ai` | BILLZ rasmiy API manzili |
+| `BILLZ_API_KEY` | *(Ixtiyoriy)* | BILLZ platformasidan olingan API kaliti |
+| `BILLZ_PLATFORM_ID` | *(Ixtiyoriy)* | BILLZ platforma identifikatori |
 
 ---
 
 ## 3. Doimiy Ma'lumotlar Bazasi va Rasmlar (Render Persistent Disk)
 
-Render-da server qayta yuklanganda (redeploy yoki restart) fayllar o‘chib ketmasligi uchun:
-1. Render xizmatida **Disks** bo‘limiga kiring.
+Render-da konteyner qayta ishga tushganda yoki yangi versiya yuklanganda tovarlar, buyurtmalar va rasmlar yo‘qolmasligi uchun:
+
+1. Render Web Service sozlamalaridagi **Disks** bo‘limiga kiring.
 2. **Add Disk** tugmasini bosing:
-   - **Name:** `shu-brend-data`
+   - **Name:** `shu-brend-disk`
    - **Mount Path:** `/var/data`
-   - **Size:** `1 GB` (yoki ko‘proq)
-3. Environment variables-ga quyidagilarni kiriting:
+   - **Size:** `5 GB` yoki `10 GB`
+3. Environment variables bo‘limida:
    - `DATA_DIR=/var/data`
    - `UPLOADS_DIR=/var/data/uploads`
-
-> Agar Persistent Disk ulanmasa, dastur loyiha ichidagi `./data` va `./public/uploads` kataloglaridan xatosiz foydalanadi.
+   sozlamalarini ko‘rsating.
 
 ---
 
 ## 4. Telegram Mini App Sozlash
 
-Telegram botingiz orqali Admin boshqaruvini ishga tushirish:
-1. Telegramda **@BotFather** ga kiring.
-2. `/newapp` buyrug‘ini bering yoki botingizni tanlang.
+1. Telegramda **@BotFather** botiga kiring.
+2. `/newapp` buyrug‘ini yuboring va botingizni tanlang.
 3. Web App URL manziliga quyidagini kiriting:
-   `https://SIZNING-RENDER-DOMENINGIZ.onrender.com/telegram-admin`
-4. Endi administratorlar Telegramdan chiqmasdan barcha yangi buyurtmalarni ko‘rishlari, to‘lovni tasdiqlashlari va mijozga bir bosishda qo‘ng‘iroq qilishlari mumkin.
+   `https://SIZNING-LOYIHA-NOMI.onrender.com/telegram-admin`
+4. Endi administratorlar Telegram ichida to‘g‘ridan-to‘g‘ri buyurtmalarni ko‘rib, ularni tasdiqlashlari mumkin.
 
 ---
 
-## 5. Natija va Xavfsizlik
+## 5. Render Blueprint orqali 1-Bosqichli Ishga Tushirish
 
-- **404 xatosi yo‘q:** Barcha sahifalar (shu jumladan `/telegram-admin`, `/clothing`, `/cart`) sahifa yangilanganda ham Express SPA router orqali bekamu-ko‘st ochiladi.
-- **Xavfsiz admin autentifikatsiyasi:** Server tomonida `scrypt` va tuzli (salt) shifrlash bilan himoyalangan.
-- **HUMO karta to‘lovlari:** Click va Paynet orqali karta raqamiga to‘g‘ridan-to‘g‘ri pul o‘tkazish tizimi to‘liq saqlangan.
+Loyihaning ildiz papkasida `render.yaml` fayli tayyorlangan. Agar siz loyihani GitHub ombori orqali Renderga "Blueprint" sifatida ulasangiz, barcha sozlamalar, buyruqlar va disk avtomatik konfiguratsiya qilinadi.

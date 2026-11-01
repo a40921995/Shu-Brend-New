@@ -38,11 +38,11 @@ export const ProfilePage: React.FC = () => {
   const [name, setName] = useState(user?.name || 'Abdulaziz');
   const [phone, setPhone] = useState(user?.phone || '+998 90 123 45 67');
   const [email, setEmail] = useState(user?.email || 'abdulaziz@gmail.com');
-  const [region, setRegion] = useState(user?.region || 'Toshkent viloyati');
-  const [city, setCity] = useState(user?.city || 'Toshkent');
-  const [address, setAddress] = useState(user?.address || 'Yunusobod tumani, 5-mavze, 14-uy');
+  const [region, setRegion] = useState(user?.region || 'Namangan viloyati');
+  const [city, setCity] = useState(user?.city || 'To‘raqo‘rg‘on tumani');
+  const [address, setAddress] = useState(user?.address || 'To‘raqo‘rg‘on');
   const [location, setLocation] = useState<LocationCoords | undefined>(
-    user?.location || { lat: 41.3533, lng: 69.2872, address: 'Yunusobod tumani, 5-mavze' }
+    user?.location || { lat: 41.001399, lng: 71.505682, address: 'To‘raqo‘rg‘on tumani' }
   );
 
   const [orders, setOrders] = useState<Order[]>([]);

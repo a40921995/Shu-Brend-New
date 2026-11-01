@@ -456,7 +456,7 @@ export const CartPage: React.FC = () => {
                   <label className="text-[11px] text-slate-400 block mb-1">Shahar / Tuman</label>
                   <input
                     type="text"
-                    placeholder="Yunusobod tumani"
+                    placeholder="Masalan: To‘raqo‘rg‘on tumani"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-900 text-xs text-white rounded-xl border border-slate-700 focus:border-[#d4af37] focus:outline-none"

@@ -89,6 +89,10 @@ export interface Product {
     origin?: string;
   };
   createdAt: string;
+  costPrice?: number;
+  hasCustomImages?: boolean;
+  colorImages?: Record<string, string[]>;
+  source?: 'MANUAL' | 'BILLZ';
 }
 
 export interface CartItem {
@@ -358,6 +362,16 @@ export interface BillzSettings {
   syncPrices: boolean;
   syncStock: boolean;
   totalSyncedProducts?: number;
+  totalCatalogProducts?: number;
+  productsWithImages?: number;
+  productsWithoutImages?: number;
+  nextSyncAt?: string;
+  authStatus?: string;
+  isSyncing?: boolean;
+  mingbuloqShopId?: string;
+  mingbuloqShopName?: string;
+  mingbuloqTotalStock?: number;
+  legacyProductsCount?: number;
 }
 
 export interface BillzSyncLog {

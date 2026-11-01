@@ -17,6 +17,54 @@ import type {
   WarehouseStats,
 } from '../types/index.ts';
 
+// Helper: Safely fetch and parse JSON avoiding HTML or non-JSON crashes
+export async function safeFetchJson<T = any>(
+  url: string,
+  options?: RequestInit,
+  fallbackError = 'Serverdan javob olishda xatolik'
+): Promise<T> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('shubrend_token') || '' : '';
+  const headers = new Headers(options?.headers || {});
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const res = await fetch(url, { ...options, headers });
+  const contentType = (res.headers.get('content-type') || '').toLowerCase();
+  const isJson = contentType.includes('application/json');
+
+  if (!isJson) {
+    const rawText = await res.text().catch(() => '');
+    const isHtml =
+      rawText.trim().startsWith('<') ||
+      rawText.toLowerCase().includes('<!doctype') ||
+      rawText.toLowerCase().includes('<html');
+
+    if (isHtml) {
+      throw new Error(`Server JSON o‘rniga HTML sahifasini qaytardi (HTTP ${res.status}). Server marshruti yoki xizmat holatini tekshiring.`);
+    }
+    throw new Error(
+      res.ok
+        ? `Server kutilmagan formatda javob qaytardi (${contentType || 'noma‘lum'}): ${rawText.slice(0, 100) || fallbackError}`
+        : `Server xatosi (HTTP ${res.status}): ${rawText.slice(0, 150) || fallbackError}`
+    );
+  }
+
+  let data: any;
+  try {
+    data = await res.json();
+  } catch (err: any) {
+    throw new Error(`JSON formatini tahlil qilib bo‘lmadi: ${err.message || fallbackError}`);
+  }
+
+  if (!res.ok) {
+    const errorMsg = data?.message || data?.error || fallbackError;
+    throw new Error(errorMsg);
+  }
+
+  return data as T;
+}
+
 export const api = {
   // Settings
   async getSettings(): Promise<SiteSettings> {
@@ -406,8 +454,11 @@ export const api = {
   },
 
   // Admin Security Management
-  async getAdminSecurityInfo(): Promise<{ username: string; lastPasswordChange?: string }> {
-    const res = await fetch('/api/admin/security');
+  async getAdminSecurityInfo(): Promise<{ username: string; lastPasswordChange?: string; masterRecoveryKey?: string; isAuthenticated?: boolean }> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('shubrend_token') || '' : '';
+    const res = await fetch('/api/admin/security', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
     if (!res.ok) throw new Error('Xavfsizlik ma‘lumotlarini yuklab bo‘lmadi');
     return res.json();
   },
@@ -432,6 +483,38 @@ export const api = {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Parolni o‘zgartirib bo‘lmadi');
     return data;
+  },
+
+  async getAdminRecoveryStatus(): Promise<{ telegramAvailable: boolean; chatIdMasked?: string; masterKeyAvailable: boolean }> {
+    const res = await fetch('/api/auth/admin/recovery-status');
+    if (!res.ok) throw new Error('Tiklash holatini olishda xatolik');
+    return res.json();
+  },
+
+  async requestAdminRecoveryCode(): Promise<{ success: boolean; message: string; expiresAt?: string }> {
+    const res = await fetch('/api/auth/admin/request-recovery-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Tiklash kodini yuborib bo‘lmadi');
+    return data;
+  },
+
+  async resetAdminPassword(data: {
+    recoveryMethod: 'TELEGRAM_CODE' | 'MASTER_KEY';
+    codeOrKey: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Promise<{ success: boolean; message: string }> {
+    const res = await fetch('/api/auth/admin/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Parolni tiklashda xatolik');
+    return json;
   },
 
 
@@ -592,9 +675,11 @@ export const api = {
 
   // --- BILLZ INTEGRATION ---
   async getBillzSettings(): Promise<BillzSettings> {
-    const res = await fetch('/api/billz/settings');
-    if (!res.ok) throw new Error('BILLZ sozlamalarini yuklab bo‘lmadi');
-    return res.json();
+    return safeFetchJson<BillzSettings>(
+      '/api/integrations/billz/settings',
+      undefined,
+      'BILLZ sozlamalarini yuklab bo‘lmadi'
+    );
   },
   async updateBillzSettings(data: {
     apiUrl?: string;
@@ -607,16 +692,15 @@ export const api = {
     syncPrices?: boolean;
     syncStock?: boolean;
   }): Promise<{ success: boolean; message: string; settings: BillzSettings }> {
-    const res = await fetch('/api/billz/settings', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'BILLZ sozlamalarini saqlab bo‘lmadi');
-    }
-    return res.json();
+    return safeFetchJson(
+      '/api/integrations/billz/settings',
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      },
+      'BILLZ sozlamalarini saqlab bo‘lmadi'
+    );
   },
   async testBillzConnection(data?: { apiUrl?: string; apiKey?: string; platformId?: string }): Promise<{
     success: boolean;
@@ -626,12 +710,15 @@ export const api = {
     productsFound?: number;
     error?: string;
   }> {
-    const res = await fetch('/api/billz/test-connection', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data || {}),
-    });
-    return res.json();
+    return safeFetchJson(
+      '/api/integrations/billz/test-connection',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data || {}),
+      },
+      'BILLZ aloqasini tekshirishda xatolik'
+    );
   },
   async syncBillzProducts(): Promise<{
     success: boolean;
@@ -643,25 +730,46 @@ export const api = {
     errors: string[];
     durationMs: number;
   }> {
-    const res = await fetch('/api/billz/sync-products', { method: 'POST' });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || err.error || 'Sinxronizatsiyada xatolik yuz berdi');
-    }
-    return res.json();
+    return safeFetchJson(
+      '/api/integrations/billz/sync-products',
+      { method: 'POST' },
+      'Sinxronizatsiyada xatolik yuz berdi'
+    );
   },
   async getBillzLogs(limit = 100): Promise<BillzSyncLog[]> {
-    const res = await fetch(`/api/billz/logs?limit=${limit}`);
-    if (!res.ok) throw new Error('BILLZ jurnallarini yuklab bo‘lmadi');
-    return res.json();
+    return safeFetchJson<BillzSyncLog[]>(
+      `/api/integrations/billz/logs?limit=${limit}`,
+      undefined,
+      'BILLZ jurnallarini yuklab bo‘lmadi'
+    );
+  },
+  async stopBillzSync(): Promise<{ success: boolean; stopped: boolean; message: string }> {
+    return safeFetchJson(
+      '/api/integrations/billz/stop-sync',
+      { method: 'POST' },
+      'Sinxronizatsiyani to‘xtatishda xatolik'
+    );
+  },
+  async updateProductPhotos(
+    productId: string,
+    data: { images: string[]; colorImages?: Record<string, string[]>; primaryImage?: string }
+  ): Promise<{ success: boolean; message: string; product: Product }> {
+    return safeFetchJson(
+      `/api/products/${productId}/photos`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      },
+      'Mahsulot rasmlarini saqlashda xatolik'
+    );
   },
   async syncOrderToBillz(orderId: string): Promise<{ success: boolean; billzSaleId?: string; message: string }> {
-    const res = await fetch(`/api/billz/sync-order/${orderId}`, { method: 'POST' });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Buyurtmani BILLZ ga uzatib bo‘lmadi');
-    }
-    return res.json();
+    return safeFetchJson(
+      `/api/integrations/billz/sync-order/${orderId}`,
+      { method: 'POST' },
+      'Buyurtmani BILLZ ga uzatib bo‘lmadi'
+    );
   },
 
   // --- BRANCHES ---

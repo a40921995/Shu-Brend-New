@@ -114,7 +114,14 @@ export const AdminDashboardPage: React.FC = () => {
   const [telegramEnabled, setTelegramEnabled] = useState(true);
 
   // --- SECURITY SETTINGS DEDICATED STATE ---
-  const [adminSecurityInfo, setAdminSecurityInfo] = useState<{ username: string; lastPasswordChange?: string }>({ username: 'admin' });
+  const [adminSecurityInfo, setAdminSecurityInfo] = useState<{
+    username: string;
+    lastPasswordChange?: string;
+    masterRecoveryKey?: string;
+    telegramConnected?: boolean;
+  }>({ username: 'admin' });
+  const [showMasterRecoveryKey, setShowMasterRecoveryKey] = useState(false);
+  const [copiedRecoveryKey, setCopiedRecoveryKey] = useState(false);
   const [newLoginInput, setNewLoginInput] = useState('');
   const [loginCurrentPassInput, setLoginCurrentPassInput] = useState('');
   const [showLoginCurrentPass, setShowLoginCurrentPass] = useState(false);
@@ -1695,6 +1702,81 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* 3. Favqulodda Master Tiklash Kaliti (Emergency Master Recovery Key) */}
+            <div className="bg-[#131b2a] rounded-3xl p-6 sm:p-7 border border-[#d4af37]/40 shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#d4af37]/15 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37]">
+                    <Key className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <span>Favqulodda Master Tiklash Kaliti</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        SUPER ADMIN
+                      </span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Agar parolni unutib qo‘ysangiz yoki Telegram bot ishlamay qolsa, ushbu maxfiy kalit orqali parolni darhol tiklashingiz mumkin.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowMasterRecoveryKey(!showMasterRecoveryKey)}
+                    className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {showMasterRecoveryKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    <span>{showMasterRecoveryKey ? 'Yashirish' : 'Ko‘rsatish'}</span>
+                  </button>
+                  {adminSecurityInfo.masterRecoveryKey && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(adminSecurityInfo.masterRecoveryKey || '');
+                        setCopiedRecoveryKey(true);
+                        showToast('Master kalit nusxalandi! Xavfsiz joyda saqlang.', 'info');
+                        setTimeout(() => setCopiedRecoveryKey(false), 2500);
+                      }}
+                      className="px-3.5 py-2 rounded-xl gold-gradient-bg text-black text-xs font-black transition flex items-center gap-1.5 cursor-pointer hover:brightness-110 active:scale-95"
+                    >
+                      {copiedRecoveryKey ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedRecoveryKey ? 'Nusxalandi' : 'Nusxa olish'}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800">
+                <span className="text-[11px] text-slate-400 block mb-1.5 font-medium">
+                  Sizning shaxsiy Master Recovery Kalitingiz:
+                </span>
+                <div className="font-mono text-sm sm:text-base font-black tracking-wider text-[#d4af37] select-all break-all">
+                  {showMasterRecoveryKey
+                    ? (adminSecurityInfo.masterRecoveryKey || 'SHU-RCV-••••-••••-••••')
+                    : 'SHU-RCV-••••-••••-•••• (Himoyalangan)'}
+                </div>
+              </div>
+
+              <div className="text-[11px] text-slate-400 space-y-1 bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4">
+                <p className="font-bold text-amber-300 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Xavfsizlik eslatmasi:</span>
+                </p>
+                <p>
+                  • Ushbu kalitni faqat o‘zingiz biladigan maxfiy joyda (masalan, shaxsiy bloknot yoki parol menejerida) saqlang.
+                </p>
+                <p>
+                  • Uni hech kimga bermang va ijtimoiy tarmoqlarda yoki ochiq kodda tarqatmang.
+                </p>
+                <p>
+                  • Tizimga kira olmagan vaqtingizda, Login oynasidagi "Parolni unutdingizmi?" tugmasini bosib, "Favqulodda Master Kalit" usulini tanlang va ushbu kalitni kiritib yangi kuchli parol o‘rnating.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -2296,6 +2378,43 @@ export const AdminDashboardPage: React.FC = () => {
                   onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
                   className="w-full px-3.5 py-2.5 bg-slate-900 text-sm text-white rounded-xl border border-slate-700"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Xarita kengligi (Latitude / Kenglik)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={settingsForm.location?.lat ?? 41.001399}
+                    onChange={(e) => setSettingsForm({
+                      ...settingsForm,
+                      location: {
+                        address: settingsForm.address || 'To‘raqo‘rg‘on, Namangan viloyati',
+                        lng: settingsForm.location?.lng ?? 71.505682,
+                        lat: parseFloat(e.target.value) || 0,
+                      }
+                    })}
+                    className="w-full px-3.5 py-2.5 bg-slate-900 text-sm text-white rounded-xl border border-slate-700 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Xarita uzunligi (Longitude / Uzunlik)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={settingsForm.location?.lng ?? 71.505682}
+                    onChange={(e) => setSettingsForm({
+                      ...settingsForm,
+                      location: {
+                        address: settingsForm.address || 'To‘raqo‘rg‘on, Namangan viloyati',
+                        lat: settingsForm.location?.lat ?? 41.001399,
+                        lng: parseFloat(e.target.value) || 0,
+                      }
+                    })}
+                    className="w-full px-3.5 py-2.5 bg-slate-900 text-sm text-white rounded-xl border border-slate-700 font-mono"
+                  />
+                </div>
               </div>
 
               <div className="pt-4 border-t border-slate-800">

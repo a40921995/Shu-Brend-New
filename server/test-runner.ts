@@ -1,5 +1,5 @@
 import { db } from './db.ts';
-import { hashPassword, verifyPassword } from './security.ts';
+import { hashPassword, verifyPassword, getMasterRecoveryKey, verifyRecoveryKey, generateSixDigitCode } from './security.ts';
 import { billzService } from './billz.ts';
 import type { Banner, Branch, Category, Order, Product } from '../src/types/index.ts';
 
@@ -670,6 +670,94 @@ async function runFullTestSuite() {
     const foundLog = logs.find(l => l.id === log.id);
 
     return !!foundLog && foundLog.itemsCount === 45 && foundLog.status === 'SUCCESS';
+  });
+
+  // 37. Super Admin: Xavfsiz scrypt hashing va doimiy salt
+  runTest(37, 'Super Admin: Parol xavfsiz scrypt orqali xeshlanishi va salt bilan himoyalanishi', () => {
+    const testSecret = 'SuperSecret@2025_TestPass';
+    const hash1 = hashPassword(testSecret);
+    const hash2 = hashPassword(testSecret);
+
+    // Both must start with scrypt: and contain different salts
+    const isScrypt1 = hash1.startsWith('scrypt:');
+    const isScrypt2 = hash2.startsWith('scrypt:');
+    const differentSalts = hash1 !== hash2; // random salt ensures distinct hashes
+    const verifyValid = verifyPassword(testSecret, hash1);
+    const verifyInvalid = !verifyPassword('WrongPassword123', hash1);
+
+    return isScrypt1 && isScrypt2 && differentSalts && verifyValid && verifyInvalid;
+  });
+
+  // 38. Super Admin: Telegram 6-xonali OTP kod generatsiyasi, muddati va urinishlar limiti
+  runTest(38, 'Super Admin: Telegram 6-xonali OTP kod generatsiyasi, muddati va urinishlar limiti', () => {
+    const code = generateSixDigitCode();
+    if (!/^\d{6}$/.test(code)) return false;
+
+    // Set code with 10 min expiry
+    db.setAdminRecoveryCode(code, 10);
+    const sec1 = db.getAdminSecurity();
+    if (!sec1.activeRecoveryCode || sec1.activeRecoveryCode.code !== code) return false;
+
+    // Wrong code attempt test
+    const wrongAttempt = db.verifyAndConsumeAdminRecoveryCode('000000');
+    if (wrongAttempt.valid !== false) return false;
+
+    // Valid code verification and single-use consumption test
+    const validAttempt = db.verifyAndConsumeAdminRecoveryCode(code);
+    if (validAttempt.valid !== true) return false;
+
+    // Second use of same code must fail (single-use token)
+    const secondAttempt = db.verifyAndConsumeAdminRecoveryCode(code);
+    return secondAttempt.valid === false;
+  });
+
+  // 39. Super Admin: Favqulodda Master Tiklash Kaliti (Master Recovery Key)
+  runTest(39, 'Super Admin: Favqulodda Master Recovery Key generatsiyasi va timing-safe solishtirish', () => {
+    const masterKey = getMasterRecoveryKey();
+    if (!masterKey || !masterKey.startsWith('SHU-RCV-')) return false;
+
+    const isValid = verifyRecoveryKey(masterKey);
+    const isInvalid = !verifyRecoveryKey('SHU-RCV-INVALID-KEY-9999');
+    const isBlank = !verifyRecoveryKey('');
+
+    return isValid && isInvalid && isBlank;
+  });
+
+  // 40. Super Admin: Yangi parol o‘rnatilganda sessiya versiyasi oshishi va mavjud ma‘lumotlar butunligi
+  runTest(40, 'Super Admin: Parol yangilanganda sessionTokenVersion oshishi va mavjud mahsulot/buyurtmalar saqlanishi', () => {
+    const secBefore = db.getAdminSecurity();
+    const productsCountBefore = db.getProducts().length;
+    const ordersCountBefore = db.getOrders().length;
+    const branchesCountBefore = db.getBranches().length;
+
+    const initialVersion = secBefore.sessionTokenVersion || 1;
+    const dummyNewHash = hashPassword('NewComplexPassword_2025_Test');
+
+    db.updateAdminSecurity({
+      passwordHash: dummyNewHash,
+      sessionTokenVersion: initialVersion + 1,
+      lastPasswordChange: new Date().toISOString(),
+    });
+
+    const secAfter = db.getAdminSecurity();
+    const productsCountAfter = db.getProducts().length;
+    const ordersCountAfter = db.getOrders().length;
+    const branchesCountAfter = db.getBranches().length;
+
+    const versionUpdated = secAfter.sessionTokenVersion === initialVersion + 1;
+    const dataIntact = (productsCountBefore === productsCountAfter) &&
+                       (ordersCountBefore === ordersCountAfter) &&
+                       (branchesCountBefore === branchesCountAfter);
+
+    // Restore original admin password hash and config so test runner is idempotent
+    db.updateAdminSecurity({
+      passwordHash: secBefore.passwordHash,
+      sessionTokenVersion: secBefore.sessionTokenVersion,
+      lastPasswordChange: secBefore.lastPasswordChange,
+      username: secBefore.username,
+    });
+
+    return versionUpdated && dataIntact;
   });
 
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

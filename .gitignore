@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+.recovery.key
+data/.recovery.key
+data/*.tmp
+

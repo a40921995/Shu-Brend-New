@@ -138,7 +138,7 @@ export const Footer: React.FC = () => {
 
             <div className="flex items-start gap-2.5 text-xs">
               <MapPin className="w-4 h-4 text-[#d4af37] shrink-0 mt-0.5" />
-              <span>{settings?.address || 'Toshkent shahar, Yunusobod tumani'}</span>
+              <span>{settings?.address || 'To‘raqo‘rg‘on, Namangan viloyati'}</span>
             </div>
 
             <div className="flex items-start gap-2.5 text-xs">

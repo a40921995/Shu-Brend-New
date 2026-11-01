@@ -21,12 +21,12 @@ export const MapPickerModal: React.FC<MapPickerModalProps> = ({
   const markerRef = useRef<L.Marker | null>(null);
 
   const [coords, setCoords] = useState<{ lat: number; lng: number }>({
-    lat: initialCoords?.lat || 41.311081,
-    lng: initialCoords?.lng || 69.240562,
+    lat: initialCoords?.lat || 41.001399,
+    lng: initialCoords?.lng || 71.505682,
   });
 
   const [resolvedAddress, setResolvedAddress] = useState<string>(
-    initialCoords?.address || 'Toshkent shahri'
+    initialCoords?.address || 'To‘raqo‘rg‘on, Namangan viloyati'
   );
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [isLocatingGPS, setIsLocatingGPS] = useState(false);

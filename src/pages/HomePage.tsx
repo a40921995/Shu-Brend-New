@@ -468,7 +468,7 @@ export const HomePage: React.FC = () => {
                   <div>
                     <span className="text-xs text-slate-400 font-semibold block">Do‘kon manzili</span>
                     <span className="text-sm font-bold text-white mt-0.5 block">
-                      {settings?.address || 'Toshkent shahar, Yunusobod tumani, 5-mavze'}
+                      {settings?.address || 'To‘raqo‘rg‘on, Namangan viloyati'}
                     </span>
                   </div>
                 </div>
@@ -526,22 +526,24 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Interactive Boutique Location Card / Static Map preview */}
+              {/* Interactive Boutique Location Card / Static Map preview */}
             <div className="rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl relative min-h-[300px] sm:min-h-[360px] bg-slate-950 flex flex-col justify-end p-5">
               <iframe
                 title="SHU BREND Lokatsiyasi"
                 width="100%"
                 height="100%"
                 className="absolute inset-0 border-0 filter invert-[0.9] hue-rotate-180 brightness-90 contrast-125"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=69.2600%2C41.3400%2C69.3100%2C41.3700&amp;layer=mapnik&amp;marker=41.3533%2C69.2872"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=71.4800%2C40.9850%2C71.5300%2C41.0180&amp;layer=mapnik&amp;marker=${settings?.location?.lat || 41.001399}%2C${settings?.location?.lng || 71.505682}`}
               />
               <div className="relative z-10 p-4 rounded-xl bg-black/85 backdrop-blur-md border border-slate-700 flex items-center justify-between">
                 <div>
                   <span className="text-xs font-bold text-[#d4af37] block">Boutique & Showroom</span>
-                  <span className="text-sm font-semibold text-white">Yunusobod tumani, 5-mavze</span>
+                  <span className="text-sm font-semibold text-white">
+                    {settings?.address || 'To‘raqo‘rg‘on, Namangan viloyati'}
+                  </span>
                 </div>
                 <a
-                  href={`https://yandex.uz/maps/?pt=${settings?.location.lng || 69.2872},${settings?.location.lat || 41.3533}&z=16&l=map`}
+                  href={`https://yandex.uz/maps/?pt=${settings?.location?.lng || 71.505682},${settings?.location?.lat || 41.001399}&z=16&l=map`}
                   target="_blank"
                   rel="noreferrer"
                   className="px-3.5 py-2 rounded-lg gold-gradient-bg text-black font-extrabold text-xs shadow-md transition active:scale-95"

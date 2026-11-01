@@ -31,6 +31,11 @@ export interface AdminSecurityConfig {
   passwordHash: string;
   sessionTokenVersion: number;
   lastPasswordChange?: string;
+  activeRecoveryCode?: {
+    code: string;
+    expiresAt: string;
+    attempts: number;
+  };
 }
 
 export interface BillzStorageConfig {
@@ -423,12 +428,12 @@ const INITIAL_DATA: DatabaseSchema = {
     phone: '+998 90 123 45 67',
     telegramUrl: 'https://t.me/shubrend',
     instagramUrl: 'https://instagram.com/shubrend',
-    address: 'Toshkent shahar, Yunusobod tumani, 5-mavze',
+    address: 'To‘raqo‘rg‘on, Namangan viloyati',
     workingHours: '09:00 - 22:00',
     location: {
-      lat: 41.3533,
-      lng: 69.2872,
-      address: 'Toshkent shahar, Yunusobod tumani, 5-mavze',
+      lat: 41.001399,
+      lng: 71.505682,
+      address: 'To‘raqo‘rg‘on, Namangan viloyati',
     },
     headerNotice: 'Yetkazib berish butun O‘zbekiston bo‘ylab tekinga amalga oshiriladi!',
     currency: 'so‘m',
@@ -577,6 +582,7 @@ class Database {
             syncStock: true,
           },
           billzLogs: Array.isArray(parsed.billzLogs) ? parsed.billzLogs : [],
+          adminSecurity: parsed.adminSecurity,
         };
       }
     } catch (err) {
@@ -1332,8 +1338,8 @@ class Database {
   // Admin Security Management
   getAdminSecurity(): AdminSecurityConfig {
     if (!this.data.adminSecurity) {
-      const defaultUser = process.env.ADMIN_USERNAME?.trim() || 'admin';
-      const defaultPass = process.env.ADMIN_PASSWORD?.trim() || 'admin12345678';
+      const defaultUser = process.env.ADMIN_USERNAME?.trim() || 'admin.1212';
+      const defaultPass = process.env.ADMIN_PASSWORD?.trim() || 'shubrend.2026';
       this.data.adminSecurity = {
         username: defaultUser,
         passwordHash: hashPassword(defaultPass),
@@ -1353,6 +1359,49 @@ class Database {
     };
     this.saveData();
     return this.data.adminSecurity;
+  }
+
+  setAdminRecoveryCode(code: string, ttlMinutes = 10) {
+    const sec = this.getAdminSecurity();
+    const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000).toISOString();
+    sec.activeRecoveryCode = {
+      code: code.trim(),
+      expiresAt,
+      attempts: 0,
+    };
+    this.saveData();
+    return expiresAt;
+  }
+
+  verifyAndConsumeAdminRecoveryCode(inputCode: string): { valid: boolean; reason?: string } {
+    const sec = this.getAdminSecurity();
+    const active = sec.activeRecoveryCode;
+    if (!active || !active.code) {
+      return { valid: false, reason: 'Faol tiklash kodi topilmadi. Qaytadan kod so‘rang.' };
+    }
+
+    if (new Date(active.expiresAt).getTime() < Date.now()) {
+      delete sec.activeRecoveryCode;
+      this.saveData();
+      return { valid: false, reason: 'Tasdiqlash kodining amal qilish muddati (10 daqiqa) tugagan. Yangi kod so‘rang.' };
+    }
+
+    active.attempts = (active.attempts || 0) + 1;
+    if (active.attempts > 5) {
+      delete sec.activeRecoveryCode;
+      this.saveData();
+      return { valid: false, reason: 'Kod noto‘g‘ri kiritish limiti (5 marta) oshib ketdi. Yangi kod so‘rang.' };
+    }
+
+    if (active.code.trim() !== inputCode.trim()) {
+      this.saveData();
+      return { valid: false, reason: `Tasdiqlash kodi noto‘g‘ri! (Qolgan urinishlar: ${Math.max(0, 5 - active.attempts)})` };
+    }
+
+    // Success: consume code
+    delete sec.activeRecoveryCode;
+    this.saveData();
+    return { valid: true };
   }
 
   // Transactions

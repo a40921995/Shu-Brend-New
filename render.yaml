@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: shu-brend
+    env: node
+    plan: starter
+    region: frankfurt
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    disk:
+      name: shu-data
+      mountPath: /var/data
+      sizeGB: 10
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SERVER_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin.1212
+      - key: ADMIN_PASSWORD
+        value: shubrend.2026
+      - key: DATA_DIR
+        value: /var/data
+      - key: UPLOADS_DIR
+        value: /var/data/uploads

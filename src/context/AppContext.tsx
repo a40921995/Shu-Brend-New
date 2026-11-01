@@ -89,10 +89,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             phone: '+998 90 123 45 67',
             email: 'abdulaziz@gmail.com',
             role: 'CUSTOMER',
-            region: 'Toshkent viloyati',
-            city: 'Toshkent',
-            address: 'Yunusobod tumani, 5-mavze, 14-uy',
-            location: { lat: 41.3533, lng: 69.2872, address: 'Yunusobod tumani, 5-mavze' },
+            region: 'Namangan viloyati',
+            city: 'To‘raqo‘rg‘on tumani',
+            address: 'To‘raqo‘rg‘on',
+            location: { lat: 41.001399, lng: 71.505682, address: 'To‘raqo‘rg‘on tumani' },
             createdAt: '2025-01-10T00:00:00Z',
           };
     } catch {
@@ -237,6 +237,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const adminLogin = async (usernameOrPhone: string, pass: string) => {
     try {
       const res = await api.adminLogin(usernameOrPhone, pass);
+      if (res.token) {
+        localStorage.setItem('shubrend_token', res.token);
+      }
       setUser(res.user);
       setIsAdminLoginModalOpen(false);
       setActiveTab('admin');
@@ -251,6 +254,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const register = async (data: any) => {
     try {
       const res = await api.register(data);
+      if (res.token) {
+        localStorage.setItem('shubrend_token', res.token);
+      }
       setUser(res.user);
       showToast('Muvaffaqiyatli ro‘yxatdan o‘tdingiz!', 'success');
       return true;
@@ -261,6 +267,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const logout = () => {
+    localStorage.removeItem('shubrend_token');
     setUser(null);
     showToast('Tizimdan chiqildi', 'info');
     setActiveTab('home');

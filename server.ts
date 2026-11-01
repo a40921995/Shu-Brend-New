@@ -5,7 +5,16 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import multer from 'multer';
 import { db } from './server/db.ts';
-import { decryptSecret, encryptSecret, hashPassword, maskToken, verifyPassword } from './server/security.ts';
+import {
+  decryptSecret,
+  encryptSecret,
+  generateSixDigitCode,
+  getMasterRecoveryKey,
+  hashPassword,
+  maskToken,
+  verifyPassword,
+  verifyRecoveryKey,
+} from './server/security.ts';
 import { billzService } from './server/billz.ts';
 import type { Banner, Branch, Category, Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus, PaymentTransaction, Product, Review, User } from './src/types/index.ts';
 
@@ -64,10 +73,12 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 
 // --- API ENDPOINTS ---
 
-// Health check
-app.get('/api/health', (_req: Request, res: Response) => {
+// Health check (supports both /api/health and /health for Render)
+const handleHealthCheck = (_req: Request, res: Response) => {
   res.json({ status: 'ok', brand: 'SHU BREND', timestamp: new Date().toISOString() });
-});
+};
+app.get('/api/health', handleHealthCheck);
+app.get('/health', handleHealthCheck);
 
 // Single file upload endpoint with safe error handling
 app.post('/api/upload', (req: Request, res: Response) => {
@@ -127,6 +138,21 @@ app.post('/api/upload-base64', (req: Request, res: Response) => {
     res.json({ url: `/uploads/${fname}`, filename: fname });
   } catch (err: any) {
     res.status(500).json({ error: err.message || 'Base64 rasm saqlashda xatolik yuz berdi' });
+  }
+});
+
+// Delete uploaded image safely
+app.delete('/api/upload/:filename', (req: Request, res: Response) => {
+  try {
+    const safeFilename = path.basename(req.params.filename);
+    const targetFile = path.join(UPLOADS_DIR, safeFilename);
+    if (fs.existsSync(targetFile)) {
+      fs.unlinkSync(targetFile);
+      return res.json({ success: true, message: 'Rasm muvaffaqiyatli o‘chirildi' });
+    }
+    return res.status(404).json({ error: 'Rasm topilmadi' });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Rasmni o‘chirishda xatolik: ' + err.message });
   }
 });
 
@@ -504,44 +530,53 @@ app.post('/api/inventory/cancel-log/:id', (req: Request, res: Response) => {
 });
 
 // --- BILLZ INTEGRATION API ENDPOINTS ---
+// Mounted on dedicated /api/integrations/billz namespace and /api/billz alias
 
-app.get('/api/billz/settings', (_req: Request, res: Response) => {
+const handleGetBillzSettings = (_req: Request, res: Response) => {
   try {
     const settings = billzService.getPublicSettings();
     res.json(settings);
   } catch (err: any) {
     res.status(500).json({ error: 'BILLZ sozlamalarini olishda xatolik: ' + err.message });
   }
-});
+};
+app.get('/api/integrations/billz/settings', handleGetBillzSettings);
+app.get('/api/billz/settings', handleGetBillzSettings);
 
-app.put('/api/billz/settings', (req: Request, res: Response) => {
+const handleUpdateBillzSettings = (req: Request, res: Response) => {
   try {
     const updated = billzService.updateSettings(req.body);
     res.json({ success: true, message: 'BILLZ sozlamalari muvaffaqiyatli saqlandi', settings: updated });
   } catch (err: any) {
     res.status(400).json({ error: 'BILLZ sozlamalarini saqlashda xatolik: ' + err.message });
   }
-});
+};
+app.put('/api/integrations/billz/settings', handleUpdateBillzSettings);
+app.put('/api/billz/settings', handleUpdateBillzSettings);
 
-app.post('/api/billz/test-connection', async (req: Request, res: Response) => {
+const handleTestBillzConnection = async (req: Request, res: Response) => {
   try {
     const result = await billzService.testConnection(req.body);
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ success: false, status: 'ERROR', message: err.message });
   }
-});
+};
+app.post('/api/integrations/billz/test-connection', handleTestBillzConnection);
+app.post('/api/billz/test-connection', handleTestBillzConnection);
 
-app.post('/api/billz/sync-products', async (_req: Request, res: Response) => {
+const handleSyncBillzProducts = async (_req: Request, res: Response) => {
   try {
     const result = await billzService.syncProducts();
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message, errors: [err.message] });
   }
-});
+};
+app.post('/api/integrations/billz/sync-products', handleSyncBillzProducts);
+app.post('/api/billz/sync-products', handleSyncBillzProducts);
 
-app.get('/api/billz/logs', (req: Request, res: Response) => {
+const handleGetBillzLogs = (req: Request, res: Response) => {
   try {
     const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 50));
     const logs = db.getBillzLogs(limit);
@@ -549,9 +584,11 @@ app.get('/api/billz/logs', (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
-});
+};
+app.get('/api/integrations/billz/logs', handleGetBillzLogs);
+app.get('/api/billz/logs', handleGetBillzLogs);
 
-app.post('/api/billz/sync-order/:id', async (req: Request, res: Response) => {
+const handleSyncBillzOrder = async (req: Request, res: Response) => {
   const order = db.getOrderById(req.params.id);
   if (!order) return res.status(404).json({ error: 'Buyurtma topilmadi' });
   try {
@@ -559,6 +596,52 @@ app.post('/api/billz/sync-order/:id', async (req: Request, res: Response) => {
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+};
+app.post('/api/integrations/billz/sync-order/:id', handleSyncBillzOrder);
+app.post('/api/billz/sync-order/:id', handleSyncBillzOrder);
+
+const handleStopBillzSync = (_req: Request, res: Response) => {
+  try {
+    const stopped = billzService.stopSync();
+    res.json({
+      success: true,
+      stopped,
+      message: stopped ? 'Sinxronizatsiya to‘xtatildi' : 'Aktiv sinxronizatsiya jarayoni yo‘q',
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+app.post('/api/integrations/billz/stop-sync', handleStopBillzSync);
+app.post('/api/billz/stop-sync', handleStopBillzSync);
+
+// Dedicated product photos management endpoint
+app.post('/api/products/:id/photos', (req: Request, res: Response) => {
+  try {
+    const prod = db.getProductById(req.params.id);
+    if (!prod) return res.status(404).json({ error: 'Mahsulot topilmadi' });
+
+    const { images, colorImages, primaryImage } = req.body;
+    let finalImages: string[] = Array.isArray(images) ? [...images] : [...prod.images];
+
+    // If primaryImage specified, place at index 0
+    if (primaryImage && typeof primaryImage === 'string') {
+      finalImages = finalImages.filter(img => img !== primaryImage);
+      finalImages.unshift(primaryImage);
+    }
+
+    const updated: Product = {
+      ...prod,
+      images: finalImages,
+      hasCustomImages: true,
+      colorImages: colorImages !== undefined ? colorImages : prod.colorImages,
+    };
+
+    db.saveProduct(updated);
+    res.json({ success: true, message: 'Mahsulot rasmlari saqlandi', product: updated });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Rasmlarni saqlashda xatolik' });
   }
 });
 
@@ -1690,12 +1773,25 @@ app.post('/api/reviews', (req: Request, res: Response) => {
   res.status(201).json(newReview);
 });
 
-// Admin Security Info (Public meta: username & last changed date only)
-app.get('/api/admin/security', (_req: Request, res: Response) => {
+// Helper: Verify if incoming request is from authenticated Super Admin
+function isRequestFromAdmin(req: Request): boolean {
+  const authHeader = req.headers.authorization || (req.headers['x-admin-token'] as string);
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+  if (!token) return false;
   const sec = db.getAdminSecurity();
+  const currentVersion = sec.sessionTokenVersion || 1;
+  return token.startsWith(`admin-token-v${currentVersion}-`);
+}
+
+// Admin Security Info (Public meta: username, last changed date; master recovery key only disclosed to authenticated admins)
+app.get('/api/admin/security', (req: Request, res: Response) => {
+  const sec = db.getAdminSecurity();
+  const isAuth = isRequestFromAdmin(req);
   res.json({
     username: sec.username,
     lastPasswordChange: sec.lastPasswordChange,
+    masterRecoveryKey: isAuth ? getMasterRecoveryKey() : undefined,
+    isAuthenticated: isAuth,
   });
 });
 
@@ -1784,19 +1880,167 @@ app.post('/api/admin/change-password', (req: Request, res: Response) => {
   });
 });
 
+// --- SUPER ADMIN PASSWORD RECOVERY MECHANISM ---
+
+// 1. Check recovery options available (Telegram, Master Key)
+app.get('/api/auth/admin/recovery-status', (_req: Request, res: Response) => {
+  const internal = db.getInternalSettings();
+  const token = db.getTelegramDecryptedToken();
+  const chatId = internal.telegramSettings?.chatId;
+  const telegramAvailable = Boolean(token && chatId && internal.telegramSettings?.enabled);
+
+  res.json({
+    telegramAvailable,
+    chatIdMasked: chatId ? maskToken(chatId) : undefined,
+    masterKeyAvailable: true,
+  });
+});
+
+// 2. Request 6-digit recovery code via Telegram
+app.post('/api/auth/admin/request-recovery-code', async (_req: Request, res: Response) => {
+  const internal = db.getInternalSettings();
+  const token = db.getTelegramDecryptedToken();
+  const chatId = internal.telegramSettings?.chatId;
+
+  if (!token || !chatId || !internal.telegramSettings?.enabled) {
+    return res.status(400).json({
+      success: false,
+      telegramAvailable: false,
+      error: 'Telegram bot ulanmagan yoki o‘chirilgan. Iltimos, Master Tiklash Kalitidan (Master Recovery Key) foydalaning.',
+    });
+  }
+
+  const code = generateSixDigitCode();
+  const expiresAt = db.setAdminRecoveryCode(code, 10);
+
+  try {
+    const text =
+      `🔐 <b>SHU BREND — Super Admin Parolini Tiklash</b>\n\n` +
+      `Hurmatli administrator, yangi parol o‘rnatish uchun bir martalik tasdiqlash kodingiz:\n\n` +
+      `🔢 Kod: <code>${code}</code>\n\n` +
+      `⏱ Ushbu kod 10 daqiqa davomida amal qiladi.\n` +
+      `⚠️ Agar ushbu so‘rovni siz yubormagan bo‘lsangiz, xabarni e’tiborsiz qoldiring!`;
+
+    const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: 'HTML',
+      }),
+    });
+
+    const data = await tgRes.json();
+    if (!data.ok) {
+      return res.status(500).json({
+        success: false,
+        error: 'Telegramga xabar yuborib bo‘lmadi: ' + (data.description || 'Xatolik'),
+      });
+    }
+
+    res.json({
+      success: true,
+      message: '6 xonali tasdiqlash kodi administrator Telegram chatiga yuborildi!',
+      expiresAt,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: 'Telegram serveriga ulanishda xatolik: ' + err.message,
+    });
+  }
+});
+
+// 3. Reset password using either Telegram 6-digit code or Master Recovery Key
+app.post('/api/auth/admin/reset-password', async (req: Request, res: Response) => {
+  const { recoveryMethod, codeOrKey, newPassword, confirmPassword } = req.body;
+
+  if (!recoveryMethod || !codeOrKey || !newPassword || !confirmPassword) {
+    return res.status(400).json({ error: 'Barcha maydonlarni to‘ldirish shart!' });
+  }
+
+  const cleanPass = String(newPassword).trim();
+  const cleanConfirm = String(confirmPassword).trim();
+
+  // 1. Password length validation (min 12 chars)
+  if (cleanPass.length < 12) {
+    return res.status(400).json({
+      error: `Yangi parol xavfsizlik talablariga muvofiq kamida 12 ta belgidan iborat bo‘lishi shart! (Hozirda: ${cleanPass.length} ta belgi)`,
+    });
+  }
+
+  // 2. Passwords match validation
+  if (cleanPass !== cleanConfirm) {
+    return res.status(400).json({ error: 'Yangi parol va tasdiqlovchi parol bir-biriga mos kelmadi!' });
+  }
+
+  // 3. Method validation
+  if (recoveryMethod === 'TELEGRAM_CODE') {
+    const verification = db.verifyAndConsumeAdminRecoveryCode(String(codeOrKey).trim());
+    if (!verification.valid) {
+      return res.status(400).json({ error: verification.reason || 'Tasdiqlash kodi noto‘g‘ri yoki muddati tugagan!' });
+    }
+  } else if (recoveryMethod === 'MASTER_KEY') {
+    const isMasterKeyValid = verifyRecoveryKey(String(codeOrKey).trim());
+    if (!isMasterKeyValid) {
+      return res.status(401).json({ error: 'Master Tiklash Kaliti (Master Recovery Key) noto‘g‘ri kiritildi!' });
+    }
+  } else {
+    return res.status(400).json({ error: 'Noto‘g‘ri tiklash usuli tanlandi' });
+  }
+
+  // 4. Hash new password and invalidate active sessions
+  const sec = db.getAdminSecurity();
+  const newHash = hashPassword(cleanPass);
+  const nextSessionVersion = (sec.sessionTokenVersion || 1) + 1;
+
+  db.updateAdminSecurity({
+    passwordHash: newHash,
+    sessionTokenVersion: nextSessionVersion,
+    lastPasswordChange: new Date().toISOString(),
+  });
+
+  // 5. Send Telegram security alert if bot active
+  try {
+    const token = db.getTelegramDecryptedToken();
+    const internal = db.getInternalSettings();
+    const chatId = internal.telegramSettings?.chatId;
+    if (token && chatId && internal.telegramSettings?.enabled) {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `🛡 <b>SHU BREND — Xavfsizlik xabarnomasi</b>\n\nSuper Admin paroli ${recoveryMethod === 'TELEGRAM_CODE' ? 'Telegram tasdiqlash kodi' : 'Master Tiklash Kaliti'} orqali muvaffaqiyatli yangilandi!\nSana: ${new Date().toLocaleString('uz-UZ')}`,
+          parse_mode: 'HTML',
+        }),
+      });
+    }
+  } catch (tgAlertErr) {
+    console.warn('Telegram security alert error:', tgAlertErr);
+  }
+
+  res.json({
+    success: true,
+    message: 'Super Admin paroli muvaffaqiyatli yangilandi! Yangi parol bilan tizimga kiring.',
+  });
+});
+
 // Admin specific secure authentication endpoint
 app.post('/api/auth/admin-login', (req: Request, res: Response) => {
-  const { usernameOrPhone, password } = req.body;
-  if (!usernameOrPhone || !password) {
+  const rawUser = req.body.usernameOrPhone || req.body.username || req.body.login;
+  const password = req.body.password;
+  if (!rawUser || !password) {
     return res.status(400).json({ error: 'Admin login va parol talab qilinadi' });
   }
 
-  const cleanInput = String(usernameOrPhone).trim().toLowerCase();
+  const cleanInput = String(rawUser).trim().toLowerCase();
   const cleanPhone = cleanInput.replace(/\D/g, '');
   const cleanPass = String(password).trim();
 
   const sec = db.getAdminSecurity();
-  const validAdminUsernames = [sec.username.toLowerCase(), 'admin', 'shubrend_admin', 'shubrend', '998901234567'];
+  const validAdminUsernames = [sec.username.toLowerCase(), 'admin', 'admin.1212', 'shubrend_admin', 'shubrend', '998901234567'];
 
   const isUsernameMatch = validAdminUsernames.includes(cleanInput) || validAdminUsernames.includes(cleanPhone);
   const isPasswordMatch = verifyPassword(cleanPass, sec.passwordHash);
@@ -1917,6 +2161,16 @@ app.put('/api/auth/profile', (req: Request, res: Response) => {
 
   db.saveUser(updated);
   res.json(updated);
+});
+
+// STEP 2: Strict JSON 404 handler for API routes
+// Never return index.html for an API request under any circumstance!
+app.all('/api/*', (req: Request, res: Response) => {
+  res.status(404).json({
+    success: false,
+    error: `API yo‘nalishi topilmadi: ${req.method} ${req.originalUrl}`,
+    status: 404,
+  });
 });
 
 // Setup Vite middleware in Dev or serve static in Prod
