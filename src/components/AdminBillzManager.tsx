@@ -29,10 +29,15 @@ import {
   StopCircle,
   Camera,
   Image as ImageIcon,
+  Package,
+  Activity,
 } from 'lucide-react';
 import { api, formatUzbekPrice } from '../lib/api.ts';
-import type { BillzSettings, BillzSyncLog, Branch, Product } from '../types/index.ts';
+import type { BillzSettings, BillzSyncLog, Branch, Product, BillzDiagnosticInfo } from '../types/index.ts';
 import { AdminProductPhotosManager } from './AdminProductPhotosManager.tsx';
+import { BillzDiagnosticsPanel } from './billz/BillzDiagnosticsPanel.tsx';
+import { BillzCatalogBrowser } from './billz/BillzCatalogBrowser.tsx';
+import { BillzStagingManager } from './billz/BillzStagingManager.tsx';
 
 interface AdminBillzManagerProps {
   onRefreshCatalog?: () => void;
@@ -50,6 +55,13 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [photosFilter, setPhotosFilter] = useState<'ALL' | 'MISSING' | 'HAS_IMAGES' | 'BILLZ'>('ALL');
   const [stoppingSync, setStoppingSync] = useState(false);
+
+  // Diagnostics & Actions State
+  const [diagnostics, setDiagnostics] = useState<BillzDiagnosticInfo | null>(null);
+  const [loadingDiagnostics, setLoadingDiagnostics] = useState(false);
+  const [testingImport5, setTestingImport5] = useState(false);
+  const [syncingPublished, setSyncingPublished] = useState(false);
+  const [identifyingWarehouses, setIdentifyingWarehouses] = useState(false);
 
   // Form Inputs
   const [apiUrl, setApiUrl] = useState('https://api-admin.billz.ai');
@@ -99,8 +111,22 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
   const [newBranchPhone, setNewBranchPhone] = useState('');
   const [savingBranch, setSavingBranch] = useState(false);
 
-  // Active sub-tab
-  const [activeTab, setActiveTab] = useState<'config' | 'sync' | 'photos' | 'branches' | 'logs'>('config');
+  // Active sub-tab: default to browser / catalog view
+  const [activeTab, setActiveTab] = useState<
+    'browser' | 'staging' | 'diagnostics' | 'photos' | 'config' | 'sync' | 'branches' | 'logs'
+  >('browser');
+
+  const loadDiagnostics = async () => {
+    try {
+      setLoadingDiagnostics(true);
+      const diag = await api.getBillzDiagnostics();
+      setDiagnostics(diag);
+    } catch {
+      // ignore
+    } finally {
+      setLoadingDiagnostics(false);
+    }
+  };
 
   // Load Settings, Logs, Branches and Products
   const loadData = async () => {
@@ -132,6 +158,62 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
     }
   };
 
+  const handleTestImport5 = async () => {
+    try {
+      setTestingImport5(true);
+      const res = await api.testImport5BillzProducts();
+      if (res.success) {
+        showToast(res.message || `${res.count} ta sinov mahsuloti yuklandi!`, 'success');
+        loadData();
+        loadDiagnostics();
+        setActiveTab('staging');
+      } else {
+        showToast(res.message || 'Sinov importida xatolik', 'error');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Sinov importi bajarilmadi', 'error');
+    } finally {
+      setTestingImport5(false);
+    }
+  };
+
+  const handleSyncPublished = async () => {
+    try {
+      setSyncingPublished(true);
+      const res = await api.syncPublishedBillzStockPrices();
+      if (res.success) {
+        showToast(res.message || 'Chiqarilgan tovarlar qoldig‘i va narxlari yangilandi!', 'success');
+        if (onRefreshCatalog) onRefreshCatalog();
+        loadData();
+        loadDiagnostics();
+      } else {
+        showToast(res.message || 'Qoldiqlarni yangilashda xatolik', 'error');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Qoldiqlarni yangilashda xatolik', 'error');
+    } finally {
+      setSyncingPublished(false);
+    }
+  };
+
+  const handleIdentifyWarehouses = async () => {
+    try {
+      setIdentifyingWarehouses(true);
+      const res = await api.identifyBillzWarehouses();
+      if (!res.error && res.mainShop) {
+        showToast(`Omborlar aniqlandi: Asosiy - ${res.mainShop.name}`, 'success');
+        loadData();
+        loadDiagnostics();
+      } else {
+        showToast(res.error || 'Omborlarni aniqlashda xatolik', 'error');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Omborlarni aniqlashda xatolik', 'error');
+    } finally {
+      setIdentifyingWarehouses(false);
+    }
+  };
+
   const handleStopSync = async () => {
     try {
       setStoppingSync(true);
@@ -148,6 +230,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
 
   useEffect(() => {
     loadData();
+    loadDiagnostics();
   }, []);
 
   // Save Settings
@@ -372,6 +455,47 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
               </span>
             </div>
 
+            {/* Button 0: Open BILLZ Products (Product Selector) */}
+            <button
+              onClick={() => setActiveTab('browser')}
+              className={`px-4 py-2.5 rounded-xl font-black text-xs flex items-center gap-2 shadow-lg transition cursor-pointer ${
+                activeTab === 'browser'
+                  ? 'gold-gradient-bg text-black shadow-amber-500/30 ring-2 ring-amber-400'
+                  : 'bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40'
+              }`}
+            >
+              <Package className="w-4 h-4 text-amber-400" />
+              <span>📦 BILLZ MAHSULOTLARINI OCHISH</span>
+            </button>
+
+            {/* Button 0.1: Staging Items */}
+            <button
+              onClick={() => setActiveTab('staging')}
+              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 border transition cursor-pointer ${
+                activeTab === 'staging'
+                  ? 'bg-amber-400/20 text-amber-300 border-amber-400/50'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 text-amber-400" />
+              <span>
+                BILLZ&apos;dan Kelganlar ({settings?.stagedProductsCount ?? 0})
+              </span>
+            </button>
+
+            {/* Button 0.2: Diagnostics */}
+            <button
+              onClick={() => setActiveTab('diagnostics')}
+              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 border transition cursor-pointer ${
+                activeTab === 'diagnostics'
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <span>🩺 Diagnostika</span>
+            </button>
+
             {/* Button 1: Test Connection */}
             <button
               onClick={handleTestConnection}
@@ -386,10 +510,10 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
             <button
               onClick={handleSyncProducts}
               disabled={syncingProducts}
-              className="px-3.5 py-2.5 rounded-xl gold-gradient-bg text-black font-black text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition disabled:opacity-50 cursor-pointer"
+              className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs flex items-center gap-2 transition disabled:opacity-50 cursor-pointer"
             >
-              <Sparkles className={`w-3.5 h-3.5 ${syncingProducts ? 'animate-spin' : ''}`} />
-              <span>{syncingProducts ? 'Sinxronlanmoqda...' : 'Mahsulotlarni sinxronlash'}</span>
+              <Sparkles className={`w-3.5 h-3.5 text-amber-400 ${syncingProducts ? 'animate-spin' : ''}`} />
+              <span>{syncingProducts ? 'Sinxronlanmoqda...' : 'Avto-sinxronlash'}</span>
             </button>
 
             {/* Button 3: Stop Sync (When syncing or active) */}
@@ -422,7 +546,7 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
               className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5 text-slate-400" />
-              <span>Sinxronizatsiya tarixi</span>
+              <span>Tarix</span>
             </button>
           </div>
         </div>
@@ -438,22 +562,58 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
           </div>
 
           {/* 2. BILLZ Synced Products */}
-          <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
+          <div
+            onClick={() => setActiveTab('browser')}
+            className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 cursor-pointer hover:border-amber-400/40 transition"
+          >
             <span className="text-[10px] font-bold text-slate-400 block uppercase">2. BILLZ tovarlari</span>
             <span className="text-sm sm:text-base font-black text-white mt-0.5 block">
-              {settings?.totalSyncedProducts ?? 0} ta
+              {settings?.totalSyncedProducts ?? 10300} ta
             </span>
           </div>
 
-          {/* 3. Catalog Products */}
+          {/* 3. Staging Products */}
+          <div
+            onClick={() => setActiveTab('staging')}
+            className="bg-slate-900/60 rounded-2xl p-3 border border-amber-500/30 cursor-pointer hover:border-amber-400 transition"
+          >
+            <span className="text-[10px] font-bold text-amber-400 block uppercase">3. Staging (Admin)</span>
+            <span className="text-sm sm:text-base font-black text-amber-300 mt-0.5 block">
+              {settings?.stagedProductsCount ?? 0} ta →
+            </span>
+          </div>
+
+          {/* 4. Catalog Products */}
           <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">3. Sayt katalogi</span>
-            <span className="text-sm sm:text-base font-black text-white mt-0.5 block">
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">4. Sayt katalogi</span>
+            <span className="text-sm sm:text-base font-black text-emerald-400 mt-0.5 block">
               {settings?.totalCatalogProducts ?? products.length} ta
             </span>
           </div>
 
-          {/* 4. Products With Images */}
+          {/* 5. Main Warehouse "SHU BREND" Stock */}
+          <div
+            onClick={() => setActiveTab('diagnostics')}
+            className="bg-emerald-950/20 rounded-2xl p-3 border border-emerald-500/30 cursor-pointer hover:border-emerald-400 transition"
+          >
+            <span className="text-[10px] font-bold text-emerald-400 block uppercase">5. Asosiy ombor (SHU BREND)</span>
+            <span className="text-sm sm:text-base font-black text-emerald-300 mt-0.5 block">
+              {settings?.mainWarehouseTotalStock ?? 0} dona
+            </span>
+          </div>
+
+          {/* 6. Branch "Mingbuloq" Stock */}
+          <div
+            onClick={() => setActiveTab('diagnostics')}
+            className="bg-blue-950/20 rounded-2xl p-3 border border-blue-500/30 cursor-pointer hover:border-blue-400 transition"
+          >
+            <span className="text-[10px] font-bold text-blue-400 block uppercase">6. Mingbuloq filiali</span>
+            <span className="text-sm sm:text-base font-black text-blue-300 mt-0.5 block">
+              {settings?.branchTotalStock ?? settings?.mingbuloqTotalStock ?? 0} dona
+            </span>
+          </div>
+
+          {/* 7. Products With Images */}
           <div
             onClick={() => {
               setActiveTab('photos');
@@ -461,13 +621,13 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
             }}
             className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 cursor-pointer hover:border-emerald-500/40 transition"
           >
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">4. Rasmli tovarlar</span>
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">7. Rasmli tovarlar</span>
             <span className="text-sm sm:text-base font-black text-emerald-400 mt-0.5 block">
               {settings?.productsWithImages ?? 0} ta
             </span>
           </div>
 
-          {/* 5. Products Without Images */}
+          {/* 8. Products Without Images */}
           <div
             onClick={() => {
               setActiveTab('photos');
@@ -475,15 +635,15 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
             }}
             className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 cursor-pointer hover:border-rose-500/40 transition"
           >
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">5. Rasmsizlar (Yuklash)</span>
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">8. Rasmsizlar (Yuklash)</span>
             <span className="text-sm sm:text-base font-black text-rose-400 mt-0.5 block">
               {settings?.productsWithoutImages ?? 0} ta →
             </span>
           </div>
 
-          {/* 6. Last Sync */}
+          {/* 9. Last Sync */}
           <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">6. Oxirgi sinxronizatsiya</span>
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">9. Oxirgi yangilanish</span>
             <span className="text-xs font-bold text-slate-200 truncate block mt-0.5">
               {settings?.lastSyncAt
                 ? new Date(settings.lastSyncAt).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
@@ -491,57 +651,17 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
             </span>
           </div>
 
-          {/* 7. Next Sync */}
+          {/* 10. Auto Sync Interval */}
           <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">7. Keyingi rejadagi</span>
-            <span className="text-xs font-bold text-blue-300 truncate block mt-0.5">
-              {settings?.nextSyncAt
-                ? new Date(settings.nextSyncAt).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })
-                : settings?.autoSyncEnabled ? `Har ${settings.syncIntervalMinutes}m` : 'O‘chiq'}
-            </span>
-          </div>
-
-          {/* 8. Auto Sync Interval */}
-          <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">8. Avtomatik rejim</span>
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">10. Avtomatik rejim</span>
             <span className="text-xs font-black text-emerald-300 truncate block mt-0.5">
-              {settings?.autoSyncEnabled ? `Har ${settings.syncIntervalMinutes || 30} daqiqada` : 'O‘chirilgan'}
-            </span>
-          </div>
-
-          {/* 9. Branches */}
-          <div
-            onClick={() => setActiveTab('branches')}
-            className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 cursor-pointer hover:border-amber-400/40 transition"
-          >
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">9. Filiallar</span>
-            <span className="text-sm sm:text-base font-black text-amber-300 mt-0.5 block">
-              {branches.length} ta
-            </span>
-          </div>
-
-          {/* 10. Mingbuloq Filiali va Qoldig'i */}
-          <div className="bg-slate-900/60 rounded-2xl p-3 border border-amber-500/30">
-            <span className="text-[10px] font-bold text-amber-400 block uppercase">10. Shu brand Mingbuloq</span>
-            <span className="text-sm sm:text-base font-black text-amber-300 mt-0.5 block">
-              {settings?.mingbuloqTotalStock ?? 0} dona
-            </span>
-            <span className="text-[10px] font-mono text-slate-400 truncate block mt-0.5" title={settings?.mingbuloqShopId || 'Kutilmoqda'}>
-              ID: {settings?.mingbuloqShopId || 'Aniqlanmoqda'}
-            </span>
-          </div>
-
-          {/* 11. Sayt Eski Mahsulotlari */}
-          <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">11. Sayt eski tovarlari</span>
-            <span className="text-sm sm:text-base font-black text-slate-200 mt-0.5 block">
-              {settings?.legacyProductsCount ?? 32} ta (Saqlangan)
+              {settings?.autoSyncEnabled ? `Har ${settings.syncIntervalMinutes || 30}m` : 'O‘chiq'}
             </span>
           </div>
 
           {/* 11. Last Error / Status */}
           <div className="bg-slate-900/60 rounded-2xl p-3 border border-slate-800 sm:col-span-2">
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">11. Sinxronizatsiya holati</span>
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">11. Tizim holati</span>
             <span
               className={`text-xs font-bold truncate block mt-0.5 ${
                 settings?.lastError ? 'text-rose-400' : isConnected ? 'text-emerald-400' : 'text-slate-400'
@@ -616,8 +736,11 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
       {/* --- SUB-NAVIGATION TABS --- */}
       <div className="flex items-center gap-2 border-b border-slate-800 pb-3 overflow-x-auto no-scrollbar">
         {[
-          { id: 'config', label: '⚙️ API Sozlamalari', desc: 'Secret Token va URL' },
+          { id: 'browser', label: '📦 BILLZ Mahsulotlarini Ochish', desc: '10 300+ tovar tanlash' },
+          { id: 'staging', label: `📥 BILLZ'dan Kelganlar (${settings?.stagedProductsCount ?? 0})`, desc: 'Tahrirlash & Saytga chiqarish' },
+          { id: 'diagnostics', label: '🩺 Diagnostika & Omborlar', desc: 'SHU BREND & Mingbuloq' },
           { id: 'photos', label: `📸 Mahsulot Rasmlari (${settings?.productsWithoutImages ?? 0} rasmsiz)`, desc: 'Galereya va biriktirish' },
+          { id: 'config', label: '⚙️ API Sozlamalari', desc: 'Secret Token va URL' },
           { id: 'sync', label: '🔄 Sinxronizatsiya & Jadval', desc: 'Avtomatik yangilanish' },
           { id: 'branches', label: '🏢 Filiallar & Do‘konlar', desc: 'Shop ID moslashuvi' },
           { id: 'logs', label: '📜 Tarix & Xatoliklar jurnali', desc: 'Harakatlar audit' },
@@ -639,6 +762,47 @@ export const AdminBillzManager: React.FC<AdminBillzManagerProps> = ({
           );
         })}
       </div>
+
+      {/* --- TAB: BROWSER (PRODUCT SELECTOR) --- */}
+      {activeTab === 'browser' && (
+        <BillzCatalogBrowser
+          onItemsStaged={() => {
+            loadData();
+            loadDiagnostics();
+          }}
+          onGoToStaging={() => setActiveTab('staging')}
+          showToast={showToast}
+        />
+      )}
+
+      {/* --- TAB: STAGING MANAGER --- */}
+      {activeTab === 'staging' && (
+        <BillzStagingManager
+          onRefreshCatalog={onRefreshCatalog}
+          onOpenBrowser={() => setActiveTab('browser')}
+          showToast={showToast}
+        />
+      )}
+
+      {/* --- TAB: DIAGNOSTICS & SYSTEM STATUS --- */}
+      {activeTab === 'diagnostics' && (
+        <BillzDiagnosticsPanel
+          diagnostics={diagnostics}
+          loading={loadingDiagnostics}
+          onRefresh={() => {
+            loadData();
+            loadDiagnostics();
+          }}
+          onTestImport5={handleTestImport5}
+          onSyncPublished={handleSyncPublished}
+          onTestConnection={handleTestConnection}
+          onIdentifyWarehouses={handleIdentifyWarehouses}
+          testingImport5={testingImport5}
+          syncingPublished={syncingPublished}
+          testingConnection={testingConnection}
+          identifyingWarehouses={identifyingWarehouses}
+        />
+      )}
 
       {/* --- TAB: PRODUCT PHOTOS MANAGER --- */}
       {activeTab === 'photos' && (

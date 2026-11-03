@@ -616,6 +616,170 @@ const handleStopBillzSync = (_req: Request, res: Response) => {
 app.post('/api/integrations/billz/stop-sync', handleStopBillzSync);
 app.post('/api/billz/stop-sync', handleStopBillzSync);
 
+// --- BILLZ CATALOG BROWSER & STAGING ENDPOINTS ---
+
+const handleIdentifyWarehouses = async (_req: Request, res: Response) => {
+  try {
+    const result = await billzService.identifyWarehouses();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+app.get('/api/integrations/billz/warehouses', handleIdentifyWarehouses);
+app.get('/api/billz/warehouses', handleIdentifyWarehouses);
+
+const handleBrowseBillzCatalog = async (req: Request, res: Response) => {
+  try {
+    const { page, limit, search, inStockOnly, minStock, minPrice, maxPrice, categoryId } = req.query;
+    const result = await billzService.browseCatalog({
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 24,
+      search: search ? String(search) : undefined,
+      inStockOnly: inStockOnly === 'true',
+      minStock: minStock ? Number(minStock) : undefined,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      categoryId: categoryId ? String(categoryId) : undefined,
+    });
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+app.get('/api/integrations/billz/catalog-browser', handleBrowseBillzCatalog);
+app.get('/api/billz/catalog-browser', handleBrowseBillzCatalog);
+
+const handleStageSelectedProducts = async (req: Request, res: Response) => {
+  try {
+    const { items } = req.body;
+    const result = await billzService.stageSelectedProducts(items || []);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+app.post('/api/integrations/billz/staging/add-selected', handleStageSelectedProducts);
+app.post('/api/billz/staging/add-selected', handleStageSelectedProducts);
+
+const handleGetStagingProducts = (req: Request, res: Response) => {
+  try {
+    const { status, search } = req.query;
+    let list = db.getBillzStagingProducts();
+
+    if (status && typeof status === 'string' && status !== 'ALL') {
+      list = list.filter(p => p.status === status);
+    }
+
+    if (search && typeof search === 'string' && search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        (p.sku && p.sku.toLowerCase().includes(q)) ||
+        (p.barcode && p.barcode.toLowerCase().includes(q)) ||
+        p.billzId.toLowerCase().includes(q)
+      );
+    }
+
+    res.json(list);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+app.get('/api/integrations/billz/staging', handleGetStagingProducts);
+app.get('/api/billz/staging', handleGetStagingProducts);
+
+const handleGetStagingProductById = (req: Request, res: Response) => {
+  const item = db.getBillzStagingProductById(req.params.id);
+  if (!item) return res.status(404).json({ error: 'Staging mahsuloti topilmadi' });
+  res.json(item);
+};
+app.get('/api/integrations/billz/staging/:id', handleGetStagingProductById);
+app.get('/api/billz/staging/:id', handleGetStagingProductById);
+
+const handleUpdateStagingProduct = (req: Request, res: Response) => {
+  try {
+    const updated = billzService.updateStagingProduct(req.params.id, req.body);
+    res.json({ success: true, item: updated, message: 'Mahsulot ma’lumotlari saqlandi' });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};
+app.put('/api/integrations/billz/staging/:id', handleUpdateStagingProduct);
+app.put('/api/billz/staging/:id', handleUpdateStagingProduct);
+
+const handleDeleteStagingProduct = (req: Request, res: Response) => {
+  try {
+    const deleted = billzService.deleteStagingProduct(req.params.id);
+    res.json({ success: deleted, message: deleted ? 'Mahsulot o‘chirildi' : 'Mahsulot topilmadi' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+app.delete('/api/integrations/billz/staging/:id', handleDeleteStagingProduct);
+app.delete('/api/billz/staging/:id', handleDeleteStagingProduct);
+
+const handlePublishStagingProduct = async (req: Request, res: Response) => {
+  try {
+    const result = await billzService.publishStagingProduct(req.params.id, req.body);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+app.post('/api/integrations/billz/staging/:id/publish', handlePublishStagingProduct);
+app.post('/api/billz/staging/:id/publish', handlePublishStagingProduct);
+
+const handleRejectStagingProduct = (req: Request, res: Response) => {
+  try {
+    const item = db.getBillzStagingProductById(req.params.id);
+    if (!item) return res.status(404).json({ error: 'Mahsulot topilmadi' });
+    item.status = 'REJECTED';
+    db.saveBillzStagingProduct(item);
+    res.json({ success: true, item, message: 'Mahsulot rad etildi' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+app.post('/api/integrations/billz/staging/:id/reject', handleRejectStagingProduct);
+app.post('/api/billz/staging/:id/reject', handleRejectStagingProduct);
+
+const handleTestImport5 = async (_req: Request, res: Response) => {
+  try {
+    const result = await billzService.testImport5Products();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+app.post('/api/integrations/billz/test-import-5', handleTestImport5);
+app.post('/api/billz/test-import-5', handleTestImport5);
+
+const handleSyncPublishedStockPrices = async (_req: Request, res: Response) => {
+  try {
+    const result = await billzService.syncPublishedProductsStockAndPrices();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+app.post('/api/integrations/billz/sync-published-stock-prices', handleSyncPublishedStockPrices);
+app.post('/api/billz/sync-published-stock-prices', handleSyncPublishedStockPrices);
+
+const handleGetBillzDiagnostics = async (_req: Request, res: Response) => {
+  try {
+    const diag = await billzService.getDiagnostics();
+    res.json(diag);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+app.get('/api/integrations/billz/diagnostics', handleGetBillzDiagnostics);
+app.get('/api/billz/diagnostics', handleGetBillzDiagnostics);
+
 // Dedicated product photos management endpoint
 app.post('/api/products/:id/photos', (req: Request, res: Response) => {
   try {

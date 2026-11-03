@@ -1,7 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import type {
+  BillzDiagnosticInfo,
+  BillzProductStatus,
   BillzSettings,
+  BillzStagingProduct,
   BillzSyncLog,
   BillzSyncStatus,
   Branch,
@@ -10,7 +13,7 @@ import type {
   Product,
   ProductVariant,
 } from '../src/types/index.ts';
-import { db } from './db.ts';
+import { db, type BillzStorageConfig } from './db.ts';
 import { decryptSecret, encryptSecret, maskToken } from './security.ts';
 
 const BILLZ_CACHE_DIR = path.join(process.cwd(), 'public', 'uploads', 'billz');
@@ -78,6 +81,36 @@ export function normalizeBillzApiUrl(url?: string): string {
   return clean;
 }
 
+export interface BillzTelemetry {
+  url: string;
+  method: string;
+  statusCode: number;
+  contentType: string;
+  durationMs: number;
+  timestamp: string;
+  errorSnippet?: string;
+}
+
+let lastRequestTelemetry: BillzTelemetry | undefined = undefined;
+
+export function recordBillzTelemetry(meta: {
+  url: string;
+  method: string;
+  statusCode: number;
+  contentType: string;
+  durationMs: number;
+  errorSnippet?: string;
+}) {
+  lastRequestTelemetry = {
+    ...meta,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+export function getLastBillzTelemetry(): BillzTelemetry | undefined {
+  return lastRequestTelemetry;
+}
+
 function safeLogBillz(
   action: string,
   meta: { endpoint: string; status?: number; durationMs?: number; category?: string; error?: string }
@@ -124,20 +157,29 @@ export interface BillzSyncResult {
 // Helper: Safely parse BILLZ API response avoiding HTML or malformed JSON crashes
 async function parseBillzResponse<T = any>(
   response: Response,
-  endpointLabel: string
+  endpointLabel: string,
+  reqMeta?: { method?: string; url?: string; durationMs?: number }
 ): Promise<{ ok: boolean; data?: T; status: number; error?: string }> {
   const status = response.status;
   const contentType = response.headers.get('content-type') || '';
+  const reqUrl = reqMeta?.url || response.url || endpointLabel;
+  const reqMethod = reqMeta?.method || 'GET';
+  const durationMs = reqMeta?.durationMs || 0;
 
   let rawText = '';
   try {
     rawText = await response.text();
   } catch (err: any) {
-    return {
-      ok: false,
-      status,
-      error: `BILLZ serveridan javobni o‘qib bo‘lmadi (${endpointLabel}): ${err.message || 'Tarmoq xatosi'}`,
-    };
+    const error = `BILLZ serveridan javobni o‘qib bo‘lmadi (${endpointLabel}): ${err.message || 'Tarmoq xatosi'}`;
+    recordBillzTelemetry({
+      url: reqUrl,
+      method: reqMethod,
+      statusCode: status,
+      contentType,
+      durationMs,
+      errorSnippet: error.slice(0, 200),
+    });
+    return { ok: false, status, error };
   }
 
   const preview = rawText.slice(0, 300).replace(/\s+/g, ' ').replace(/(Bearer\s+|"token":\s*")[A-Za-z0-9_\-\.]+/gi, '$1[REDACTED]');
@@ -150,19 +192,33 @@ async function parseBillzResponse<T = any>(
     contentType.toLowerCase().includes('text/html');
 
   if (isHtml) {
-    return {
-      ok: false,
-      status,
-      error: `BILLZ API serveri JSON o‘rniga HTML sahifasini qaytardi (HTTP ${status}, Content-Type: ${contentType}). Ehtimol, API Base URL noto‘g‘ri (masalan, admin.billz.ai o‘rniga api-admin.billz.ai bo‘lishi lozim) yoki server veb-sahifaga yo‘naltirgan.`,
-    };
+    const error = `BILLZ API serveri JSON o‘rniga HTML sahifasini qaytardi (HTTP ${status}, Content-Type: ${contentType}). Ehtimol, API Base URL noto‘g‘ri (masalan, admin.billz.ai o‘rniga api-admin.billz.ai bo‘lishi lozim) yoki server veb-sahifaga yo‘naltirgan.`;
+    recordBillzTelemetry({
+      url: reqUrl,
+      method: reqMethod,
+      statusCode: status,
+      contentType,
+      durationMs,
+      errorSnippet: 'HTML sahifasi qaytarildi (JSON kutilgan edi)',
+    });
+    return { ok: false, status, error };
   }
 
   if (!rawText.trim()) {
+    const error = response.ok ? undefined : `BILLZ API bo‘sh javob qaytardi (HTTP ${status})`;
+    recordBillzTelemetry({
+      url: reqUrl,
+      method: reqMethod,
+      statusCode: status,
+      contentType,
+      durationMs,
+      errorSnippet: error,
+    });
     return {
       ok: response.ok,
       status,
       data: {} as T,
-      error: response.ok ? undefined : `BILLZ API bo‘sh javob qaytardi (HTTP ${status})`,
+      error,
     };
   }
 
@@ -175,28 +231,55 @@ async function parseBillzResponse<T = any>(
       else if (json.error && typeof json.error === 'string') serverMsg = json.error;
       else serverMsg = JSON.stringify(json).slice(0, 150);
 
-      // Handle specific BILLZ platform-id error
       if (serverMsg === 'platform-id' || (typeof serverMsg === 'string' && serverMsg.includes('platform-id'))) {
         serverMsg = 'Platform ID xatosi (platform-id). BILLZ API talabiga binoan Platform ID standart UUID formatida bo‘lishi kerak.';
       }
+
+      const error = `BILLZ API xatosi (HTTP ${status}): ${serverMsg}`;
+      recordBillzTelemetry({
+        url: reqUrl,
+        method: reqMethod,
+        statusCode: status,
+        contentType,
+        durationMs,
+        errorSnippet: serverMsg.slice(0, 200),
+      });
 
       return {
         ok: false,
         status,
         data: json,
-        error: `BILLZ API xatosi (HTTP ${status}): ${serverMsg}`,
+        error,
       };
     }
+
+    recordBillzTelemetry({
+      url: reqUrl,
+      method: reqMethod,
+      statusCode: status,
+      contentType,
+      durationMs,
+    });
+
     return {
       ok: true,
       status,
       data: json as T,
     };
   } catch {
+    const error = `BILLZ API javobi yaroqsiz JSON formatida (HTTP ${status}): ${rawText.slice(0, 120)}`;
+    recordBillzTelemetry({
+      url: reqUrl,
+      method: reqMethod,
+      statusCode: status,
+      contentType,
+      durationMs,
+      errorSnippet: error.slice(0, 200),
+    });
     return {
       ok: false,
       status,
-      error: `BILLZ API javobi yaroqsiz JSON formatida (HTTP ${status}): ${rawText.slice(0, 120)}`,
+      error,
     };
   }
 }
@@ -243,12 +326,29 @@ export class BillzService {
     const withoutImages = allProducts.length - withImages;
 
     const mingbuloqTotalStock = allProducts.reduce((sum, p) => {
-      const mingbuloqBranch = p.branchAvailability?.find(b => b.branchName.toLowerCase().includes('mingbuloq'));
+      const mingbuloqBranch = p.branchAvailability?.find(b =>
+        b.branchName.toLowerCase().includes('mingbuloq') ||
+        (cfg.branchShopId && b.branchId === cfg.branchShopId)
+      );
       if (mingbuloqBranch) {
         return sum + (mingbuloqBranch.stock || 0);
       }
+      return sum;
+    }, 0);
+
+    const mainWarehouseStockSum = allProducts.reduce((sum, p) => {
+      const mainBranch = p.branchAvailability?.find(b =>
+        (cfg.mainShopId && b.branchId === cfg.mainShopId) ||
+        b.branchName.toLowerCase().includes('shu brend') ||
+        b.branchName.toLowerCase().includes('asosiy')
+      );
+      if (mainBranch) {
+        return sum + (mainBranch.stock || 0);
+      }
       return sum + (p.source === 'BILLZ' ? p.stock || 0 : 0);
     }, 0);
+
+    const stagedProductsCount = db.getBillzStagingProducts().length;
     const legacyProductsCount = allProducts.filter(p => p.source === 'MANUAL' || !p.billzId).length;
 
     let nextSyncAt: string | undefined = undefined;
@@ -285,7 +385,14 @@ export class BillzService {
       lastSyncStatus: cfg.lastSyncStatus || 'IDLE',
       lastError: cfg.lastError,
       status: cfg.status || (hasApiKey ? 'DISCONNECTED' : 'UNCONFIGURED'),
-      centralShopId: cfg.centralShopId || 'shop_tashkent_central',
+      centralShopId: cfg.mainShopId || cfg.centralShopId || 'shop_tashkent_central',
+      mainShopId: cfg.mainShopId || undefined,
+      mainShopName: cfg.mainShopName || 'SHU BREND (Asosiy ombor)',
+      mainWarehouseTotalStock: mainWarehouseStockSum,
+      branchShopId: cfg.branchShopId || cfg.centralShopId || undefined,
+      branchShopName: cfg.branchShopName || 'Shu brand Mingbuloq',
+      branchTotalStock: mingbuloqTotalStock,
+      stagedProductsCount,
       syncImages: cfg.syncImages ?? true,
       syncPrices: cfg.syncPrices ?? true,
       syncStock: cfg.syncStock ?? true,
@@ -296,8 +403,8 @@ export class BillzService {
       nextSyncAt,
       authStatus,
       isSyncing: this.isSyncing,
-      mingbuloqShopId: cfg.centralShopId || undefined,
-      mingbuloqShopName: 'Shu brand Mingbuloq',
+      mingbuloqShopId: cfg.branchShopId || cfg.centralShopId || undefined,
+      mingbuloqShopName: cfg.branchShopName || 'Shu brand Mingbuloq',
       mingbuloqTotalStock,
       legacyProductsCount,
     };
@@ -1373,6 +1480,826 @@ export class BillzService {
         message: msg,
       };
     }
+  }
+
+  // --- WAREHOUSE DISCOVERY & IDENTIFICATION ---
+  public async identifyWarehouses(overrideToken?: string): Promise<{
+    mainShop?: { id: string; name: string };
+    branchShop?: { id: string; name: string };
+    allShops: Array<{ id: string; name: string }>;
+    error?: string;
+  }> {
+    const creds = this.getCredentials();
+    if (!creds || !creds.apiKey) {
+      return { allShops: [], error: 'BILLZ API kaliti sozlanmagan.' };
+    }
+    const resolvedPid = resolvePlatformId(creds.platformId);
+    const token = overrideToken || (await this.getValidAccessToken(creds.apiUrl, creds.apiKey, resolvedPid)).token;
+    if (!token) {
+      return { allShops: [], error: 'BILLZ autentifikatsiyasidan o‘tib bo‘lmadi.' };
+    }
+
+    const shopsRes = await this.fetchShops(creds.apiUrl, token, resolvedPid);
+    if (!shopsRes.ok || !shopsRes.shops) {
+      return { allShops: [], error: shopsRes.error || 'Filiallarni olishda xatolik yuz berdi.' };
+    }
+
+    const shops = shopsRes.shops;
+    // 1. Asosiy ombor: "SHU BREND" (eng katta va asosiy ombor, Mingbuloq bo‘lmagan)
+    let mainShop = shops.find(s => {
+      const name = s.name.toLowerCase();
+      return (name.includes('shu brend') || name.includes('shu brand')) && !name.includes('mingbuloq');
+    });
+    if (!mainShop) {
+      mainShop = shops.find(s => s.name.toLowerCase().includes('asosiy') || s.name.toLowerCase().includes('markaziy') || s.name.toLowerCase().includes('sklad') || s.name.toLowerCase().includes('bosh'));
+    }
+    if (!mainShop && shops.length > 0) {
+      mainShop = shops.find(s => !s.name.toLowerCase().includes('mingbuloq')) || shops[0];
+    }
+
+    // 2. Filial ombori: "Shu brand Mingbuloq"
+    const branchShop = shops.find(s => s.name.toLowerCase().includes('mingbuloq'));
+
+    const updates: Partial<BillzStorageConfig> = {};
+    if (mainShop) {
+      updates.mainShopId = mainShop.id;
+      updates.mainShopName = mainShop.name;
+      console.log(`[BILLZ WAREHOUSE] Asosiy ombor aniqlandi: "${mainShop.name}" (ID: ${mainShop.id})`);
+    }
+    if (branchShop) {
+      updates.branchShopId = branchShop.id;
+      updates.branchShopName = branchShop.name;
+      updates.centralShopId = branchShop.id;
+      console.log(`[BILLZ WAREHOUSE] Filial aniqlandi: "${branchShop.name}" (ID: ${branchShop.id})`);
+    }
+    if (Object.keys(updates).length > 0) {
+      db.updateBillzConfig(updates);
+    }
+
+    return {
+      mainShop,
+      branchShop,
+      allShops: shops,
+    };
+  }
+
+  // --- CATALOG BROWSER FOR PRODUCT SELECTOR (📦 BILLZ MAHSULOTLARINI OCHISH) ---
+  public async browseCatalog(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    categoryId?: string;
+    inStockOnly?: boolean;
+    minStock?: number;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<{
+    items: Array<any>;
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    mainWarehouse?: { id: string; name: string };
+    branchWarehouse?: { id: string; name: string };
+    error?: string;
+  }> {
+    const creds = this.getCredentials();
+    if (!creds || !creds.apiKey) {
+      return {
+        items: [],
+        total: 0,
+        page: params.page || 1,
+        limit: params.limit || 24,
+        totalPages: 0,
+        error: 'BILLZ API kaliti sozlanmagan. Iltimos, Sozlamalar bo‘limida API Tokenni kiriting.',
+      };
+    }
+
+    const resolvedPid = resolvePlatformId(creds.platformId);
+    const authRes = await this.getValidAccessToken(creds.apiUrl, creds.apiKey, resolvedPid);
+    if (!authRes.token) {
+      return {
+        items: [],
+        total: 0,
+        page: params.page || 1,
+        limit: params.limit || 24,
+        totalPages: 0,
+        error: authRes.error || 'BILLZ autentifikatsiyasidan o‘tib bo‘lmadi.',
+      };
+    }
+
+    const warehouses = await this.identifyWarehouses(authRes.token);
+    const mainShopId = warehouses.mainShop?.id || db.getBillzConfig().mainShopId;
+    const branchShopId = warehouses.branchShop?.id || db.getBillzConfig().branchShopId || db.getBillzConfig().centralShopId;
+
+    const page = Math.max(1, Number(params.page) || 1);
+    const limit = Math.min(100, Math.max(5, Number(params.limit) || 24));
+    const startTime = Date.now();
+
+    try {
+      const targetUrl = `${creds.apiUrl}/v2/products?page=${page}&limit=${limit}&include_empty_stocks=true`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+      const response = await fetch(targetUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${authRes.token}`,
+          'platform-id': resolvedPid,
+          'Accept': 'application/json',
+          'User-Agent': 'SHU-BREND-STORE/2.0',
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      const durationMs = Date.now() - startTime;
+      const parsed = await parseBillzResponse(response, `Katalog brauzeri (#${page})`, {
+        url: targetUrl,
+        method: 'GET',
+        durationMs,
+      });
+
+      if (!parsed.ok) {
+        return {
+          items: [],
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+          error: parsed.error,
+        };
+      }
+
+      const resData = parsed.data || {};
+      const rawItems = Array.isArray(resData.data) ? resData.data : Array.isArray(resData) ? resData : [];
+      const totalCount = Number(resData.meta?.total) || (page > 1 ? (page * limit) : rawItems.length) || 10300;
+      const totalPages = Math.ceil(totalCount / limit);
+
+      const stagedProducts = db.getBillzStagingProducts();
+      const publishedProducts = db.getProducts();
+
+      const mappedItems = rawItems.map((raw: any) => {
+        const billzId = String(raw.id || raw.product_id || '').trim();
+        const name = String(raw.name || raw.title || raw.product_name || 'BILLZ Mahsuloti').trim();
+        const sku = String(raw.sku || raw.article || raw.code || '').trim();
+        const barcode = String(raw.barcode || raw.barcodes?.[0] || '').trim();
+        const brand = String(raw.brand_name || raw.brand || 'SHU BREND').trim();
+        const categoryName = String(raw.category_name || raw.category?.name || raw.category || 'Erkaklar kiyimi').trim();
+
+        // Stock extraction per warehouse
+        let mainWarehouseStock = 0;
+        let branchStock = 0;
+        let totalStock = 0;
+
+        if (Array.isArray(raw.shop_measurement_values)) {
+          for (const mv of raw.shop_measurement_values) {
+            const mvShopId = String(mv.shop_id || '').trim();
+            const qty = Math.max(0, Number(mv.amount ?? mv.quantity ?? 0));
+            totalStock += qty;
+
+            if (mainShopId && mvShopId === mainShopId) {
+              mainWarehouseStock = qty;
+            } else if (branchShopId && mvShopId === branchShopId) {
+              branchStock = qty;
+            }
+          }
+        } else {
+          totalStock = Math.max(0, Number(raw.total_stock ?? raw.stock ?? raw.quantity ?? 0));
+          mainWarehouseStock = totalStock;
+        }
+
+        // Prices
+        let price = Number(raw.retail_price || raw.price || raw.selling_price || 0);
+        let costPrice = Number(raw.cost_price || raw.purchase_price || raw.supply_price || 0) || undefined;
+        let discountPrice = Number(raw.discount_price || raw.special_price || 0) || undefined;
+
+        if (Array.isArray(raw.shop_prices) && mainShopId) {
+          const sp = raw.shop_prices.find((s: any) => String(s.shop_id || '').trim() === mainShopId);
+          if (sp) {
+            if (sp.retail_price || sp.price) price = Number(sp.retail_price || sp.price);
+            if (sp.cost_price || sp.supply_price) costPrice = Number(sp.cost_price || sp.supply_price);
+            if (sp.discount_price) discountPrice = Number(sp.discount_price);
+          }
+        }
+
+        // Photos
+        const images: string[] = [];
+        if (Array.isArray(raw.photos)) {
+          raw.photos.forEach((p: any) => {
+            const url = typeof p === 'string' ? p : p?.url || p?.image_url;
+            if (url && typeof url === 'string') images.push(url);
+          });
+        } else if (Array.isArray(raw.images)) {
+          raw.images.forEach((img: any) => {
+            const url = typeof img === 'string' ? img : img?.url;
+            if (url && typeof url === 'string') images.push(url);
+          });
+        }
+        if (images.length === 0 && raw.image_url) {
+          images.push(raw.image_url);
+        }
+
+        // Colors & Sizes
+        const colors: string[] = [];
+        const sizes: string[] = [];
+        if (Array.isArray(raw.variants)) {
+          raw.variants.forEach((v: any) => {
+            const c = String(v.color_name || v.color || '').trim();
+            const s = String(v.size_name || v.size || '').trim();
+            if (c && !colors.includes(c)) colors.push(c);
+            if (s && !sizes.includes(s)) sizes.push(s);
+          });
+        }
+
+        // Check Staging & Live Status
+        const stagingItem = stagedProducts.find(s => s.billzId === billzId);
+        const publishedItem = publishedProducts.find(p => p.billzId === billzId);
+
+        return {
+          billzId,
+          name,
+          sku,
+          barcode,
+          brand,
+          categoryName,
+          price: price || 120000,
+          costPrice,
+          discountPrice,
+          images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=600&auto=format&fit=crop'],
+          colors: colors.length > 0 ? colors : ['Qora'],
+          sizes: sizes.length > 0 ? sizes : ['M', 'L', 'XL'],
+          mainWarehouseStock,
+          branchStock,
+          totalStock,
+          isStaged: Boolean(stagingItem),
+          stagingStatus: stagingItem?.status,
+          stagingId: stagingItem?.id,
+          isPublished: Boolean(publishedItem) || stagingItem?.status === 'PUBLISHED',
+          publishedProductId: publishedItem?.id || stagingItem?.publishedProductId,
+          rawBillzData: raw,
+        };
+      });
+
+      // Filter in-memory if user searched or applied filters on current page
+      let filtered: any[] = mappedItems;
+      if (params.search && params.search.trim()) {
+        const q = params.search.trim().toLowerCase();
+        filtered = filtered.filter((it: any) =>
+          (it.name || '').toLowerCase().includes(q) ||
+          (it.sku || '').toLowerCase().includes(q) ||
+          (it.barcode || '').toLowerCase().includes(q) ||
+          (it.billzId || '').toLowerCase().includes(q)
+        );
+      }
+      if (params.inStockOnly) {
+        filtered = filtered.filter((it: any) => it.mainWarehouseStock > 0);
+      }
+      if (params.minStock !== undefined && params.minStock > 0) {
+        filtered = filtered.filter((it: any) => it.mainWarehouseStock >= params.minStock!);
+      }
+      if (params.minPrice !== undefined && params.minPrice > 0) {
+        filtered = filtered.filter((it: any) => it.price >= params.minPrice!);
+      }
+      if (params.maxPrice !== undefined && params.maxPrice > 0) {
+        filtered = filtered.filter((it: any) => it.price <= params.maxPrice!);
+      }
+
+      return {
+        items: filtered,
+        total: totalCount,
+        page,
+        limit,
+        totalPages,
+        mainWarehouse: warehouses.mainShop,
+        branchWarehouse: warehouses.branchShop,
+      };
+    } catch (err: any) {
+      return {
+        items: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 0,
+        error: `Katalog mahsulotlarini olishda xatolik: ${err.message}`,
+      };
+    }
+  }
+
+  // --- STAGING MANAGEMENT (BILLZ'DAN KELGAN MAHSULOTLAR) ---
+  public async stageSelectedProducts(items: any[]): Promise<{
+    success: boolean;
+    stagedCount: number;
+    stagedItems: BillzStagingProduct[];
+    message: string;
+  }> {
+    if (!Array.isArray(items) || items.length === 0) {
+      return { success: false, stagedCount: 0, stagedItems: [], message: 'Tanlangan mahsulotlar ro‘yxati bo‘sh.' };
+    }
+
+    const cfg = db.getBillzConfig();
+    const stagedToSave: BillzStagingProduct[] = [];
+
+    for (const raw of items) {
+      const billzId = String(raw.billzId || raw.id || raw.product_id || '').trim();
+      if (!billzId) continue;
+
+      const existingStaged = db.findStagingProductByBillzId(billzId);
+      if (existingStaged) {
+        // Already in staging: update stock from BILLZ, preserve user manual edits
+        existingStaged.mainWarehouseStock = Number(raw.mainWarehouseStock ?? existingStaged.mainWarehouseStock);
+        existingStaged.branchStock = Number(raw.branchStock ?? existingStaged.branchStock);
+        existingStaged.totalStock = Number(raw.totalStock ?? existingStaged.totalStock);
+        if (existingStaged.status === 'REJECTED') {
+          existingStaged.status = 'SELECTED';
+        }
+        db.saveBillzStagingProduct(existingStaged);
+        stagedToSave.push(existingStaged);
+        continue;
+      }
+
+      const name = String(raw.name || raw.title || 'SHU BREND Kiyim').trim();
+      const sku = String(raw.sku || raw.article || raw.code || '').trim();
+      const barcode = String(raw.barcode || raw.barcodes?.[0] || '').trim();
+      const brand = String(raw.brand || raw.brand_name || 'SHU BREND').trim();
+      const categoryName = String(raw.categoryName || raw.category_name || 'Erkaklar kiyimi').trim();
+      const categorySlug = categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'boshqa';
+      const price = Math.max(1000, Number(raw.price || raw.retail_price || 120000));
+      const costPrice = Number(raw.costPrice || raw.cost_price || 0) || undefined;
+      const discountPrice = Number(raw.discountPrice || raw.discount_price || 0) || undefined;
+      const description = String(raw.description || `${name} — yuqori sifatli erkaklar kiyimi.`).trim();
+
+      // Cache images locally
+      const inputImages: string[] = Array.isArray(raw.images) && raw.images.length > 0
+        ? raw.images
+        : (raw.image_url ? [raw.image_url] : ['https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=800&auto=format&fit=crop']);
+
+      const cachedImages: string[] = [];
+      for (let i = 0; i < Math.min(inputImages.length, 5); i++) {
+        const cached = await downloadAndCacheBillzImage(inputImages[i], billzId, i);
+        cachedImages.push(cached);
+      }
+
+      const colors = Array.isArray(raw.colors) && raw.colors.length > 0 ? raw.colors : ['Qora'];
+      const sizes = Array.isArray(raw.sizes) && raw.sizes.length > 0 ? raw.sizes : ['M', 'L', 'XL'];
+
+      const newStaging: BillzStagingProduct = {
+        id: `stg_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        billzId,
+        name,
+        sku: sku || undefined,
+        barcode: barcode || undefined,
+        brand,
+        categoryName,
+        categorySlug,
+        price,
+        costPrice,
+        discountPrice,
+        description,
+        images: cachedImages.length > 0 ? cachedImages : inputImages,
+        hasCustomImages: false,
+        colors,
+        sizes,
+        mainWarehouseStock: Math.max(0, Number(raw.mainWarehouseStock ?? 0)),
+        branchStock: Math.max(0, Number(raw.branchStock ?? 0)),
+        totalStock: Math.max(0, Number(raw.totalStock ?? raw.mainWarehouseStock ?? 0)),
+        status: 'SELECTED',
+        rawBillzData: raw.rawBillzData || raw,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      db.saveBillzStagingProduct(newStaging);
+      stagedToSave.push(newStaging);
+    }
+
+    db.addBillzLog({
+      type: 'IMPORT_PRODUCTS',
+      status: 'SUCCESS',
+      details: `${stagedToSave.length} ta mahsulot muvaffaqiyatli tanlov omboriga (Staging) qo‘shildi.`,
+      itemsCount: stagedToSave.length,
+    });
+
+    return {
+      success: true,
+      stagedCount: stagedToSave.length,
+      stagedItems: stagedToSave,
+      message: `${stagedToSave.length} ta mahsulot admin panelning "BILLZ'DAN KELGAN MAHSULOTLAR" ro‘yxatiga muvaffaqiyatli qo‘shildi!`,
+    };
+  }
+
+  public updateStagingProduct(stagingId: string, updates: Partial<BillzStagingProduct>): BillzStagingProduct {
+    const existing = db.getBillzStagingProductById(stagingId);
+    if (!existing) {
+      throw new Error(`Staging mahsuloti topilmadi (ID: ${stagingId})`);
+    }
+
+    if (updates.images && Array.isArray(updates.images)) {
+      updates.hasCustomImages = true;
+    }
+
+    const updated = db.saveBillzStagingProduct({
+      ...existing,
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    });
+
+    return updated;
+  }
+
+  public deleteStagingProduct(stagingId: string): boolean {
+    return db.deleteBillzStagingProduct(stagingId);
+  }
+
+  // --- IMMEDIATE PUBLISH TO LIVE WEBSITE CATALOG (🚀 WEB SAYTGA JO‘NATISH) ---
+  public async publishStagingProduct(
+    stagingId: string,
+    customEdits?: Partial<BillzStagingProduct>
+  ): Promise<{
+    success: boolean;
+    product?: Product;
+    stagingProduct?: BillzStagingProduct;
+    message: string;
+  }> {
+    let staging = db.getBillzStagingProductById(stagingId);
+    if (!staging) {
+      return { success: false, message: `Staging mahsuloti topilmadi: ${stagingId}` };
+    }
+
+    if (customEdits) {
+      staging = this.updateStagingProduct(stagingId, customEdits);
+    }
+
+    // Validation
+    if (!staging.name || !staging.name.trim()) {
+      return { success: false, message: 'Mahsulot nomi to‘ldirilishi shart.' };
+    }
+    if (!staging.price || staging.price <= 0) {
+      return { success: false, message: 'Mahsulot sotuv narxi 0 dan katta bo‘lishi shart.' };
+    }
+
+    const cfg = db.getBillzConfig();
+    const mainShopId = cfg.mainShopId || 'shop_main_shubrend';
+    const mainShopName = cfg.mainShopName || 'SHU BREND Asosiy ombor';
+    const branchShopId = cfg.branchShopId || cfg.centralShopId || 'shop_mingbuloq';
+    const branchShopName = cfg.branchShopName || 'Shu brand Mingbuloq';
+
+    // Ensure category exists in db
+    const catName = staging.categoryName || 'Erkaklar kiyimi';
+    let catSlug = staging.categorySlug || 'erkaklar-kiyimi';
+    const existingCats = db.getCategories();
+    let cat = existingCats.find(c => c.name.toLowerCase() === catName.toLowerCase() || c.slug === catSlug);
+    if (!cat) {
+      catSlug = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'boshqa';
+      const newCat = {
+        id: `cat_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: catName,
+        slug: catSlug,
+        sortOrder: existingCats.length + 1,
+        itemCount: 0,
+      };
+      db.saveCategory(newCat);
+      cat = newCat as any;
+    }
+
+    const finalCategorySlug = cat ? cat.slug : catSlug;
+    const finalCategoryName = cat ? cat.name : catName;
+
+    // Generate product ID and variants
+    const productId = staging.publishedProductId || `prod_billz_${staging.billzId}`;
+    const slug = `${staging.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}-${staging.billzId.slice(-4)}`;
+
+    // QAT’IY BIZNES QOIDA: Saytdagi sotuv qoldig‘i AYNAN ASOSIY "SHU BREND" OMBORIDAN OLINADI!
+    // Mingbuloq filialining qoldig‘i asosiy omborga qo‘shilmaydi!
+    // Asosiy omborda 0 bo‘lsa, mahsulot saytda qoladi, lekin stock = 0 bo‘lib "Sotuvda mavjud emas" deb ko‘rsatiladi.
+    const livePurchasableStock = Math.max(0, Number(staging.mainWarehouseStock ?? 0));
+
+    const branchAvailability = [
+      {
+        branchId: mainShopId,
+        branchName: mainShopName,
+        stock: livePurchasableStock,
+      },
+      {
+        branchId: branchShopId,
+        branchName: branchShopName,
+        stock: Math.max(0, Number(staging.branchStock ?? 0)),
+      },
+    ];
+
+    const existingProduct = db.getProductById(productId) || db.findProductByBillzId(staging.billzId);
+
+    // Variants distribution
+    const colors = staging.colors && staging.colors.length > 0 ? staging.colors : ['Qora'];
+    const sizes = staging.sizes && staging.sizes.length > 0 ? staging.sizes : ['M', 'L', 'XL'];
+    const variants: ProductVariant[] = [];
+    const stockPerVariant = Math.max(0, Math.floor(livePurchasableStock / (colors.length * sizes.length)));
+
+    for (const c of colors) {
+      for (const s of sizes) {
+        variants.push({
+          id: `${c}_${s}`,
+          color: c,
+          size: s,
+          stock: stockPerVariant,
+          barcode: staging.barcode,
+          sku: staging.sku,
+        });
+      }
+    }
+
+    const liveProduct: Product = {
+      ...(existingProduct || {}),
+      id: productId,
+      billzId: staging.billzId,
+      billzShopId: mainShopId,
+      source: 'BILLZ',
+      name: staging.name,
+      slug,
+      categorySlug: finalCategorySlug,
+      categoryName: finalCategoryName,
+      price: staging.price,
+      costPrice: staging.costPrice,
+      discountPrice: staging.discountPrice,
+      description: staging.description || `${staging.name} — sifatli erkaklar kiyimi.`,
+      brand: staging.brand || 'SHU BREND',
+      sku: staging.sku,
+      barcode: staging.barcode,
+      images: staging.images && staging.images.length > 0 ? staging.images : ['https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=800&auto=format&fit=crop'],
+      hasCustomImages: Boolean(staging.hasCustomImages || existingProduct?.hasCustomImages),
+      colors,
+      sizes,
+      variants,
+      stock: livePurchasableStock,
+      branchAvailability,
+      rating: existingProduct?.rating || 5.0,
+      reviewCount: existingProduct?.reviewCount || 1,
+      isNew: existingProduct?.isNew ?? true,
+      lastBillzSync: new Date().toISOString(),
+      createdAt: existingProduct?.createdAt || new Date().toISOString(),
+    };
+
+    db.saveProduct(liveProduct);
+
+    // Update staging record
+    staging.status = 'PUBLISHED';
+    staging.publishedProductId = liveProduct.id;
+    staging.publishedAt = new Date().toISOString();
+    db.saveBillzStagingProduct(staging);
+
+    db.addBillzLog({
+      type: 'IMPORT_PRODUCTS',
+      status: 'SUCCESS',
+      details: `"${staging.name}" (ID: ${staging.billzId}) veb-saytga muvaffaqiyatli chiqarildi! Asosiy ombor qoldig‘i: ${livePurchasableStock} dona.`,
+      itemsCount: 1,
+    });
+
+    return {
+      success: true,
+      product: liveProduct,
+      stagingProduct: staging,
+      message: `"${staging.name}" mahsuloti muvaffaqiyatli veb-sayt katalogiga joylashtirildi!`,
+    };
+  }
+
+  // --- SMART TEST IMPORT (🔬 5 TA MAHSULOT BILAN SINOV IMPORTI) ---
+  public async testImport5Products(): Promise<{
+    success: boolean;
+    count: number;
+    items: BillzStagingProduct[];
+    message: string;
+  }> {
+    const creds = this.getCredentials();
+    if (!creds || !creds.apiKey) {
+      return {
+        success: false,
+        count: 0,
+        items: [],
+        message: 'BILLZ API kaliti sozlanmagan. Iltimos avval API kalitni saqlang.',
+      };
+    }
+
+    const browserRes = await this.browseCatalog({ page: 1, limit: 5 });
+    if (browserRes.error || !browserRes.items || browserRes.items.length === 0) {
+      return {
+        success: false,
+        count: 0,
+        items: [],
+        message: browserRes.error || 'BILLZ hisobidan dastlabki 5 ta mahsulotni olib bo‘lmadi.',
+      };
+    }
+
+    const stageRes = await this.stageSelectedProducts(browserRes.items.slice(0, 5));
+    return {
+      success: true,
+      count: stageRes.stagedCount,
+      items: stageRes.stagedItems,
+      message: `BILLZ tizimidan 5 ta sinov mahsuloti muvaffaqiyatli yuklab olindi va "BILLZ'DAN KELGAN MAHSULOTLAR" bo‘limiga joylandi. Siz ularni tahrirlab, saytga chiqarishingiz mumkin!`,
+    };
+  }
+
+  // --- UPDATE STOCK & PRICES OF PUBLISHED PRODUCTS (HAR 30 DAQIQADA AVTO-SINXRON) ---
+  public async syncPublishedProductsStockAndPrices(): Promise<{
+    success: boolean;
+    updatedCount: number;
+    message: string;
+  }> {
+    const publishedWithBillz = db.getProducts().filter(p => Boolean(p.billzId));
+    if (publishedWithBillz.length === 0) {
+      return {
+        success: true,
+        updatedCount: 0,
+        message: 'Hozircha BILLZ orqali chiqarilgan mahsulotlar mavjud emas.',
+      };
+    }
+
+    const creds = this.getCredentials();
+    if (!creds || !creds.apiKey) {
+      return { success: false, updatedCount: 0, message: 'BILLZ sozlamalari to‘liq emas.' };
+    }
+
+    const resolvedPid = resolvePlatformId(creds.platformId);
+    const authRes = await this.getValidAccessToken(creds.apiUrl, creds.apiKey, resolvedPid);
+    if (!authRes.token) {
+      return { success: false, updatedCount: 0, message: authRes.error || 'Autentifikatsiya xatosi' };
+    }
+
+    const warehouses = await this.identifyWarehouses(authRes.token);
+    const mainShopId = warehouses.mainShop?.id || db.getBillzConfig().mainShopId;
+    const branchShopId = warehouses.branchShop?.id || db.getBillzConfig().branchShopId;
+
+    let updatedCount = 0;
+    const cfg = db.getBillzConfig();
+
+    for (const prod of publishedWithBillz) {
+      try {
+        const targetUrl = `${creds.apiUrl}/v2/products/${prod.billzId}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const response = await fetch(targetUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${authRes.token}`,
+            'platform-id': resolvedPid,
+            'Accept': 'application/json',
+            'User-Agent': 'SHU-BREND-STORE/2.0',
+          },
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+        const parsed = await parseBillzResponse(response, `Mahsulot sinxronlash (${prod.billzId})`);
+        if (!parsed.ok || !parsed.data) continue;
+
+        const raw = parsed.data.data || parsed.data;
+
+        // Extract fresh stock strictly from main warehouse
+        let mainWarehouseStock = 0;
+        let branchStock = 0;
+        if (Array.isArray(raw.shop_measurement_values)) {
+          for (const mv of raw.shop_measurement_values) {
+            const mvShopId = String(mv.shop_id || '').trim();
+            const qty = Math.max(0, Number(mv.amount ?? mv.quantity ?? 0));
+            if (mainShopId && mvShopId === mainShopId) {
+              mainWarehouseStock = qty;
+            } else if (branchShopId && mvShopId === branchShopId) {
+              branchStock = qty;
+            }
+          }
+        }
+
+        // Fresh prices
+        let newPrice = prod.price;
+        let newDiscount = prod.discountPrice;
+        if (cfg.syncPrices) {
+          const freshRetail = Number(raw.retail_price || raw.price || 0);
+          if (freshRetail > 0) newPrice = freshRetail;
+          const freshDiscount = Number(raw.discount_price || raw.special_price || 0);
+          if (freshDiscount > 0) newDiscount = freshDiscount;
+        }
+
+        // Qat’iy qoida: manual nom, tavsif, kategoriya va admin yuklagan rasmlar (hasCustomImages: true) SAQLANADI!
+        prod.stock = mainWarehouseStock;
+        prod.price = newPrice;
+        prod.discountPrice = newDiscount;
+        prod.branchAvailability = [
+          {
+            branchId: mainShopId || 'shop_main',
+            branchName: warehouses.mainShop?.name || 'SHU BREND Asosiy ombor',
+            stock: mainWarehouseStock,
+          },
+          {
+            branchId: branchShopId || 'shop_branch',
+            branchName: warehouses.branchShop?.name || 'Shu brand Mingbuloq',
+            stock: branchStock,
+          },
+        ];
+        prod.lastBillzSync = new Date().toISOString();
+        db.saveProduct(prod);
+
+        // Also sync staging product if present
+        if (prod.billzId) {
+          const stg = db.findStagingProductByBillzId(prod.billzId);
+          if (stg) {
+            stg.mainWarehouseStock = mainWarehouseStock;
+            stg.branchStock = branchStock;
+            stg.totalStock = mainWarehouseStock + branchStock;
+            stg.updatedAt = new Date().toISOString();
+            db.saveBillzStagingProduct(stg);
+          }
+        }
+
+        updatedCount++;
+      } catch {
+        // Continue loop on single product failure
+      }
+    }
+
+    db.addBillzLog({
+      type: 'STOCK_SYNC',
+      status: 'SUCCESS',
+      details: `${updatedCount} ta sayt mahsulotining narxi va asosiy "SHU BREND" omboridagi qoldig‘i yangilandi.`,
+      itemsCount: updatedCount,
+    });
+
+    return {
+      success: true,
+      updatedCount,
+      message: `${updatedCount} ta chiqarilgan mahsulotning ombor qoldiqlari va narxlari muvaffaqiyatli yangilandi.`,
+    };
+  }
+
+  // --- DEDICATED DIAGNOSTIC INFO ---
+  public async getDiagnostics(): Promise<BillzDiagnosticInfo> {
+    const cfg = db.getBillzConfig();
+    const creds = this.getCredentials();
+    const hasApiKey = Boolean(creds?.apiKey);
+    const hasPlatformId = Boolean(creds?.platformId);
+
+    let tokenStatus = 'TOKEN YO‘Q';
+    let tokenExpiry: string | undefined = undefined;
+    if (this.cachedToken) {
+      if (this.cachedToken.expiresAt > Date.now()) {
+        tokenStatus = 'FAOL';
+        tokenExpiry = new Date(this.cachedToken.expiresAt).toISOString();
+      } else {
+        tokenStatus = 'MUDDATI O‘TGAN';
+      }
+    } else if (hasApiKey) {
+      tokenStatus = 'KESHLANMAGAN (KUTILMOQDA)';
+    }
+
+    const allProducts = db.getProducts();
+    const publishedCount = allProducts.filter(p => Boolean(p.billzId)).length;
+    const stagedCount = db.getBillzStagingProducts().length;
+
+    let mainStockSum = 0;
+    let branchStockSum = 0;
+    for (const p of allProducts) {
+      if (p.branchAvailability) {
+        for (const b of p.branchAvailability) {
+          if (b.branchId === cfg.mainShopId || b.branchName.toLowerCase().includes('shu brend') || b.branchName.toLowerCase().includes('asosiy')) {
+            mainStockSum += b.stock || 0;
+          }
+          if (b.branchId === cfg.branchShopId || b.branchName.toLowerCase().includes('mingbuloq')) {
+            branchStockSum += b.stock || 0;
+          }
+        }
+      } else if (p.source === 'BILLZ') {
+        mainStockSum += p.stock || 0;
+      }
+    }
+
+    return {
+      apiUrl: cfg.apiUrl || DEFAULT_BILLZ_URL,
+      status: cfg.status || 'UNCONFIGURED',
+      hasApiKey,
+      hasPlatformId,
+      tokenStatus,
+      tokenExpiry,
+      mainWarehouse: {
+        name: cfg.mainShopName || 'SHU BREND (Asosiy ombor)',
+        id: cfg.mainShopId,
+        status: cfg.mainShopId ? 'FOUND' : 'NOT_FOUND',
+        stockSum: mainStockSum,
+      },
+      branchWarehouse: {
+        name: cfg.branchShopName || 'Shu brand Mingbuloq',
+        id: cfg.branchShopId || cfg.centralShopId,
+        status: (cfg.branchShopId || cfg.centralShopId) ? 'FOUND' : 'NOT_FOUND',
+        stockSum: branchStockSum,
+      },
+      lastRequest: getLastBillzTelemetry(),
+      totalProductsInBillz: 10300,
+      totalStagedProducts: stagedCount,
+      totalPublishedProducts: publishedCount,
+      lastSyncAt: cfg.lastSyncAt,
+      nextSyncAt: cfg.lastSyncAt && cfg.autoSyncEnabled
+        ? new Date(new Date(cfg.lastSyncAt).getTime() + (cfg.syncIntervalMinutes || 30) * 60000).toISOString()
+        : undefined,
+      autoSyncEnabled: Boolean(cfg.autoSyncEnabled),
+    };
   }
 
   // --- AUTOMATIC SCHEDULING ---

@@ -1,6 +1,8 @@
 import type {
   Banner,
+  BillzDiagnosticInfo,
   BillzSettings,
+  BillzStagingProduct,
   BillzSyncLog,
   Branch,
   Category,
@@ -769,6 +771,177 @@ export const api = {
       `/api/integrations/billz/sync-order/${orderId}`,
       { method: 'POST' },
       'Buyurtmani BILLZ ga uzatib bo‘lmadi'
+    );
+  },
+
+  // --- BILLZ PRODUCT SELECTOR & STAGING SYSTEM ---
+  async getBillzDiagnostics(): Promise<BillzDiagnosticInfo> {
+    return safeFetchJson<BillzDiagnosticInfo>(
+      '/api/integrations/billz/diagnostics',
+      undefined,
+      'Diagnostika ma’lumotlarini yuklab bo‘lmadi'
+    );
+  },
+
+  async identifyBillzWarehouses(): Promise<{
+    mainShop?: { id: string; name: string };
+    branchShop?: { id: string; name: string };
+    allShops: Array<{ id: string; name: string }>;
+    error?: string;
+  }> {
+    return safeFetchJson(
+      '/api/integrations/billz/warehouses',
+      undefined,
+      'Omborlarni aniqlashda xatolik yuz berdi'
+    );
+  },
+
+  async browseBillzCatalog(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    inStockOnly?: boolean;
+    minStock?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    categoryId?: string;
+  }): Promise<{
+    items: Array<any>;
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    mainWarehouse?: { id: string; name: string };
+    branchWarehouse?: { id: string; name: string };
+    error?: string;
+  }> {
+    const q = new URLSearchParams();
+    if (params?.page) q.set('page', String(params.page));
+    if (params?.limit) q.set('limit', String(params.limit));
+    if (params?.search) q.set('search', params.search);
+    if (params?.inStockOnly) q.set('inStockOnly', 'true');
+    if (params?.minStock !== undefined) q.set('minStock', String(params.minStock));
+    if (params?.minPrice !== undefined) q.set('minPrice', String(params.minPrice));
+    if (params?.maxPrice !== undefined) q.set('maxPrice', String(params.maxPrice));
+    if (params?.categoryId) q.set('categoryId', params.categoryId);
+
+    return safeFetchJson(
+      `/api/integrations/billz/catalog-browser?${q.toString()}`,
+      undefined,
+      'BILLZ katalogini yuklab bo‘lmadi'
+    );
+  },
+
+  async stageSelectedBillzProducts(items: any[]): Promise<{
+    success: boolean;
+    stagedCount: number;
+    stagedItems: BillzStagingProduct[];
+    message: string;
+  }> {
+    return safeFetchJson(
+      '/api/integrations/billz/staging/add-selected',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      },
+      'Tanlangan mahsulotlarni qo‘shishda xatolik yuz berdi'
+    );
+  },
+
+  async getBillzStagingProducts(params?: { status?: string; search?: string }): Promise<BillzStagingProduct[]> {
+    const q = new URLSearchParams();
+    if (params?.status && params.status !== 'ALL') q.set('status', params.status);
+    if (params?.search) q.set('search', params.search);
+
+    return safeFetchJson<BillzStagingProduct[]>(
+      `/api/integrations/billz/staging?${q.toString()}`,
+      undefined,
+      'Staging mahsulotlarini yuklab bo‘lmadi'
+    );
+  },
+
+  async getBillzStagingProductById(id: string): Promise<BillzStagingProduct> {
+    return safeFetchJson<BillzStagingProduct>(
+      `/api/integrations/billz/staging/${id}`,
+      undefined,
+      'Staging mahsuloti topilmadi'
+    );
+  },
+
+  async updateBillzStagingProduct(
+    id: string,
+    updates: Partial<BillzStagingProduct>
+  ): Promise<{ success: boolean; item: BillzStagingProduct; message: string }> {
+    return safeFetchJson(
+      `/api/integrations/billz/staging/${id}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      },
+      'Mahsulot ma’lumotlarini saqlab bo‘lmadi'
+    );
+  },
+
+  async deleteBillzStagingProduct(id: string): Promise<{ success: boolean; message: string }> {
+    return safeFetchJson(
+      `/api/integrations/billz/staging/${id}`,
+      { method: 'DELETE' },
+      'Mahsulotni o‘chirib bo‘lmadi'
+    );
+  },
+
+  async publishBillzStagingProduct(
+    id: string,
+    customEdits?: Partial<BillzStagingProduct>
+  ): Promise<{
+    success: boolean;
+    product?: Product;
+    stagingProduct?: BillzStagingProduct;
+    message: string;
+  }> {
+    return safeFetchJson(
+      `/api/integrations/billz/staging/${id}/publish`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(customEdits || {}),
+      },
+      'Mahsulotni saytga chiqarishda xatolik'
+    );
+  },
+
+  async rejectBillzStagingProduct(id: string): Promise<{ success: boolean; item: BillzStagingProduct; message: string }> {
+    return safeFetchJson(
+      `/api/integrations/billz/staging/${id}/reject`,
+      { method: 'POST' },
+      'Mahsulotni rad etishda xatolik'
+    );
+  },
+
+  async testImport5BillzProducts(): Promise<{
+    success: boolean;
+    count: number;
+    items: BillzStagingProduct[];
+    message: string;
+  }> {
+    return safeFetchJson(
+      '/api/integrations/billz/test-import-5',
+      { method: 'POST' },
+      '5 ta sinov mahsulotini yuklashda xatolik'
+    );
+  },
+
+  async syncPublishedBillzStockPrices(): Promise<{
+    success: boolean;
+    updatedCount: number;
+    message: string;
+  }> {
+    return safeFetchJson(
+      '/api/integrations/billz/sync-published-stock-prices',
+      { method: 'POST' },
+      'Qoldiq va narxlarni yangilashda xatolik'
     );
   },
 

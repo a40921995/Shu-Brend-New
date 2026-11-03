@@ -3,6 +3,7 @@ import path from 'node:path';
 import type {
   Banner,
   BillzSettings,
+  BillzStagingProduct,
   BillzSyncLog,
   BillzSyncStatus,
   Branch,
@@ -49,6 +50,10 @@ export interface BillzStorageConfig {
   lastError?: string;
   status: BillzSyncStatus;
   centralShopId?: string;
+  mainShopId?: string;
+  mainShopName?: string;
+  branchShopId?: string;
+  branchShopName?: string;
   syncImages: boolean;
   syncPrices: boolean;
   syncStock: boolean;
@@ -68,11 +73,13 @@ export interface DatabaseSchema {
   branches?: Branch[];
   billzConfig?: BillzStorageConfig;
   billzLogs?: BillzSyncLog[];
+  billzStagingProducts?: BillzStagingProduct[];
 }
 
 // Initial seed matching user requirements and design screenshot perfectly
 const INITIAL_DATA: DatabaseSchema = {
   inventoryLogs: [],
+  billzStagingProducts: [],
 
   users: [
     {
@@ -582,6 +589,7 @@ class Database {
             syncStock: true,
           },
           billzLogs: Array.isArray(parsed.billzLogs) ? parsed.billzLogs : [],
+          billzStagingProducts: Array.isArray(parsed.billzStagingProducts) ? parsed.billzStagingProducts : [],
           adminSecurity: parsed.adminSecurity,
         };
       }
@@ -1576,12 +1584,66 @@ class Database {
   }
 
   findProductBySkuOrBarcode(sku?: string, barcode?: string): Product | undefined {
-    if (!sku && !barcode) return undefined;
     return this.data.products.find(p => {
-      if (sku && (p.sku === sku || p.variants?.some(v => v.sku === sku))) return true;
-      if (barcode && (p.barcode === barcode || p.variants?.some(v => v.barcode === barcode))) return true;
+      if (sku && p.sku && p.sku.toLowerCase() === sku.toLowerCase()) return true;
+      if (barcode && p.barcode && p.barcode === barcode) return true;
+      if (sku && p.variants && p.variants.some(v => v.sku && v.sku.toLowerCase() === sku.toLowerCase())) return true;
+      if (barcode && p.variants && p.variants.some(v => v.barcode && v.barcode === barcode)) return true;
       return false;
     });
+  }
+
+  // --- BILLZ STAGING & PRODUCT SELECTION STORAGE ---
+
+  getBillzStagingProducts(): BillzStagingProduct[] {
+    return this.data.billzStagingProducts || [];
+  }
+
+  getBillzStagingProductById(id: string): BillzStagingProduct | undefined {
+    return (this.data.billzStagingProducts || []).find(p => p.id === id);
+  }
+
+  findStagingProductByBillzId(billzId: string): BillzStagingProduct | undefined {
+    return (this.data.billzStagingProducts || []).find(p => p.billzId === billzId);
+  }
+
+  saveBillzStagingProduct(item: BillzStagingProduct): BillzStagingProduct {
+    if (!this.data.billzStagingProducts) this.data.billzStagingProducts = [];
+    const idx = this.data.billzStagingProducts.findIndex(p => p.id === item.id || p.billzId === item.billzId);
+    item.updatedAt = new Date().toISOString();
+    if (idx >= 0) {
+      this.data.billzStagingProducts[idx] = { ...this.data.billzStagingProducts[idx], ...item };
+    } else {
+      this.data.billzStagingProducts.unshift(item);
+    }
+    this.saveData();
+    return item;
+  }
+
+  saveBillzStagingProducts(items: BillzStagingProduct[]): BillzStagingProduct[] {
+    if (!this.data.billzStagingProducts) this.data.billzStagingProducts = [];
+    for (const item of items) {
+      const idx = this.data.billzStagingProducts.findIndex(p => p.id === item.id || p.billzId === item.billzId);
+      item.updatedAt = new Date().toISOString();
+      if (idx >= 0) {
+        this.data.billzStagingProducts[idx] = { ...this.data.billzStagingProducts[idx], ...item };
+      } else {
+        this.data.billzStagingProducts.unshift(item);
+      }
+    }
+    this.saveData();
+    return this.data.billzStagingProducts;
+  }
+
+  deleteBillzStagingProduct(id: string): boolean {
+    if (!this.data.billzStagingProducts) return false;
+    const initialLen = this.data.billzStagingProducts.length;
+    this.data.billzStagingProducts = this.data.billzStagingProducts.filter(p => p.id !== id);
+    if (this.data.billzStagingProducts.length < initialLen) {
+      this.saveData();
+      return true;
+    }
+    return false;
   }
 }
 

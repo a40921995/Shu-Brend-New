@@ -59,22 +59,31 @@ export function decryptSecret(cipherText: string): string {
     return cipherText;
   }
 
-  try {
-    const parts = cipherText.split(':');
-    if (parts.length !== 4) return '';
-    const iv = Buffer.from(parts[1], 'hex');
-    const authTag = Buffer.from(parts[2], 'hex');
-    const encryptedHex = parts[3];
+  const parts = cipherText.split(':');
+  if (parts.length !== 4) return '';
+  const iv = Buffer.from(parts[1], 'hex');
+  const authTag = Buffer.from(parts[2], 'hex');
+  const encryptedHex = parts[3];
 
-    const decipher = crypto.createDecipheriv('aes-256-gcm', MASTER_KEY, iv);
-    decipher.setAuthTag(authTag);
-    let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-  } catch (err: any) {
-    console.error('Failed to decrypt secret:', err.message);
-    return '';
+  const candidateKeys: Buffer[] = [MASTER_KEY];
+  try {
+    if (fs.existsSync(SECRET_KEY_FILE)) {
+      const fHex = fs.readFileSync(SECRET_KEY_FILE, 'utf-8').trim();
+      if (fHex.length === 64) candidateKeys.push(Buffer.from(fHex, 'hex'));
+    }
+  } catch {}
+  candidateKeys.push(crypto.createHash('sha256').update('shu_brend_ultra_secure_server_secret_2026_xyz').digest());
+
+  for (const key of candidateKeys) {
+    try {
+      const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+      decipher.setAuthTag(authTag);
+      let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      if (decrypted) return decrypted;
+    } catch {}
   }
+  return '';
 }
 
 // Mask token for safe UI display (e.g. 7123••••••••4567)

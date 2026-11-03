@@ -372,6 +372,86 @@ export interface BillzSettings {
   mingbuloqShopName?: string;
   mingbuloqTotalStock?: number;
   legacyProductsCount?: number;
+  mainShopId?: string;
+  mainShopName?: string;
+  mainWarehouseTotalStock?: number;
+  branchShopId?: string;
+  branchShopName?: string;
+  branchTotalStock?: number;
+  stagedProductsCount?: number;
+}
+
+export type BillzProductStatus =
+  | 'SELECTED'        // Tanlangan
+  | 'UNDER_REVIEW'   // Ko‘rib chiqilmoqda
+  | 'EDITING'        // Tahrirlanmoqda
+  | 'READY'          // Saytga chiqarishga tayyor
+  | 'PUBLISHED'      // Saytga chiqarilgan
+  | 'REJECTED';      // Rad etilgan
+
+export interface BillzStagingProduct {
+  id: string;
+  billzId: string;
+  name: string;
+  sku?: string;
+  barcode?: string;
+  brand?: string;
+  categoryName?: string;
+  categorySlug?: string;
+  price: number;
+  costPrice?: number;
+  discountPrice?: number;
+  description?: string;
+  images: string[];
+  hasCustomImages?: boolean;
+  colors: string[];
+  sizes: string[];
+  variants?: ProductVariant[];
+  mainWarehouseStock: number; // Asosiy "SHU BREND" omboridagi qoldiq
+  branchStock: number;        // "Shu brand Mingbuloq" filialidagi qoldiq
+  totalStock: number;
+  status: BillzProductStatus;
+  publishedProductId?: string;
+  publishedAt?: string;
+  rawBillzData?: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BillzDiagnosticInfo {
+  apiUrl: string;
+  status: BillzSyncStatus;
+  hasApiKey: boolean;
+  hasPlatformId: boolean;
+  tokenStatus: string;
+  tokenExpiry?: string;
+  mainWarehouse: {
+    name: string;
+    id?: string;
+    status: 'FOUND' | 'NOT_FOUND' | 'CHECKING';
+    stockSum: number;
+  };
+  branchWarehouse: {
+    name: string;
+    id?: string;
+    status: 'FOUND' | 'NOT_FOUND' | 'CHECKING';
+    stockSum: number;
+  };
+  lastRequest?: {
+    url: string;
+    method: string;
+    statusCode: number;
+    contentType: string;
+    durationMs: number;
+    timestamp: string;
+    errorSnippet?: string;
+  };
+  totalProductsInBillz: number;
+  totalStagedProducts: number;
+  totalPublishedProducts: number;
+  lastSyncAt?: string;
+  nextSyncAt?: string;
+  autoSyncEnabled: boolean;
 }
 
 export interface BillzSyncLog {

@@ -97,6 +97,13 @@
       "itemCount": 0,
       "imageUrl": "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?q=80&w=800&auto=format&fit=crop",
       "isHidden": true
+    },
+    {
+      "id": "cat_1793632923981_l2sz",
+      "name": "Kostyumlar",
+      "slug": "kostyumlar",
+      "sortOrder": 7,
+      "itemCount": 0
     }
   ],
   "products": [
@@ -7661,10 +7668,34 @@
     "encryptedApiKey": "aes-gcm:9c55ca140ecdef48aee4d5e7:0f65354f0634cc4691833c5fbab43c96:22266b6cb9ca40fd3524ac6398c6689ce50761d4ff1ff96c1911acca5342db59b75cc266c06597",
     "encryptedPlatformId": "aes-gcm:b2aca4344b0cd95ff51010f3:df378080ae6583c1c8d101cdbe32bc82:4c3e7df66f19b6a25a80b648b7f575c769cc3f9f799d7f0f6da6",
     "lastError": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling.",
-    "lastSyncAt": "2026-11-01T15:16:28.110Z",
+    "lastSyncAt": "2026-11-02T14:56:34.121Z",
     "lastSyncStatus": "FAILED"
   },
   "billzLogs": [
+    {
+      "id": "blog_1793632923988_l0rlz",
+      "timestamp": "2026-11-02T15:22:03.988Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "SUCCESS",
+      "details": "\"Klassik Paxtali Erkaklar Kostyumi SHU-01\" (ID: item_billz_test_01) veb-saytga muvaffaqiyatli chiqarildi! Asosiy ombor qoldig‘i: 14 dona.",
+      "itemsCount": 1
+    },
+    {
+      "id": "blog_1793632914307_a4ymn",
+      "timestamp": "2026-11-02T15:21:54.307Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "SUCCESS",
+      "details": "1 ta mahsulot muvaffaqiyatli tanlov omboriga (Staging) qo‘shildi.",
+      "itemsCount": 1
+    },
+    {
+      "id": "blog_1793631394124_4b4hr",
+      "timestamp": "2026-11-02T14:56:34.124Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "FAILED",
+      "details": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling.",
+      "error": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling."
+    },
     {
       "id": "blog_1793546188112_c6u71",
       "timestamp": "2026-11-01T15:16:28.112Z",
@@ -8029,6 +8060,7 @@
       "durationMs": 320
     }
   ],
+  "billzStagingProducts": [],
   "adminSecurity": {
     "username": "admin",
     "passwordHash": "scrypt:b86726fbb7d702ab8f642618e5176c50:543f0e29a486dbe958518cd64d63796a7bf627fe710ece877f54742db811c13c01ec38fefdf896334af80c5f8c39eccb32cfbeb02e348cdafa722b449f17c67e",
