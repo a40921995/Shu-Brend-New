@@ -16,6 +16,8 @@ import {
   verifyRecoveryKey,
 } from './server/security.ts';
 import { billzService } from './server/billz.ts';
+import { supabaseAdapter } from './server/supabase.ts';
+import { n8nService } from './server/n8n.ts';
 import type { Banner, Branch, Category, Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus, PaymentTransaction, Product, Review, User } from './src/types/index.ts';
 
 
@@ -75,7 +77,7 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 
 // Health check (supports both /api/health and /health for Render)
 const handleHealthCheck = (_req: Request, res: Response) => {
-  res.json({ status: 'ok', brand: 'SHU BREND', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', brand: 'SHU BRAND NEW', timestamp: new Date().toISOString() });
 };
 app.get('/api/health', handleHealthCheck);
 app.get('/health', handleHealthCheck);
@@ -526,6 +528,180 @@ app.post('/api/inventory/cancel-log/:id', (req: Request, res: Response) => {
     res.json(result);
   } catch (err: any) {
     res.status(400).json({ error: err.message || 'Harakatni bekor qilib bo‘lmadi' });
+  }
+});
+
+// ============================================================================
+// --- BILLZ + n8n INTEGRATION API ENDPOINTS (Official Webhook Receiver) ---
+// Architecture: BILLZ ➔ n8n Workflow ➔ SHU BREND Store
+// ============================================================================
+
+// 1. Health check for n8n connectivity
+app.get(['/api/integrations/n8n/health', '/api/n8n/health'], (_req: Request, res: Response) => {
+  const cfg = db.getN8nConfig();
+  res.json({
+    status: 'ok',
+    service: 'SHU BREND — n8n Webhook Receiver',
+    enabled: cfg.enabled,
+    totalSyncedProducts: cfg.totalSyncedProducts,
+    lastWebhookAt: cfg.lastWebhookAt,
+    lastWebhookStatus: cfg.lastWebhookStatus,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// 2. Single product upsert from n8n
+app.post(['/api/integrations/n8n/products', '/api/n8n/products'], async (req: Request, res: Response) => {
+  const auth = n8nService.validateAuth(req);
+  if (!auth.valid) {
+    return res.status(401).json({
+      success: false,
+      error: auth.reason || 'Autentifikatsiya xatosi. X-API-KEY sarlavhasi talab qilinadi.',
+    });
+  }
+
+  try {
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
+    const result = await n8nService.upsertProduct(req.body, clientIp);
+    res.status(200).json(result);
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      error: err.message || 'Mahsulotni qabul qilishda xatolik yuz berdi',
+    });
+  }
+});
+
+// 3. Bulk products upsert from n8n
+app.post(['/api/integrations/n8n/products/bulk', '/api/n8n/products/bulk'], async (req: Request, res: Response) => {
+  const auth = n8nService.validateAuth(req);
+  if (!auth.valid) {
+    return res.status(401).json({
+      success: false,
+      error: auth.reason || 'Autentifikatsiya xatosi. X-API-KEY sarlavhasi talab qilinadi.',
+    });
+  }
+
+  try {
+    const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
+    const items = Array.isArray(req.body)
+      ? req.body
+      : (req.body?.products || req.body?.items || req.body?.data || []);
+
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Mahsulotlar ro‘yxati (massiv) bo‘sh yoki noto‘g‘ri formatda',
+      });
+    }
+
+    const result = await n8nService.upsertProductsBulk(items, clientIp);
+    res.status(200).json(result);
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      error: err.message || 'Ommaviy mahsulotlarni qabul qilishda xatolik yuz berdi',
+    });
+  }
+});
+
+// 4. Query products synced from BILLZ / n8n
+app.get(['/api/integrations/n8n/products', '/api/n8n/products'], (req: Request, res: Response) => {
+  const auth = n8nService.validateAuth(req);
+  if (!auth.valid && !isRequestFromAdmin(req)) {
+    return res.status(401).json({
+      success: false,
+      error: auth.reason || 'Autentifikatsiya talab qilinadi',
+    });
+  }
+
+  const { search, category, limit } = req.query;
+  let list = db.getProducts().filter(p => p.billzId || p.source === 'BILLZ');
+
+  if (search && typeof search === 'string' && search.trim()) {
+    const q = search.trim().toLowerCase();
+    list = list.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.sku && p.sku.toLowerCase().includes(q)) ||
+      (p.barcode && p.barcode.includes(q)) ||
+      (p.billzId && p.billzId.toLowerCase().includes(q))
+    );
+  }
+
+  if (category && typeof category === 'string' && category !== 'ALL') {
+    list = list.filter(p => p.categorySlug === category);
+  }
+
+  const max = Math.min(200, Math.max(1, Number(limit) || 100));
+  res.json({
+    success: true,
+    total: list.length,
+    products: list.slice(0, max),
+  });
+});
+
+// 5. Admin n8n Config & Status
+app.get('/api/admin/n8n/config', (req: Request, res: Response) => {
+  try {
+    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.get('host') || 'localhost:3000';
+    const hostUrl = `${proto}://${host}`;
+    const status = n8nService.getStatus(hostUrl);
+    res.json(status);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 6. Admin n8n Update Config
+app.post('/api/admin/n8n/config', (req: Request, res: Response) => {
+  try {
+    const { enabled, autoPublish, preserveCustomImages } = req.body;
+    db.updateN8nConfig({
+      enabled: enabled !== undefined ? Boolean(enabled) : undefined,
+      autoPublish: autoPublish !== undefined ? Boolean(autoPublish) : undefined,
+      preserveCustomImages: preserveCustomImages !== undefined ? Boolean(preserveCustomImages) : undefined,
+    });
+    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.get('host') || 'localhost:3000';
+    res.json({
+      success: true,
+      message: 'n8n sozlamalari saqlandi',
+      config: n8nService.getStatus(`${proto}://${host}`),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 7. Admin n8n Regenerate API Key
+app.post('/api/admin/n8n/generate-key', (req: Request, res: Response) => {
+  try {
+    const newKey = db.resetN8nApiKey();
+    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.get('host') || 'localhost:3000';
+    res.json({
+      success: true,
+      apiKey: newKey,
+      message: 'Yangi API kaliti yaratildi! n8n HTTP Request node sarlavhasida (X-API-KEY) yangi kalitni kiriting.',
+      config: n8nService.getStatus(`${proto}://${host}`),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 8. Admin n8n Test Webhook Simulator
+app.post('/api/admin/n8n/test-sync', async (_req: Request, res: Response) => {
+  try {
+    const result = await n8nService.simulateTestWebhook();
+    res.json({
+      success: true,
+      result,
+      message: 'Sinov mahsuloti n8n webhook orqali muvaffaqiyatli qabul qilindi va sayt katalogiga qo‘shildi!',
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
@@ -1897,6 +2073,272 @@ app.post('/api/payments/simulate', (req: Request, res: Response) => {
 app.get('/api/admin/stats', (_req: Request, res: Response) => {
   res.json(db.getAdminStats());
 });
+
+// --- SAVDO VA MOLIYA (SALES, REVENUE, PROFIT & STATISTICAL PERIODS) ---
+
+// 1. Get comprehensive Sales & Finance analytics
+app.get('/api/admin/sales-finance', (req: Request, res: Response) => {
+  try {
+    const { periodId, startDate, endDate } = req.query;
+    const stats = db.getSalesAndFinanceAnalytics({
+      periodId: typeof periodId === 'string' ? periodId : undefined,
+      startDate: typeof startDate === 'string' ? startDate : undefined,
+      endDate: typeof endDate === 'string' ? endDate : undefined,
+    });
+    res.json(stats);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Savdo va moliya statistikasini hisoblashda xatolik' });
+  }
+});
+
+// 2. Get detailed Sold Items History
+app.get('/api/admin/sales-history', (req: Request, res: Response) => {
+  try {
+    const { periodId, startDate, endDate, search, limit, offset } = req.query;
+    const result = db.getSoldItemsHistory({
+      periodId: typeof periodId === 'string' ? periodId : undefined,
+      startDate: typeof startDate === 'string' ? startDate : undefined,
+      endDate: typeof endDate === 'string' ? endDate : undefined,
+      search: typeof search === 'string' ? search : undefined,
+      limit: limit ? Number(limit) : undefined,
+      offset: offset ? Number(offset) : undefined,
+    });
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Sotilgan mahsulotlar tarixini yuklashda xatolik' });
+  }
+});
+
+// 3. Get Statistical Periods list
+app.get('/api/admin/statistical-periods', (_req: Request, res: Response) => {
+  try {
+    res.json({
+      currentPeriod: db.getCurrentStatisticalPeriod(),
+      periods: db.getStatisticalPeriods(),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 4. Start New Statistical Period (Reset Dashboard to 0, Archive Old Period)
+app.post('/api/admin/statistical-periods/reset', (req: Request, res: Response) => {
+  try {
+    const { password, reason } = req.body;
+    if (!password) {
+      return res.status(400).json({ error: 'Super Admin paroli talab qilinadi!' });
+    }
+
+    const sec = db.getAdminSecurity();
+    if (!verifyPassword(String(password).trim(), sec.passwordHash)) {
+      return res.status(401).json({ error: 'Super Admin paroli noto‘g‘ri kiritildi!' });
+    }
+
+    const result = db.startNewStatisticalPeriod(
+      'admin',
+      'SUPER_ADMIN',
+      reason ? String(reason).trim() : undefined
+    );
+
+    res.json({
+      success: true,
+      message: `Yangi statistik davr muvaffaqiyatli boshlandi! Oldingi davr («${result.previousPeriod.name}») arxivlandi va hisobotlar saqlandi.`,
+      result,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Yangi statistik davrni boshlashda xatolik' });
+  }
+});
+
+// 5. Get Audit Logs
+app.get('/api/admin/audit-logs', (req: Request, res: Response) => {
+  try {
+    const limit = req.query.limit ? Number(req.query.limit) : 100;
+    res.json(db.getAuditLogs(limit));
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 6. Supabase Connection Status
+app.get('/api/admin/supabase/status', async (_req: Request, res: Response) => {
+  try {
+    const status = await supabaseAdapter.getStatus();
+    res.json(status);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Helper for CSV escaping
+function escapeCsvCell(val: any): string {
+  if (val === null || val === undefined) return '""';
+  const str = String(val).replace(/"/g, '""').replace(/\r?\n/g, ' ');
+  return `"${str}"`;
+}
+
+// 7. Export CSV Backup / Report
+app.get('/api/admin/backup/csv/:type', (req: Request, res: Response) => {
+  try {
+    const { type } = req.params;
+    let csvRows: string[] = [];
+    const dateStr = new Date().toISOString().slice(0, 10);
+
+    if (type === 'products') {
+      csvRows.push([
+        'ID',
+        'Mahsulot nomi',
+        'Kategoriya',
+        'Sotuv narxi (so‘m)',
+        'Tannarx (so‘m)',
+        'Ombordagi qoldiq',
+        'BILLZ ID',
+        'SKU',
+        'Shtrix-kod',
+        'Ranglar',
+        'O‘lchamlar',
+        'Holat',
+      ].map(escapeCsvCell).join(','));
+
+      const products = db.getProducts();
+      for (const p of products) {
+        csvRows.push([
+          p.id,
+          p.name,
+          p.categoryName || '',
+          p.price,
+          p.costPrice || Math.round(p.price * 0.6),
+          p.stock,
+          p.billzId || '',
+          p.sku || '',
+          p.barcode || '',
+          p.colors.join('; '),
+          p.sizes.join('; '),
+          p.isPublished ? 'FAOL' : 'YASHIRIN',
+        ].map(escapeCsvCell).join(','));
+      }
+    } else if (type === 'orders') {
+      csvRows.push([
+        'Buyurtma raqami',
+        'Mijoz ismi',
+        'Telefon',
+        'Umumiy summa (so‘m)',
+        'Yetkazib berish (so‘m)',
+        'Chegirma (so‘m)',
+        'Buyurtma holati',
+        'To‘lov holati',
+        'To‘lov usuli',
+        'Viloyat',
+        'Shahar/Tuman',
+        'Manzil',
+        'Sana',
+      ].map(escapeCsvCell).join(','));
+
+      const orders = db.getOrders();
+      for (const o of orders) {
+        csvRows.push([
+          o.orderNumber,
+          o.customerName,
+          o.customerPhone,
+          o.total,
+          o.deliveryFee || 0,
+          o.discount || 0,
+          o.status,
+          o.paymentStatus,
+          o.paymentMethod,
+          o.region,
+          o.city,
+          o.address,
+          o.createdAt,
+        ].map(escapeCsvCell).join(','));
+      }
+    } else if (type === 'sales') {
+      csvRows.push([
+        'Buyurtma raqami',
+        'Mahsulot nomi',
+        'Kategoriya',
+        'O‘lcham',
+        'Rang',
+        'Soni',
+        'Sotuv narxi (so‘m)',
+        'Tannarxi (so‘m)',
+        'Jami tushum (so‘m)',
+        'Jami tannarx (so‘m)',
+        'Sof foyda (so‘m)',
+        'Mijoz ismi',
+        'Telefon',
+        'To‘lov holati',
+        'Buyurtma holati',
+        'Sotilgan vaqti',
+      ].map(escapeCsvCell).join(','));
+
+      const history = db.getSoldItemsHistory({ limit: 5000 });
+      for (const item of history.items) {
+        csvRows.push([
+          item.orderNumber,
+          item.productName,
+          item.categoryName,
+          item.size,
+          item.color,
+          item.quantity,
+          item.unitPrice,
+          item.costPrice,
+          item.totalRevenue,
+          item.totalCost,
+          item.profit,
+          item.customerName,
+          item.customerPhone,
+          item.paymentStatus,
+          item.orderStatus,
+          item.soldAt,
+        ].map(escapeCsvCell).join(','));
+      }
+    } else if (type === 'finance') {
+      const stats = db.getSalesAndFinanceAnalytics();
+      csvRows.push(['Moliya ko‘rsatkichi', 'Qiymat', 'Birlik', 'Izoh'].map(escapeCsvCell).join(','));
+      csvRows.push(['Statistik davr', stats.period.name, 'Matn', 'Faol hisobot davri'].map(escapeCsvCell).join(','));
+      csvRows.push(['Davr boshlangan sana', stats.period.startedAt, 'Sana/Vaqt', 'Boshlanish vaqti'].map(escapeCsvCell).join(','));
+      csvRows.push(['Umumiy aylanma', stats.totalTurnover, 'so‘m', 'Jami tasdiqlangan buyurtmalar aylanmasi'].map(escapeCsvCell).join(','));
+      csvRows.push(['Haqiqiy tushum', stats.totalRevenue, 'so‘m', 'Yetkazib berilgan tovarlar tushumi'].map(escapeCsvCell).join(','));
+      csvRows.push(['Mahsulotlar tannarxi (COGS)', stats.cogsTotal, 'so‘m', 'Sotilgan tovarlar xarid/ishlab chiqarish tannarxi'].map(escapeCsvCell).join(','));
+      csvRows.push(['Yalpi daromad (Gross Profit)', stats.grossProfit, 'so‘m', 'Tushum minus Tannarx'].map(escapeCsvCell).join(','));
+      csvRows.push(['Yetkazib berish xarajatlari', stats.deliveryExpensesTotal, 'so‘m', 'Kuryerlik va yetkazish harajatlari'].map(escapeCsvCell).join(','));
+      csvRows.push(['Berilgan chegirmalar', stats.discountsTotal, 'so‘m', 'Promokod va aksiyalar'].map(escapeCsvCell).join(','));
+      csvRows.push(['Qaytarilgan pullar', stats.refundsTotal, 'so‘m', 'Qaytarilgan mahsulotlar'].map(escapeCsvCell).join(','));
+      csvRows.push(['Haqiqiy sof foyda (Net Real Profit)', stats.netRealProfit, 'so‘m', 'Yalpi daromad minus xarajatlar'].map(escapeCsvCell).join(','));
+      csvRows.push(['Rentabellik (Profit Margin)', `${stats.profitMarginPercent}%`, 'foiz', 'Sof foyda marjasi'].map(escapeCsvCell).join(','));
+      csvRows.push(['Jami sotilgan mahsulotlar', stats.totalSoldItems, 'dona', 'Sotilgan buyumlar soni'].map(escapeCsvCell).join(','));
+      csvRows.push(['Jami buyurtmalar', stats.totalOrdersCount, 'ta', 'Buyurtmalar soni'].map(escapeCsvCell).join(','));
+      csvRows.push(['Yetkazilgan buyurtmalar', stats.completedOrdersCount, 'ta', 'Muvaffaqiyatli buyurtmalar'].map(escapeCsvCell).join(','));
+      csvRows.push(['Bekor qilingan buyurtmalar', stats.cancelledOrdersCount, 'ta', 'Bekor qilinganlar'].map(escapeCsvCell).join(','));
+    } else {
+      return res.status(400).json({ error: 'Noma’lum CSV turi. Mumkin bo‘lganlar: products, orders, sales, finance' });
+    }
+
+    const csvContent = '\uFEFF' + csvRows.join('\r\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="shu_brand_${type}_${dateStr}.csv"`);
+    res.send(csvContent);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'CSV eksport qilishda xatolik' });
+  }
+});
+
+// 8. Full JSON Database Backup Download
+app.get('/api/admin/backup/json', (_req: Request, res: Response) => {
+  try {
+    const backup = db.getFullDatabaseSnapshot();
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const content = JSON.stringify(backup, null, 2);
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="shu_brand_backup_${dateStr}.json"`);
+    res.send(content);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'JSON zaxirasini yuklashda xatolik' });
+  }
+});
+
 
 // Reviews
 app.get('/api/reviews', (req: Request, res: Response) => {

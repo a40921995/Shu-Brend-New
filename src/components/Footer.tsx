@@ -21,7 +21,7 @@ export const Footer: React.FC = () => {
                 </div>
               </div>
               <span className="font-brand text-2xl font-black tracking-widest text-white">
-                {settings?.storeName || 'SHU BREND'}
+                {settings?.storeName || 'SHU BRAND NEW'}
               </span>
             </div>
 

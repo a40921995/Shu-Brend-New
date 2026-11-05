@@ -107,7 +107,7 @@ export const HomePage: React.FC = () => {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#d4af37]/20 border border-[#d4af37]/40 text-[#d4af37] text-xs font-bold tracking-widest uppercase mb-4 shadow-lg backdrop-blur-md">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>{activeBanner.badge || 'SHU BREND — STYLE & CONFIDENCE'}</span>
+                <span>{activeBanner.badge || 'SHU BRAND NEW — STYLE & LUXURY'}</span>
               </div>
 
               {/* Title */}

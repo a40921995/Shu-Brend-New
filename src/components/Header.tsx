@@ -49,7 +49,7 @@ export const Header: React.FC = () => {
           </div>
           <div>
             <span className="font-brand text-xl sm:text-2xl font-black tracking-widest text-white block leading-none">
-              {settings?.storeName || 'SHU BREND'}
+              {settings?.storeName || 'SHU BRAND NEW'}
             </span>
             <span className="text-[10px] uppercase tracking-[0.25em] text-[#d4af37] font-semibold block mt-1">
               Erkaklar Kiyimi

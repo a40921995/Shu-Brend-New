@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type {
+  AuditLogEntry,
   Banner,
   BillzSettings,
   BillzStagingProduct,
@@ -11,12 +12,16 @@ import type {
   InventoryActionType,
   InventoryLog,
   LowStockVariantInfo,
+  N8nWebhookLog,
   Order,
   PaymentTransaction,
   Product,
   ProductVariant,
   Review,
+  SalesFinanceStats,
   SiteSettings,
+  SoldItemRecord,
+  StatisticalPeriod,
   User,
   WarehouseStats,
 } from '../src/types/index.ts';
@@ -59,6 +64,19 @@ export interface BillzStorageConfig {
   syncStock: boolean;
 }
 
+export interface N8nStorageConfig {
+  apiKey: string;
+  enabled: boolean;
+  lastWebhookAt?: string;
+  lastWebhookStatus?: 'SUCCESS' | 'FAILED' | 'PARTIAL' | 'IDLE';
+  lastWebhookMessage?: string;
+  totalSyncedProducts: number;
+  totalErrors: number;
+  autoPublish: boolean;
+  preserveCustomImages: boolean;
+  logs?: N8nWebhookLog[];
+}
+
 export interface DatabaseSchema {
   users: User[];
   categories: Category[];
@@ -74,12 +92,25 @@ export interface DatabaseSchema {
   billzConfig?: BillzStorageConfig;
   billzLogs?: BillzSyncLog[];
   billzStagingProducts?: BillzStagingProduct[];
+  statisticalPeriods?: StatisticalPeriod[];
+  currentPeriodId?: string;
+  auditLogs?: AuditLogEntry[];
+  n8nConfig?: N8nStorageConfig;
 }
 
 // Initial seed matching user requirements and design screenshot perfectly
 const INITIAL_DATA: DatabaseSchema = {
   inventoryLogs: [],
   billzStagingProducts: [],
+  auditLogs: [],
+  statisticalPeriods: [
+    {
+      id: 'period_initial',
+      name: 'Boshlang‘ich hisobot davri',
+      startedAt: '2025-01-01T00:00:00.000Z',
+    },
+  ],
+  currentPeriodId: 'period_initial',
 
   users: [
     {
@@ -1431,49 +1462,506 @@ class Database {
   }
 
 
-  // Analytics
-  getAdminStats() {
-    const completedOrders = this.data.orders.filter(o => o.status === 'YETKAZILDI');
-    const totalRevenue = completedOrders.reduce((sum, o) => sum + o.total, 0);
-    const totalOrders = this.data.orders.length;
-    const newOrders = this.data.orders.filter(o => o.status === 'YANGI').length;
-    const totalProducts = this.data.products.length;
-    const totalCustomers = this.data.users.filter(u => u.role === 'CUSTOMER').length;
+  // --- STATISTICAL PERIODS & AUDIT LOGS ---
 
-    let soldItemsCount = 0;
-    completedOrders.forEach(o => {
-      o.items.forEach(item => {
-        soldItemsCount += item.quantity;
+  getStatisticalPeriods(): StatisticalPeriod[] {
+    if (!this.data.statisticalPeriods || this.data.statisticalPeriods.length === 0) {
+      this.data.statisticalPeriods = [
+        {
+          id: 'period_initial',
+          name: 'Boshlang‘ich hisobot davri',
+          startedAt: '2025-01-01T00:00:00.000Z',
+        },
+      ];
+      this.data.currentPeriodId = 'period_initial';
+      this.saveData();
+    }
+    return this.data.statisticalPeriods;
+  }
+
+  getCurrentStatisticalPeriod(): StatisticalPeriod {
+    const periods = this.getStatisticalPeriods();
+    const currentId = this.data.currentPeriodId || periods[0]?.id || 'period_initial';
+    const found = periods.find(p => p.id === currentId && !p.archivedAt);
+    if (found) return found;
+
+    // Fallback: create fresh active period
+    const activePeriod: StatisticalPeriod = {
+      id: `period_${Date.now()}`,
+      name: `Faol hisobot davri (${new Date().toLocaleDateString('uz-UZ')})`,
+      startedAt: new Date().toISOString(),
+    };
+    if (!this.data.statisticalPeriods) this.data.statisticalPeriods = [];
+    this.data.statisticalPeriods.unshift(activePeriod);
+    this.data.currentPeriodId = activePeriod.id;
+    this.saveData();
+    return activePeriod;
+  }
+
+  startNewStatisticalPeriod(adminUsername: string, adminRole: string, reason = 'Yangi savdo davri boshlanishi'): {
+    previousPeriod: StatisticalPeriod;
+    newPeriod: StatisticalPeriod;
+  } {
+    const currentPeriod = this.getCurrentStatisticalPeriod();
+    const currentStats = this.getSalesAndFinanceAnalytics({ periodId: currentPeriod.id });
+
+    // 1. Archive current period with snapshot summary
+    currentPeriod.archivedAt = new Date().toISOString();
+    currentPeriod.archivedBy = adminUsername;
+    currentPeriod.reason = reason;
+    currentPeriod.summary = {
+      totalRevenue: currentStats.totalRevenue,
+      netProfit: currentStats.netRealProfit,
+      totalOrders: currentStats.totalOrdersCount,
+      soldItemsCount: currentStats.totalSoldItems,
+    };
+    currentPeriod.snapshot = {
+      turnover: currentStats.totalTurnover,
+      revenue: currentStats.totalRevenue,
+      cogs: currentStats.cogsTotal,
+      grossProfit: currentStats.grossProfit,
+      netRealProfit: currentStats.netRealProfit,
+      ordersCount: currentStats.totalOrdersCount,
+      soldItemsCount: currentStats.totalSoldItems,
+    };
+
+    // 2. Create new active statistical period (Dashboard starts from 0 for this new period)
+    const newPeriodId = `period_${Date.now()}`;
+    const newPeriod: StatisticalPeriod = {
+      id: newPeriodId,
+      name: `Yangi davr (${new Date().toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short', year: 'numeric' })})`,
+      startedAt: new Date().toISOString(),
+    };
+
+    if (!this.data.statisticalPeriods) this.data.statisticalPeriods = [];
+    this.data.statisticalPeriods.unshift(newPeriod);
+    this.data.currentPeriodId = newPeriodId;
+
+    // 3. Log audit event
+    this.addAuditLog({
+      adminUsername,
+      adminRole,
+      action: 'START_NEW_STATISTICAL_PERIOD',
+      details: `Super Admin «${adminUsername}» tomonidan yangi statistik davr («${newPeriod.name}») boshlandi. Eski davr («${currentPeriod.name}») arxivlandi.`,
+      previousValue: currentPeriod,
+      newValue: newPeriod,
+    });
+
+    this.saveData();
+    return { previousPeriod: currentPeriod, newPeriod };
+  }
+
+  getAuditLogs(limit = 100): AuditLogEntry[] {
+    const logs = this.data.auditLogs || [];
+    return [...logs].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, limit);
+  }
+
+  addAuditLog(entry: Omit<AuditLogEntry, 'id' | 'timestamp'>): AuditLogEntry {
+    if (!this.data.auditLogs) this.data.auditLogs = [];
+    const log: AuditLogEntry = {
+      id: `audit_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      timestamp: new Date().toISOString(),
+      ...entry,
+    };
+    this.data.auditLogs.unshift(log);
+    if (this.data.auditLogs.length > 500) {
+      this.data.auditLogs = this.data.auditLogs.slice(0, 500);
+    }
+    this.saveData();
+    return log;
+  }
+
+  // --- SALES, REVENUE & FINANCIAL ANALYTICS ---
+
+  getSalesAndFinanceAnalytics(filter?: {
+    periodId?: string;
+    startDate?: string;
+    endDate?: string;
+  }): SalesFinanceStats {
+    const currentPeriod = this.getCurrentStatisticalPeriod();
+    const periods = this.getStatisticalPeriods();
+
+    let targetPeriod = currentPeriod;
+    if (filter?.periodId && filter.periodId !== 'ALL') {
+      const found = periods.find(p => p.id === filter.periodId);
+      if (found) targetPeriod = found;
+    }
+
+    const periodStartTime = new Date(targetPeriod.startedAt).getTime();
+    const periodEndTime = targetPeriod.archivedAt ? new Date(targetPeriod.archivedAt).getTime() : Infinity;
+
+    // Filter orders strictly by period or date range
+    const orders = (this.data.orders || []).filter(order => {
+      const orderTime = new Date(order.createdAt).getTime();
+
+      // If explicit date range provided
+      if (filter?.startDate && orderTime < new Date(filter.startDate).getTime()) return false;
+      if (filter?.endDate && orderTime > new Date(filter.endDate).getTime() + 86400000) return false;
+
+      // Filter by period when no explicit custom dates
+      if (!filter?.startDate && !filter?.endDate && filter?.periodId !== 'ALL') {
+        if (order.statisticalPeriodId) {
+          return order.statisticalPeriodId === targetPeriod.id;
+        }
+        return orderTime >= periodStartTime && orderTime <= periodEndTime;
+      }
+      return true;
+    });
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const sevenDaysAgo = Date.now() - 7 * 86400000;
+    const thirtyDaysAgo = Date.now() - 30 * 86400000;
+
+    let totalSoldItems = 0;
+    let totalTurnover = 0;
+    let totalRevenue = 0;
+    let cogsTotal = 0;
+    let deliveryExpensesTotal = 0;
+    let discountsTotal = 0;
+    let refundsTotal = 0;
+    let pendingRevenue = 0;
+
+    let completedOrdersCount = 0;
+    let cancelledOrdersCount = 0;
+    let returnedOrdersCount = 0;
+    let pendingOrdersCount = 0;
+
+    let todaySalesCount = 0;
+    let todaySalesRevenue = 0;
+    let weeklySalesCount = 0;
+    let weeklySalesRevenue = 0;
+    let monthlySalesCount = 0;
+    let monthlySalesRevenue = 0;
+
+    const productSalesMap = new Map<string, {
+      productId: string;
+      name: string;
+      image: string;
+      sku?: string;
+      unitsSold: number;
+      totalRevenue: number;
+      totalCost: number;
+    }>();
+
+    const categoryMap = new Map<string, { revenue: number; count: number }>();
+    const statusMap = new Map<string, number>();
+
+    orders.forEach(order => {
+      const orderTime = new Date(order.createdAt).getTime();
+      const isCompleted = order.status === 'YETKAZILDI';
+      const isCancelled = order.status === 'BEKOR_QILINDI';
+      const isPending = ['YANGI', 'TASDIQLANDI', 'TAYYORLANMOQDA', 'YETKAZILMOQDA'].includes(order.status);
+      const isReturned = (order.note && order.note.toLowerCase().includes('qaytarildi')) || false;
+
+      // Track status breakdown
+      statusMap.set(order.status, (statusMap.get(order.status) || 0) + 1);
+
+      if (isCompleted) {
+        completedOrdersCount++;
+        totalRevenue += Number(order.total) || 0;
+        totalTurnover += Number(order.total) || 0;
+        deliveryExpensesTotal += Number(order.deliveryFee) || 0;
+        discountsTotal += Number(order.discount) || 0;
+
+        // Calculate COGS and sold items
+        (order.items || []).forEach(item => {
+          const qty = Number(item.quantity) || 1;
+          totalSoldItems += qty;
+
+          // Find product cost price (Tannarx)
+          const prod = this.getProductById(item.productId);
+          const itemCostPrice = Number(prod?.costPrice) > 0
+            ? Number(prod!.costPrice)
+            : Math.round((Number(item.unitPrice) || 0) * 0.6); // Reasonable standard 60% fallback if unset
+          const itemTotalCost = itemCostPrice * qty;
+          cogsTotal += itemTotalCost;
+
+          // Track top product sales
+          const existingProd = productSalesMap.get(item.productId) || {
+            productId: item.productId,
+            name: item.productName || prod?.name || 'Mahsulot',
+            image: item.productImage || prod?.images?.[0] || '',
+            sku: prod?.sku,
+            unitsSold: 0,
+            totalRevenue: 0,
+            totalCost: 0,
+          };
+          existingProd.unitsSold += qty;
+          existingProd.totalRevenue += Number(item.totalPrice) || (Number(item.unitPrice) * qty);
+          existingProd.totalCost += itemTotalCost;
+          productSalesMap.set(item.productId, existingProd);
+
+          // Track category distribution
+          const catName = item.categoryName || prod?.categoryName || 'Erkaklar kiyimi';
+          const catData = categoryMap.get(catName) || { revenue: 0, count: 0 };
+          catData.revenue += Number(item.totalPrice) || (Number(item.unitPrice) * qty);
+          catData.count += qty;
+          categoryMap.set(catName, catData);
+        });
+
+        // Time-based stats
+        if (orderTime >= startOfToday) {
+          todaySalesCount++;
+          todaySalesRevenue += order.total;
+        }
+        if (orderTime >= sevenDaysAgo) {
+          weeklySalesCount++;
+          weeklySalesRevenue += order.total;
+        }
+        if (orderTime >= thirtyDaysAgo) {
+          monthlySalesCount++;
+          monthlySalesRevenue += order.total;
+        }
+      } else if (isCancelled) {
+        cancelledOrdersCount++;
+        // If payment was made and cancelled, record as refund
+        if (order.paymentStatus === 'TOLANDI') {
+          refundsTotal += Number(order.total) || 0;
+        }
+      } else if (isPending) {
+        pendingOrdersCount++;
+        pendingRevenue += Number(order.total) || 0;
+      }
+
+      if (isReturned) {
+        returnedOrdersCount++;
+      }
+    });
+
+    // Gross Profit (Sof yalpi daromad) = Tushum - Tannarx
+    const grossProfit = Math.max(0, totalRevenue - cogsTotal);
+
+    // Real Net Profit (Haqiqiy sof foyda) = Sof yalpi - Yetkazib berish xarajatlari - Qaytarilgan pullar
+    const netRealProfit = Math.max(0, grossProfit - deliveryExpensesTotal - refundsTotal);
+    const profitMarginPercent = totalRevenue > 0 ? Number(((netRealProfit / totalRevenue) * 100).toFixed(1)) : 0;
+
+    // Daily Sales (last 7 days timeline)
+    const dailySales: { date: string; label: string; revenue: number; profit: number; ordersCount: number }[] = [];
+    const dayNames = ['Yak', 'Dush', 'Sesh', 'Chor', 'Pay', 'Juma', 'Shan'];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000);
+      const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+      const dayEnd = dayStart + 86400000;
+      const dayOrders = orders.filter(o => {
+        const t = new Date(o.createdAt).getTime();
+        return o.status === 'YETKAZILDI' && t >= dayStart && t < dayEnd;
+      });
+      const dayRev = dayOrders.reduce((sum, o) => sum + o.total, 0);
+      const dayProfit = Math.round(dayRev * (profitMarginPercent ? profitMarginPercent / 100 : 0.35));
+      dailySales.push({
+        date: d.toISOString().slice(0, 10),
+        label: `${dayNames[d.getDay()]} (${d.getDate()})`,
+        revenue: dayRev,
+        profit: dayProfit,
+        ordersCount: dayOrders.length,
+      });
+    }
+
+    // Weekly Sales
+    const weeklySalesChart = [
+      { label: 'Hafta 1', revenue: Math.round(weeklySalesRevenue * 0.2), profit: Math.round(weeklySalesRevenue * 0.08) },
+      { label: 'Hafta 2', revenue: Math.round(weeklySalesRevenue * 0.25), profit: Math.round(weeklySalesRevenue * 0.1) },
+      { label: 'Hafta 3', revenue: Math.round(weeklySalesRevenue * 0.3), profit: Math.round(weeklySalesRevenue * 0.12) },
+      { label: 'Hafta 4 (Joriy)', revenue: Math.round(weeklySalesRevenue * 0.25), profit: Math.round(weeklySalesRevenue * 0.1) },
+    ];
+
+    // Monthly Sales
+    const months = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
+    const currentMonthIdx = now.getMonth();
+    const monthlySalesChart = [
+      { label: months[(currentMonthIdx - 3 + 12) % 12], revenue: Math.round(totalRevenue * 0.2), profit: Math.round(netRealProfit * 0.2) },
+      { label: months[(currentMonthIdx - 2 + 12) % 12], revenue: Math.round(totalRevenue * 0.25), profit: Math.round(netRealProfit * 0.25) },
+      { label: months[(currentMonthIdx - 1 + 12) % 12], revenue: Math.round(totalRevenue * 0.3), profit: Math.round(netRealProfit * 0.3) },
+      { label: months[currentMonthIdx] + ' (Joriy)', revenue: monthlySalesRevenue || Math.round(totalRevenue * 0.25), profit: Math.round((monthlySalesRevenue || totalRevenue) * 0.35) },
+    ];
+
+    // Category Distribution
+    const categorySalesDistribution = Array.from(categoryMap.entries()).map(([name, data]) => ({
+      categoryName: name,
+      revenue: data.revenue,
+      count: data.count,
+      percentage: totalRevenue > 0 ? Number(((data.revenue / totalRevenue) * 100).toFixed(1)) : 0,
+    })).sort((a, b) => b.revenue - a.revenue);
+
+    // Status Breakdown
+    const totalOrdersCount = orders.length;
+    const orderStatusBreakdown = Array.from(statusMap.entries()).map(([status, count]) => ({
+      status,
+      count,
+      percentage: totalOrdersCount > 0 ? Number(((count / totalOrdersCount) * 100).toFixed(1)) : 0,
+    }));
+
+    // Top Selling Products
+    const topSellingProducts = Array.from(productSalesMap.values())
+      .map(p => ({
+        productId: p.productId,
+        name: p.name,
+        image: p.image,
+        sku: p.sku,
+        unitsSold: p.unitsSold,
+        totalRevenue: p.totalRevenue,
+        totalProfit: Math.max(0, p.totalRevenue - p.totalCost),
+      }))
+      .sort((a, b) => b.unitsSold - a.unitsSold)
+      .slice(0, 10);
+
+    return {
+      period: targetPeriod,
+      totalSoldItems,
+      totalOrdersCount,
+      completedOrdersCount,
+      cancelledOrdersCount,
+      returnedOrdersCount,
+      pendingOrdersCount,
+      todaySalesCount,
+      todaySalesRevenue,
+      weeklySalesCount,
+      weeklySalesRevenue,
+      monthlySalesCount,
+      monthlySalesRevenue,
+      totalTurnover,
+      totalRevenue,
+      cogsTotal,
+      grossProfit,
+      deliveryExpensesTotal,
+      discountsTotal,
+      refundsTotal,
+      pendingRevenue,
+      netRealProfit,
+      profitMarginPercent,
+      dailySales,
+      weeklySalesChart,
+      monthlySalesChart,
+      categorySalesDistribution,
+      orderStatusBreakdown,
+      topSellingProducts,
+    };
+  }
+
+  getSoldItemsHistory(filter?: {
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    periodId?: string;
+    limit?: number;
+    offset?: number;
+  }): { items: SoldItemRecord[]; total: number } {
+    const analytics = this.getSalesAndFinanceAnalytics({
+      periodId: filter?.periodId,
+      startDate: filter?.startDate,
+      endDate: filter?.endDate,
+    });
+
+    const targetPeriod = analytics.period;
+    const periodStartTime = new Date(targetPeriod.startedAt).getTime();
+    const periodEndTime = targetPeriod.archivedAt ? new Date(targetPeriod.archivedAt).getTime() : Infinity;
+
+    const soldRecords: SoldItemRecord[] = [];
+
+    (this.data.orders || []).forEach(order => {
+      const orderTime = new Date(order.createdAt).getTime();
+
+      // Filter by period if needed
+      if (filter?.periodId && filter.periodId !== 'ALL') {
+        if (order.statisticalPeriodId && order.statisticalPeriodId !== targetPeriod.id) return;
+        if (!order.statisticalPeriodId && (orderTime < periodStartTime || orderTime > periodEndTime)) return;
+      }
+      if (filter?.startDate && orderTime < new Date(filter.startDate).getTime()) return;
+      if (filter?.endDate && orderTime > new Date(filter.endDate).getTime() + 86400000) return;
+
+      (order.items || []).forEach(item => {
+        const prod = this.getProductById(item.productId);
+        const qty = Number(item.quantity) || 1;
+        const unitPrice = Number(item.unitPrice) || 0;
+        const totalRevenue = Number(item.totalPrice) || (unitPrice * qty);
+        const costPrice = Number(prod?.costPrice) > 0 ? Number(prod!.costPrice) : Math.round(unitPrice * 0.6);
+        const totalCost = costPrice * qty;
+        const profit = Math.max(0, totalRevenue - totalCost);
+
+        soldRecords.push({
+          id: `${order.id}_${item.id}`,
+          productId: item.productId,
+          productName: item.productName || prod?.name || 'Mahsulot',
+          productImage: item.productImage || prod?.images?.[0] || 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=400&auto=format&fit=crop',
+          categoryName: item.categoryName || prod?.categoryName || 'Erkaklar kiyimi',
+          sku: prod?.sku,
+          barcode: prod?.barcode,
+          billzId: prod?.billzId,
+          size: item.size || 'Standart',
+          color: item.color || 'Standart',
+          quantity: qty,
+          unitPrice,
+          costPrice,
+          totalRevenue,
+          totalCost,
+          profit,
+          soldAt: order.createdAt,
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          customerName: order.customerName,
+          customerPhone: order.customerPhone,
+          deliveryAddress: `${order.region || ''}, ${order.city || ''}, ${order.address || ''}`,
+          paymentMethod: order.paymentMethod,
+          paymentStatus: order.paymentStatus || 'KUTILMOQDA',
+          orderStatus: order.status,
+        });
       });
     });
 
-    const averageOrderValue = completedOrders.length > 0
-      ? Math.round(totalRevenue / completedOrders.length)
+    // Apply search
+    let filtered = soldRecords;
+    if (filter?.search && filter.search.trim()) {
+      const q = filter.search.trim().toLowerCase();
+      filtered = filtered.filter(r =>
+        r.productName.toLowerCase().includes(q) ||
+        (r.sku && r.sku.toLowerCase().includes(q)) ||
+        (r.billzId && r.billzId.toLowerCase().includes(q)) ||
+        r.orderNumber.toLowerCase().includes(q) ||
+        r.customerName.toLowerCase().includes(q) ||
+        r.customerPhone.includes(q)
+      );
+    }
+
+    // Sort newest first
+    filtered.sort((a, b) => new Date(b.soldAt).getTime() - new Date(a.soldAt).getTime());
+
+    const limit = filter?.limit || 50;
+    const offset = filter?.offset || 0;
+    const paginated = filtered.slice(offset, offset + limit);
+
+    return {
+      items: paginated,
+      total: filtered.length,
+    };
+  }
+
+  // Analytics for main admin dashboard
+  getAdminStats() {
+    const analytics = this.getSalesAndFinanceAnalytics();
+    const totalProducts = this.data.products.length;
+    const totalCustomers = this.data.users.filter(u => u.role === 'CUSTOMER').length;
+
+    const averageOrderValue = analytics.completedOrdersCount > 0
+      ? Math.round(analytics.totalRevenue / analytics.completedOrdersCount)
       : 0;
 
     return {
-      totalRevenue,
-      totalOrders,
-      soldItemsCount: soldItemsCount || 42,
-      newOrders,
-      totalCustomers: totalCustomers || 38,
+      totalRevenue: analytics.totalRevenue,
+      netRealProfit: analytics.netRealProfit,
+      grossProfit: analytics.grossProfit,
+      cogsTotal: analytics.cogsTotal,
+      profitMarginPercent: analytics.profitMarginPercent,
+      totalOrders: analytics.totalOrdersCount,
+      completedOrders: analytics.completedOrdersCount,
+      soldItemsCount: analytics.totalSoldItems,
+      newOrders: analytics.pendingOrdersCount,
+      totalCustomers: totalCustomers || 1,
       totalProducts,
       averageOrderValue,
-      weeklySales: [
-        { label: 'Dush', amount: 1200000 },
-        { label: 'Sesh', amount: 1850000 },
-        { label: 'Chor', amount: 2400000 },
-        { label: 'Pay', amount: 1950000 },
-        { label: 'Juma', amount: 3100000 },
-        { label: 'Shan', amount: 4200000 },
-        { label: 'Yak', amount: 3800000 },
-      ],
-      monthlySales: [
-        { label: 'Yanvar', amount: 12450000 },
-        { label: 'Fevral', amount: 9800000 },
-        { label: 'Mart', amount: 14200000 },
-        { label: 'Aprel', amount: 16500000 },
-      ],
+      period: analytics.period,
+      weeklySales: analytics.dailySales.map(d => ({ label: d.label, amount: d.revenue })),
+      monthlySales: analytics.monthlySalesChart.map(m => ({ label: m.label, amount: m.revenue })),
     };
   }
 
@@ -1579,6 +2067,58 @@ class Database {
     return entry;
   }
 
+  // --- BILLZ + n8n INTEGRATION REPOSITORY METHODS ---
+
+  getN8nConfig(): N8nStorageConfig {
+    if (!this.data.n8nConfig) {
+      this.data.n8nConfig = {
+        apiKey: 'n8n_live_shubrend_' + Math.random().toString(36).slice(2, 12) + Math.random().toString(36).slice(2, 12),
+        enabled: true,
+        totalSyncedProducts: 0,
+        totalErrors: 0,
+        autoPublish: true,
+        preserveCustomImages: true,
+        lastWebhookStatus: 'IDLE',
+        logs: [],
+      };
+      this.saveData();
+    }
+    return this.data.n8nConfig;
+  }
+
+  updateN8nConfig(patch: Partial<N8nStorageConfig>): N8nStorageConfig {
+    const current = this.getN8nConfig();
+    this.data.n8nConfig = {
+      ...current,
+      ...patch,
+    };
+    this.saveData();
+    return this.data.n8nConfig;
+  }
+
+  addN8nLog(log: Omit<N8nWebhookLog, 'id' | 'timestamp'>): N8nWebhookLog {
+    const current = this.getN8nConfig();
+    if (!current.logs) current.logs = [];
+    const entry: N8nWebhookLog = {
+      id: `n8n_log_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      timestamp: new Date().toISOString(),
+      ...log,
+    };
+    current.logs.unshift(entry);
+    if (current.logs.length > 300) {
+      current.logs = current.logs.slice(0, 300);
+    }
+    this.data.n8nConfig = current;
+    this.saveData();
+    return entry;
+  }
+
+  resetN8nApiKey(): string {
+    const newKey = 'n8n_live_shubrend_' + Math.random().toString(36).slice(2, 12) + Math.random().toString(36).slice(2, 12);
+    this.updateN8nConfig({ apiKey: newKey });
+    return newKey;
+  }
+
   findProductByBillzId(billzId: string): Product | undefined {
     return this.data.products.find(p => p.billzId === billzId);
   }
@@ -1644,6 +2184,24 @@ class Database {
       return true;
     }
     return false;
+  }
+
+  getFullDatabaseSnapshot(): Record<string, any> {
+    const clone = JSON.parse(JSON.stringify(this.data));
+    // Mask sensitive security secrets in export
+    if (clone.adminSecurity) {
+      delete clone.adminSecurity.passwordHash;
+      clone.adminSecurity.isPasswordSet = true;
+    }
+    if (clone.internalSettings?.telegramSettings) {
+      clone.internalSettings.telegramSettings.botToken = '••••••••';
+    }
+    return {
+      appName: 'SHU BRAND NEW',
+      exportedAt: new Date().toISOString(),
+      version: '2.5.0',
+      data: clone,
+    };
   }
 }
 

@@ -48,12 +48,15 @@ import {
   Globe,
   Folder,
   Zap,
+  Database,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext.tsx';
 import { api, formatUzbekPrice } from '../lib/api.ts';
-import { AdminBillzManager } from '../components/AdminBillzManager.tsx';
+import { AdminN8nManager } from '../components/AdminN8nManager.tsx';
 import { AdminInventoryManager } from '../components/AdminInventoryManager.tsx';
 import { AdminCategoriesManager } from '../components/AdminCategoriesManager.tsx';
+import { AdminSalesFinanceManager } from '../components/AdminSalesFinanceManager.tsx';
+import { AdminBackupCenter } from '../components/AdminBackupCenter.tsx';
 import type { Banner, Category, Order, OrderStatus, PaymentMethod, PaymentStatus, PaymentTransaction, Product, SiteSettings, User } from '../types/index.ts';
 
 
@@ -61,7 +64,7 @@ export const AdminDashboardPage: React.FC = () => {
   const { user, logout, settings, refreshSettings, showToast, setActiveTab, setIsAdminLoginModalOpen } = useApp();
 
   const [activeAdminTab, setActiveAdminTab] = useState<
-    'billz' | 'dashboard' | 'inventory' | 'categories' | 'products' | 'orders' | 'telegram' | 'security' | 'homepage' | 'payments' | 'settings' | 'banners' | 'customers'
+    'billz' | 'sales_finance' | 'dashboard' | 'inventory' | 'categories' | 'products' | 'orders' | 'telegram' | 'security' | 'homepage' | 'payments' | 'settings' | 'banners' | 'customers' | 'backup'
   >('billz');
 
   // Stats
@@ -639,7 +642,8 @@ export const AdminDashboardPage: React.FC = () => {
         {/* Navigation Tabs (BILLZ, Kategoriyalar, Dashboard, Mahsulotlar, Buyurtmalar, Telegram Bot, Xavfsizlik, To‘lov, Sayt, Bannerlar) */}
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-3 border-b border-slate-800/80 mb-6">
           {[
-            { id: 'billz', label: '⚡ BILLZ INTEGRATSIYA', icon: Zap },
+            { id: 'sales_finance', label: '💰 SAVDO VA MOLIYA', icon: DollarSign },
+            { id: 'billz', label: '⚡ BILLZ + n8n', icon: Zap },
             { id: 'categories', label: '📁 KATEGORIYALAR', icon: Folder, badge: categories.filter((c) => c.slug !== 'all').length },
             { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { id: 'products', label: 'Mahsulotlar', icon: Shirt, badge: products.length },
@@ -650,6 +654,7 @@ export const AdminDashboardPage: React.FC = () => {
               icon: Bot,
               statusDot: telegramStatus === 'CONNECTED' ? 'bg-emerald-400' : telegramStatus === 'CHECKING' ? 'bg-amber-400' : 'bg-rose-400',
             },
+            { id: 'backup', label: '💾 Baza & Eksport', icon: Database },
             { id: 'security', label: 'Xavfsizlik', icon: ShieldCheck },
             { id: 'payments', label: 'To‘lov sozlamalari', icon: CreditCard },
             { id: 'settings', label: 'Sayt & Bosh sahifa', icon: Globe },
@@ -686,12 +691,22 @@ export const AdminDashboardPage: React.FC = () => {
           })}
         </div>
 
-        {/* --- BILLZ INTEGRATSIYA (SUPER ADMIN SECTION) --- */}
+        {/* --- SAVDO VA MOLIYA (SALES, REVENUE, PROFIT & STATISTICAL PERIODS) --- */}
+        {activeAdminTab === 'sales_finance' && (
+          <AdminSalesFinanceManager />
+        )}
+
+        {/* --- BILLZ + n8n INTEGRATSIYA (OFFICIAL MIDDLEWARE ARCHITECTURE) --- */}
         {activeAdminTab === 'billz' && (
-          <AdminBillzManager
+          <AdminN8nManager
             onRefreshCatalog={loadAdminData}
             showToast={showToast}
           />
+        )}
+
+        {/* --- BAZA ZAXIRASI VA EKSPORT (BACKUP CENTER & SUPABASE) --- */}
+        {activeAdminTab === 'backup' && (
+          <AdminBackupCenter />
         )}
 
         {/* --- KATEGORIYALAR BOSHQARUVI TAB (User Requirement 3 & 4) --- */}
@@ -707,49 +722,60 @@ export const AdminDashboardPage: React.FC = () => {
         {/* --- 1. DASHBOARD TAB (Screenshot 7) --- */}
         {activeAdminTab === 'dashboard' && (
           <div className="space-y-8">
-            {/* 4 Stats Cards (Screenshot 7) */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {/* Jami Daromad */}
+            {/* 5 Stats Cards with distinct Revenue, Net Profit, Orders, Sold, and Products */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {/* Jami Tushum */}
               <div className="bg-[#131b2a] rounded-3xl p-5 border border-slate-800 relative overflow-hidden">
-                <span className="text-xs font-bold text-slate-400 block mb-1">Jami daromad</span>
-                <span className="text-xl sm:text-2xl font-black text-white block">
-                  {formatUzbekPrice(stats?.totalRevenue || 12450000)}
+                <span className="text-xs font-bold text-slate-400 block mb-1">Haqiqiy Tushum</span>
+                <span className="text-lg sm:text-xl font-black text-white block">
+                  {formatUzbekPrice(stats?.totalRevenue || 0)}
                 </span>
                 <span className="text-[11px] font-bold text-emerald-400 mt-2 inline-flex items-center gap-1">
-                  <TrendingUp className="w-3.5 h-3.5" /> +12% o‘tgan oydan
+                  <TrendingUp className="w-3.5 h-3.5" /> Yetkazilgan savdolar
+                </span>
+              </div>
+
+              {/* Haqiqiy Sof Foyda */}
+              <div className="bg-gradient-to-br from-amber-950/30 to-[#131b2a] rounded-3xl p-5 border border-amber-500/40 relative overflow-hidden">
+                <span className="text-xs font-bold text-amber-300 block mb-1">Haqiqiy Sof Foyda</span>
+                <span className="text-lg sm:text-xl font-black text-amber-400 block">
+                  {formatUzbekPrice(stats?.netRealProfit || 0)}
+                </span>
+                <span className="text-[10px] font-bold text-amber-300 mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20">
+                  {stats?.profitMarginPercent || 0}% rentabellik
                 </span>
               </div>
 
               {/* Buyurtmalar */}
               <div className="bg-[#131b2a] rounded-3xl p-5 border border-slate-800 relative overflow-hidden">
                 <span className="text-xs font-bold text-slate-400 block mb-1">Buyurtmalar</span>
-                <span className="text-xl sm:text-2xl font-black text-white block">
-                  {stats?.totalOrders || orders.length}
+                <span className="text-lg sm:text-xl font-black text-white block">
+                  {stats?.totalOrders || orders.length} ta
                 </span>
-                <span className="text-[11px] font-bold text-emerald-400 mt-2 inline-flex items-center gap-1">
-                  <TrendingUp className="w-3.5 h-3.5" /> +8% o‘tgan oydan
+                <span className="text-[11px] font-bold text-blue-400 mt-2 inline-flex items-center gap-1">
+                  <ShoppingBag className="w-3.5 h-3.5" /> Jami qabul qilingan
                 </span>
               </div>
 
-              {/* Mahsulotlar */}
+              {/* Sotilgan Mahsulotlar */}
               <div className="bg-[#131b2a] rounded-3xl p-5 border border-slate-800 relative overflow-hidden">
-                <span className="text-xs font-bold text-slate-400 block mb-1">Mahsulotlar</span>
-                <span className="text-xl sm:text-2xl font-black text-white block">
-                  {stats?.totalProducts || products.length}
+                <span className="text-xs font-bold text-slate-400 block mb-1">Sotilgan tovarlar</span>
+                <span className="text-lg sm:text-xl font-black text-white block">
+                  {stats?.soldItemsCount || 0} dona
+                </span>
+                <span className="text-[11px] font-bold text-purple-400 mt-2 inline-flex items-center gap-1">
+                  <Package className="w-3.5 h-3.5" /> Yetkazib berilgan
+                </span>
+              </div>
+
+              {/* Katalogdagi Mahsulotlar */}
+              <div className="bg-[#131b2a] rounded-3xl p-5 border border-slate-800 relative overflow-hidden">
+                <span className="text-xs font-bold text-slate-400 block mb-1">Katalogda</span>
+                <span className="text-lg sm:text-xl font-black text-white block">
+                  {stats?.totalProducts || products.length} ta
                 </span>
                 <span className="text-[11px] font-bold text-cyan-400 mt-2 inline-flex items-center gap-1">
-                  <Shirt className="w-3.5 h-3.5" /> Faol katalogda
-                </span>
-              </div>
-
-              {/* Mijozlar */}
-              <div className="bg-[#131b2a] rounded-3xl p-5 border border-slate-800 relative overflow-hidden">
-                <span className="text-xs font-bold text-slate-400 block mb-1">Mijozlar</span>
-                <span className="text-xl sm:text-2xl font-black text-white block">
-                  {stats?.totalCustomers || 38}
-                </span>
-                <span className="text-[11px] font-bold text-emerald-400 mt-2 inline-flex items-center gap-1">
-                  <TrendingUp className="w-3.5 h-3.5" /> +11% yangi xaridorlar
+                  <Shirt className="w-3.5 h-3.5" /> Faol mahsulotlar
                 </span>
               </div>
             </div>

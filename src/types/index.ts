@@ -93,6 +93,7 @@ export interface Product {
   hasCustomImages?: boolean;
   colorImages?: Record<string, string[]>;
   source?: 'MANUAL' | 'BILLZ';
+  isPublished?: boolean;
 }
 
 export interface CartItem {
@@ -151,6 +152,7 @@ export interface Order {
   billzSaleId?: string;
   billzSyncedAt?: string;
   assignedBranchId?: string;
+  statisticalPeriodId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -464,3 +466,217 @@ export interface BillzSyncLog {
   error?: string;
   durationMs?: number;
 }
+
+// --- BILLZ + n8n INTEGRATION TYPES ---
+
+export interface N8nWebhookLog {
+  id: string;
+  timestamp: string;
+  type: 'SINGLE' | 'BULK' | 'HEALTH_CHECK';
+  status: 'SUCCESS' | 'FAILED' | 'PARTIAL';
+  productsReceived: number;
+  productsUpserted: number;
+  errorCount: number;
+  details?: string;
+  sourceIp?: string;
+}
+
+export interface N8nConfig {
+  apiKey: string;
+  apiKeyMasked: string;
+  enabled: boolean;
+  webhookUrlSingle: string;
+  webhookUrlBulk: string;
+  healthUrl: string;
+  lastWebhookAt?: string;
+  lastWebhookStatus?: 'SUCCESS' | 'FAILED' | 'PARTIAL' | 'IDLE';
+  lastWebhookMessage?: string;
+  totalSyncedProducts: number;
+  totalErrors: number;
+  autoPublish: boolean;
+  preserveCustomImages: boolean;
+  logs: N8nWebhookLog[];
+}
+
+export interface N8nProductPayload {
+  billzId: string;
+  name: string;
+  sku?: string;
+  barcode?: string;
+  article?: string;
+  images?: string[];
+  image?: string;
+  category?: string;
+  categoryName?: string;
+  categorySlug?: string;
+  price: number;
+  costPrice?: number;
+  discountPrice?: number;
+  colors?: string[];
+  sizes?: string[];
+  stock?: number;
+  quantity?: number;
+  description?: string;
+  isPublished?: boolean;
+  branchAvailability?: {
+    branchId: string;
+    branchName: string;
+    stock: number;
+  }[];
+  variants?: {
+    id?: string;
+    size: string;
+    color: string;
+    stock: number;
+    barcode?: string;
+    sku?: string;
+    price?: number;
+  }[];
+}
+
+export interface N8nUpsertResult {
+  success: boolean;
+  action: 'CREATED' | 'UPDATED' | 'SKIPPED';
+  productId: string;
+  name: string;
+  billzId: string;
+  price: number;
+  stock: number;
+  message: string;
+}
+
+export interface N8nBulkUpsertResult {
+  success: boolean;
+  totalReceived: number;
+  upsertedCount: number;
+  createdCount: number;
+  updatedCount: number;
+  errorCount: number;
+  errors: { billzId?: string; name?: string; error: string }[];
+  message: string;
+  timestamp: string;
+}
+
+// --- SALES, REVENUE & FINANCIAL ANALYTICS ---
+
+export interface SoldItemRecord {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage: string;
+  categoryName?: string;
+  sku?: string;
+  barcode?: string;
+  billzId?: string;
+  size: string;
+  color: string;
+  quantity: number;
+  unitPrice: number;
+  costPrice: number;
+  totalRevenue: number;
+  totalCost: number;
+  profit: number;
+  soldAt: string;
+  orderId: string;
+  orderNumber: string;
+  customerName: string;
+  customerPhone: string;
+  deliveryAddress: string;
+  paymentMethod?: string;
+  paymentStatus: string;
+  orderStatus: string;
+}
+
+export interface StatisticalPeriod {
+  id: string;
+  name: string;
+  startedAt: string;
+  archivedAt?: string;
+  archivedBy?: string;
+  reason?: string;
+  summary?: {
+    totalRevenue: number;
+    netProfit: number;
+    totalOrders: number;
+    soldItemsCount: number;
+  };
+  snapshot?: {
+    turnover: number;
+    revenue: number;
+    cogs: number;
+    grossProfit: number;
+    netRealProfit: number;
+    ordersCount: number;
+    soldItemsCount: number;
+  };
+}
+
+export interface SalesFinanceStats {
+  period: StatisticalPeriod;
+  // 1. Savdo statistikasi
+  totalSoldItems: number;
+  totalOrdersCount: number;
+  completedOrdersCount: number;
+  cancelledOrdersCount: number;
+  returnedOrdersCount: number;
+  pendingOrdersCount: number;
+  todaySalesCount: number;
+  todaySalesRevenue: number;
+  weeklySalesCount: number;
+  weeklySalesRevenue: number;
+  monthlySalesCount: number;
+  monthlySalesRevenue: number;
+  totalTurnover: number;
+
+  // 2. Daromad va foyda
+  totalRevenue: number; // Jami tushum
+  cogsTotal: number; // Mahsulotlarning tannarxi (Cost of goods sold)
+  grossProfit: number; // Sof yalpi daromad (Tushum - Tannarx)
+  deliveryExpensesTotal: number; // Yetkazib berish xarajatlari
+  discountsTotal: number; // Chegirmalar summasi
+  refundsTotal: number; // Qaytarilgan pullar
+  pendingRevenue: number; // Kutilayotgan to‘lovlar
+  netRealProfit: number; // Haqiqiy sof foyda (Sof yalpi - Yetkazib berish - Chegirmalar - Qaytarilgan)
+  profitMarginPercent: number; // Foyda marjasi %
+
+  // Dynamics charts
+  dailySales: { date: string; label: string; revenue: number; profit: number; ordersCount: number }[];
+  weeklySalesChart: { label: string; revenue: number; profit: number }[];
+  monthlySalesChart: { label: string; revenue: number; profit: number }[];
+  categorySalesDistribution: { categoryName: string; revenue: number; count: number; percentage: number }[];
+  orderStatusBreakdown: { status: string; count: number; percentage: number }[];
+
+  // Top products
+  topSellingProducts: {
+    productId: string;
+    name: string;
+    image: string;
+    sku?: string;
+    unitsSold: number;
+    totalRevenue: number;
+    totalProfit: number;
+  }[];
+}
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  adminUsername: string;
+  adminRole: string;
+  action: string;
+  details: string;
+  ipAddress?: string;
+  previousValue?: any;
+  newValue?: any;
+}
+
+export interface SupabaseConfig {
+  connected: boolean;
+  url?: string;
+  hasServiceKey: boolean;
+  tablesVerified: boolean;
+  lastSyncAt?: string;
+  mode: 'SUPABASE_POSTGRES' | 'LOCAL_PERSISTENT';
+  error?: string;
+}
+

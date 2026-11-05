@@ -1,4 +1,5 @@
 import type {
+  AuditLogEntry,
   Banner,
   BillzDiagnosticInfo,
   BillzSettings,
@@ -8,13 +9,21 @@ import type {
   Category,
   InventoryActionType,
   InventoryLog,
+  LowStockVariantInfo,
+  N8nConfig,
+  N8nUpsertResult,
+  N8nBulkUpsertResult,
   Order,
   OrderStatus,
   PaymentStatus,
   PaymentTransaction,
   Product,
   Review,
+  SalesFinanceStats,
   SiteSettings,
+  SoldItemRecord,
+  StatisticalPeriod,
+  SupabaseConfig,
   User,
   WarehouseStats,
 } from '../types/index.ts';
@@ -981,6 +990,117 @@ export const api = {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || 'Filialni o‘chirib bo‘lmadi');
     }
+  },
+
+  // --- SAVDO VA MOLIYA (SALES & FINANCE) ---
+  async getSalesFinanceStats(filter?: { periodId?: string; startDate?: string; endDate?: string }): Promise<SalesFinanceStats> {
+    const params = new URLSearchParams();
+    if (filter?.periodId) params.append('periodId', filter.periodId);
+    if (filter?.startDate) params.append('startDate', filter.startDate);
+    if (filter?.endDate) params.append('endDate', filter.endDate);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return safeFetchJson(`/api/admin/sales-finance${query}`, undefined, 'Moliya statistikasini yuklashda xatolik');
+  },
+
+  async getSoldItemsHistory(filter?: {
+    periodId?: string;
+    startDate?: string;
+    endDate?: string;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ items: SoldItemRecord[]; total: number }> {
+    const params = new URLSearchParams();
+    if (filter?.periodId) params.append('periodId', filter.periodId);
+    if (filter?.startDate) params.append('startDate', filter.startDate);
+    if (filter?.endDate) params.append('endDate', filter.endDate);
+    if (filter?.search) params.append('search', filter.search);
+    if (filter?.limit) params.append('limit', String(filter.limit));
+    if (filter?.offset) params.append('offset', String(filter.offset));
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return safeFetchJson(`/api/admin/sales-history${query}`, undefined, 'Sotilgan mahsulotlar tarixini yuklashda xatolik');
+  },
+
+  async getStatisticalPeriods(): Promise<{ currentPeriod: StatisticalPeriod; periods: StatisticalPeriod[] }> {
+    return safeFetchJson('/api/admin/statistical-periods', undefined, 'Statistik davrlarni yuklashda xatolik');
+  },
+
+  async resetStatisticalPeriod(password: string, reason?: string): Promise<{
+    success: boolean;
+    message: string;
+    result: { previousPeriod: StatisticalPeriod; newPeriod: StatisticalPeriod };
+  }> {
+    return safeFetchJson(
+      '/api/admin/statistical-periods/reset',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, reason }),
+      },
+      'Yangi statistik davrni boshlashda xatolik'
+    );
+  },
+
+  async getAuditLogs(limit = 100): Promise<AuditLogEntry[]> {
+    return safeFetchJson(`/api/admin/audit-logs?limit=${limit}`, undefined, 'Audit jurnalini yuklashda xatolik');
+  },
+
+  async getSupabaseStatus(): Promise<SupabaseConfig> {
+    return safeFetchJson('/api/admin/supabase/status', undefined, 'Supabase holatini tekshirishda xatolik');
+  },
+
+  getBackupCsvUrl(type: 'products' | 'orders' | 'sales' | 'finance'): string {
+    return `/api/admin/backup/csv/${type}`;
+  },
+
+  getBackupJsonUrl(): string {
+    return '/api/admin/backup/json';
+  },
+
+  // --- BILLZ + n8n INTEGRATION ---
+  async getN8nConfig(): Promise<N8nConfig> {
+    return safeFetchJson('/api/admin/n8n/config', undefined, 'n8n sozlamalarini yuklashda xatolik');
+  },
+
+  async updateN8nConfig(patch: Partial<N8nConfig>): Promise<{ success: boolean; message: string; config: N8nConfig }> {
+    return safeFetchJson(
+      '/api/admin/n8n/config',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      },
+      'n8n sozlamalarini saqlashda xatolik'
+    );
+  },
+
+  async generateN8nApiKey(): Promise<{ success: boolean; apiKey: string; message: string; config: N8nConfig }> {
+    return safeFetchJson(
+      '/api/admin/n8n/generate-key',
+      { method: 'POST' },
+      'Yangi API kaliti yaratishda xatolik'
+    );
+  },
+
+  async testN8nSync(): Promise<{ success: boolean; message: string; result: any }> {
+    return safeFetchJson(
+      '/api/admin/n8n/test-sync',
+      { method: 'POST' },
+      'n8n sinov so‘rovini yuborishda xatolik'
+    );
+  },
+
+  async getN8nProducts(params?: { search?: string; category?: string; limit?: number }): Promise<{
+    success: boolean;
+    total: number;
+    products: Product[];
+  }> {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    if (params?.category) query.append('category', params.category);
+    if (params?.limit) query.append('limit', String(params.limit));
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    return safeFetchJson(`/api/integrations/n8n/products${qs}`, undefined, 'n8n mahsulotlarini yuklashda xatolik');
   },
 };
 

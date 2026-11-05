@@ -1,6 +1,7 @@
 import { db } from './db.ts';
 import { hashPassword, verifyPassword, getMasterRecoveryKey, verifyRecoveryKey, generateSixDigitCode } from './security.ts';
 import { billzService } from './billz.ts';
+import { n8nService } from './n8n.ts';
 import type { Banner, Branch, Category, Order, Product } from '../src/types/index.ts';
 
 
@@ -12,10 +13,10 @@ async function runFullTestSuite() {
   let passed = 0;
   let total = 0;
 
-  function runTest(num: number, description: string, fn: () => boolean) {
+  async function runTest(num: number, description: string, fn: () => boolean | Promise<boolean>) {
     total++;
     try {
-      const ok = fn();
+      const ok = await fn();
       if (ok) {
         console.log(`✅ [TEST ${num}/20 PASS] ${description}`);
         passed++;
@@ -758,6 +759,141 @@ async function runFullTestSuite() {
     });
 
     return versionUpdated && dataIntact;
+  });
+
+  // 41. BILLZ + n8n: API Key autentifikatsiya va himoya
+  await runTest(41, 'BILLZ + n8n: API Key autentifikatsiya va xavfsizlik (X-API-KEY va ruxsatsiz so‘rovni qaytarish)', () => {
+    const config = n8nService.getConfig();
+    if (!config || !config.apiKey) return false;
+
+    // To'g'ri header bilan
+    const reqValidHeader = {
+      headers: { 'x-api-key': config.apiKey },
+      query: {},
+    };
+    const auth1 = n8nService.validateAuth(reqValidHeader);
+    if (!auth1.valid) return false;
+
+    // Noto'g'ri kalit bilan
+    const reqInvalid = {
+      headers: { 'x-api-key': 'n8n_fake_key_12345' },
+      query: {},
+    };
+    const auth2 = n8nService.validateAuth(reqInvalid);
+    if (auth2.valid) return false;
+
+    // Bearer token bilan
+    const reqBearer = {
+      headers: { authorization: `Bearer ${config.apiKey}` },
+      query: {},
+    };
+    const auth3 = n8nService.validateAuth(reqBearer);
+    return auth3.valid;
+  });
+
+  // 42. BILLZ + n8n: Yagona mahsulotni n8n orqali qabul qilish va upsert qilish
+  let n8nCreatedBillzId = 'billz_test_' + Date.now();
+  await runTest(42, 'BILLZ + n8n: Yagona mahsulotni qabul qilish, normalizatsiya va avtomatik katalogga joylash', async () => {
+    const payload = {
+      billzId: n8nCreatedBillzId,
+      name: 'SHU n8n Premium Kofta',
+      sku: 'SHU-N8N-001',
+      barcode: '998000112233',
+      category: 'Kofta',
+      price: 490000,
+      costPrice: 280000,
+      stock: 15,
+      sizes: ['M', 'L', 'XL'],
+      colors: ['Qora', 'Kulrang'],
+      images: ['https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=1000'],
+      description: 'n8n orqali BILLZdan kelgan sifatli erkaklar ko‘ftasi',
+      brand: 'SHU BREND',
+      branchesStock: [
+        { branchName: 'SHU BREND Asosiy Ombor', stock: 10 },
+        { branchName: 'Shu brand Mingbuloq', stock: 5 },
+      ],
+    };
+
+    const res = await n8nService.upsertProduct(payload, '127.0.0.1');
+    if (!res.success || !res.productId) return false;
+
+    const saved = db.getProductById(res.productId);
+    return !!saved &&
+           saved.billzId === n8nCreatedBillzId &&
+           saved.sku === 'SHU-N8N-001' &&
+           saved.price === 490000 &&
+           saved.stock === 15 &&
+           saved.sizes.includes('M') &&
+           saved.isPublished === true;
+  });
+
+  // 43. BILLZ + n8n: Studiya rasmlarini himoya qilish (hasCustomImages: true bo‘lsa BILLZ rasmlari o‘chmasligi)
+  await runTest(43, 'BILLZ + n8n: Admin tomonidan yuklangan studiya rasmlarini saqlab qolish (hasCustomImages)', async () => {
+    // Topamiz va mahsulotga studiya rasmini biriktiramiz
+    const allProducts = db.getProducts();
+    const prod = allProducts.find(p => p.billzId === n8nCreatedBillzId);
+    if (!prod) return false;
+
+    const studioImage = 'https://images.unsplash.com/photo-custom-studio-high-res-shu-brand.jpg';
+    prod.images = [studioImage];
+    prod.hasCustomImages = true;
+    db.saveProduct(prod);
+
+    // Endi n8n qaytadan BILLZdan yangi past sifatli rasm bilan update yuborsa ham, studiya rasmi saqlanadi
+    const updatePayload = {
+      billzId: n8nCreatedBillzId,
+      name: 'SHU n8n Premium Kofta (Yangilangan narx)',
+      price: 520000,
+      stock: 12,
+      images: ['https://billz.ai/cdn/low-res-default.jpg'],
+    };
+
+    const res = await n8nService.upsertProduct(updatePayload, '127.0.0.1');
+    if (!res.success) return false;
+
+    const afterUpdate = db.getProductById(prod.id);
+    if (!afterUpdate) return false;
+
+    const priceUpdated = afterUpdate.price === 520000;
+    const stockUpdated = afterUpdate.stock === 12;
+    const studioImagesPreserved = afterUpdate.images.includes(studioImage) && afterUpdate.hasCustomImages === true;
+
+    return priceUpdated && stockUpdated && studioImagesPreserved;
+  });
+
+  // 44. BILLZ + n8n: Ommaviy (Bulk) mahsulotlarni qabul qilish va sinxronlash
+  await runTest(44, 'BILLZ + n8n: Ommaviy (bulk) mahsulotlar paketini qabul qilish va statistika qaytarish', async () => {
+    const bulkBatch = [
+      {
+        billzId: 'billz_bulk_1_' + Math.random(),
+        name: 'SHU n8n Klassik Shim',
+        sku: 'SHU-N8N-SHIM-' + Date.now(),
+        price: 380000,
+        stock: 20,
+        category: 'Shim',
+      },
+      {
+        billzId: 'billz_bulk_2_' + Math.random(),
+        name: 'SHU n8n Paxta Futbolka',
+        sku: 'SHU-N8N-FUT-' + Date.now(),
+        price: 190000,
+        stock: 50,
+        category: 'Futbolka',
+      },
+    ];
+
+    const bulkRes = await n8nService.upsertProductsBulk(bulkBatch, '127.0.0.1');
+    return bulkRes.success && bulkRes.totalReceived === 2 && bulkRes.upsertedCount === 2 && bulkRes.errors.length === 0;
+  });
+
+  // 45. BILLZ + n8n: Test simulyatsiyasi va Webhook audit loglari
+  await runTest(45, 'BILLZ + n8n: Test webhook simulyatsiyasi va audit loglari to‘g‘ri yozilishi', async () => {
+    const simRes = await n8nService.simulateTestWebhook();
+    if (!simRes.success) return false;
+
+    const logs = n8nService.getLogs(10);
+    const hasLog = logs.some(l => l.type === 'SINGLE' || l.type === 'BULK');
+    return hasLog;
   });
 
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
