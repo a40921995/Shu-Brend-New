@@ -18,6 +18,7 @@ import type {
   PaymentStatus,
   PaymentTransaction,
   Product,
+  ProductLifecycleStatus,
   Review,
   SalesFinanceStats,
   SiteSettings,
@@ -185,6 +186,7 @@ export const api = {
     color?: string;
     sort?: string;
     includeHidden?: boolean;
+    status?: ProductLifecycleStatus | 'ALL';
   }): Promise<Product[]> {
     const url = new URL('/api/products', window.location.origin);
     if (params) {
@@ -196,13 +198,15 @@ export const api = {
       if (params.color) url.searchParams.set('color', params.color);
       if (params.sort) url.searchParams.set('sort', params.sort);
       if (params.includeHidden) url.searchParams.set('includeHidden', 'true');
+      if (params.status && params.status !== 'ALL') url.searchParams.set('status', params.status);
     }
     const res = await fetch(url.toString());
     if (!res.ok) throw new Error('Mahsulotlarni yuklab bo‘lmadi');
     return res.json();
   },
-  async getProduct(id: string): Promise<Product> {
-    const res = await fetch(`/api/products/${id}`);
+  async getProduct(id: string, includeHidden = true): Promise<Product> {
+    const url = `/api/products/${id}${includeHidden ? '?includeHidden=true' : ''}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Mahsulot topilmadi');
     return res.json();
   },
@@ -222,6 +226,55 @@ export const api = {
       body: JSON.stringify(product),
     });
     if (!res.ok) throw new Error('Mahsulotni yangilab bo‘lmadi');
+    return res.json();
+  },
+  async updateProductStatus(id: string, status: ProductLifecycleStatus): Promise<{ success: boolean; product: Product }> {
+    const res = await fetch(`/api/products/${id}/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) throw new Error('Mahsulot holatini o‘zgartirib bo‘lmadi');
+    return res.json();
+  },
+  async bulkUpdateProductStatus(productIds: string[], status: ProductLifecycleStatus): Promise<{ success: boolean; count: number; message: string }> {
+    const res = await fetch('/api/products/bulk-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productIds, status }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Mahsulotlar holatini o‘zgartirib bo‘lmadi');
+    }
+    return res.json();
+  },
+  async getBillzSyncSummary(): Promise<{
+    totalProducts: number;
+    billzImportedCount: number;
+    draftsCount: number;
+    editingCount: number;
+    readyCount: number;
+    publishedCount: number;
+    archivedCount: number;
+    discrepancyCount: number;
+    totalOrdersCount: number;
+    syncedOrdersCount: number;
+    pendingOrdersCount: number;
+    failedOrdersCount: number;
+  }> {
+    const res = await fetch('/api/admin/billz-sync/summary');
+    if (!res.ok) throw new Error('BILLZ sinxronizatsiya statistikasini olib bo‘lmadi');
+    return res.json();
+  },
+  async retryBillzOrderSync(orderId: string): Promise<{ success: boolean; billzSaleId?: string; message: string }> {
+    const res = await fetch(`/api/orders/${orderId}/retry-billz-sync`, {
+      method: 'POST',
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'BILLZ sotuvini qayta yuborishda xatolik yuz berdi');
+    }
     return res.json();
   },
   async deleteProduct(id: string): Promise<void> {

@@ -103,6 +103,7 @@ export const CartPage: React.FC = () => {
           color: c.color,
           quantity: c.quantity,
           unitPrice: c.unitPrice,
+          variantId: c.variantId || `${c.color}_${c.size}`,
         })),
       };
 

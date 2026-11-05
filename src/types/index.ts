@@ -45,6 +45,8 @@ export interface Category {
   isHidden?: boolean;
 }
 
+export type ProductLifecycleStatus = 'DRAFT' | 'EDITING' | 'READY' | 'PUBLISHED' | 'ARCHIVED';
+
 export interface ProductVariant {
   id?: string;
   size: string;
@@ -69,6 +71,8 @@ export interface Product {
   sizes: string[];
   colors: string[];
   stock: number;
+  billzReportedStock?: number;
+  stockDiscrepancy?: number;
   variants?: ProductVariant[];
   rating: number;
   reviewCount: number;
@@ -94,6 +98,9 @@ export interface Product {
   colorImages?: Record<string, string[]>;
   source?: 'MANUAL' | 'BILLZ';
   isPublished?: boolean;
+  status?: ProductLifecycleStatus;
+  readyForPublishAt?: string;
+  publishedAt?: string;
 }
 
 export interface CartItem {
@@ -104,6 +111,7 @@ export interface CartItem {
   color: string;
   quantity: number;
   unitPrice: number;
+  variantId?: string;
 }
 
 export interface OrderItem {
@@ -117,6 +125,7 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  variantId?: string;
 }
 
 export interface Order {
@@ -151,6 +160,8 @@ export interface Order {
   }[];
   billzSaleId?: string;
   billzSyncedAt?: string;
+  billzSyncStatus?: 'PENDING' | 'SYNCED' | 'FAILED' | 'LOCAL_ONLY';
+  billzSyncError?: string;
   assignedBranchId?: string;
   statisticalPeriodId?: string;
   createdAt: string;

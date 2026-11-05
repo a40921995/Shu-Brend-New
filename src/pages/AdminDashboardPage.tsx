@@ -52,6 +52,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext.tsx';
 import { api, formatUzbekPrice } from '../lib/api.ts';
+import { AdminBillzSmartManager } from '../components/AdminBillzSmartManager.tsx';
 import { AdminN8nManager } from '../components/AdminN8nManager.tsx';
 import { AdminInventoryManager } from '../components/AdminInventoryManager.tsx';
 import { AdminCategoriesManager } from '../components/AdminCategoriesManager.tsx';
@@ -643,7 +644,7 @@ export const AdminDashboardPage: React.FC = () => {
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-3 border-b border-slate-800/80 mb-6">
           {[
             { id: 'sales_finance', label: '💰 SAVDO VA MOLIYA', icon: DollarSign },
-            { id: 'billz', label: '⚡ BILLZ + n8n', icon: Zap },
+            { id: 'billz', label: '⚡ BILLZ & QORALAMALAR', icon: Zap },
             { id: 'categories', label: '📁 KATEGORIYALAR', icon: Folder, badge: categories.filter((c) => c.slug !== 'all').length },
             { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
             { id: 'products', label: 'Mahsulotlar', icon: Shirt, badge: products.length },
@@ -696,9 +697,9 @@ export const AdminDashboardPage: React.FC = () => {
           <AdminSalesFinanceManager />
         )}
 
-        {/* --- BILLZ + n8n INTEGRATSIYA (OFFICIAL MIDDLEWARE ARCHITECTURE) --- */}
+        {/* --- BILLZ SMART INVENTORY & PRODUCT MANAGEMENT --- */}
         {activeAdminTab === 'billz' && (
-          <AdminN8nManager
+          <AdminBillzSmartManager
             onRefreshCatalog={loadAdminData}
             showToast={showToast}
           />

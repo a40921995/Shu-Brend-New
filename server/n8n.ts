@@ -251,15 +251,11 @@ export class N8nIntegrationService {
         sku: v.sku || payload.sku,
       }));
     } else if (existing?.variants && existing.variants.length > 0) {
-      // Proportional stock update across existing variants
-      const totalStock = payload.stock || 0;
-      const count = existing.variants.length;
-      finalVariants = existing.variants.map((v, i) => ({
-        ...v,
-        stock: count > 0 ? Math.floor(totalStock / count) + (i < (totalStock % count) ? 1 : 0) : 0,
-      }));
+      // Preserve admin's manual size stock allocation
+      // Requirement: Admin qo‘lda kiritgan razmer qoldiqlari BILLZ umumiy qoldig‘i bilan avtomatik ustma-ust yozilmasin.
+      finalVariants = existing.variants;
     } else {
-      // Build even variant distribution
+      // Build initial variant distribution for fresh imports
       const totalStock = payload.stock || 0;
       const totalCombinations = colors.length * sizes.length;
       const stockPerItem = totalCombinations > 0 ? Math.floor(totalStock / totalCombinations) : 0;
@@ -282,10 +278,18 @@ export class N8nIntegrationService {
     }
 
     const calculatedTotalStock = finalVariants.reduce((sum, v) => sum + v.stock, 0);
+    const billzReportedStock = payload.stock ?? 0;
+    const stockDiscrepancy = calculatedTotalStock - billzReportedStock;
 
     // 5. Construct Product
     const isNew = !existing;
     const productId = existing ? existing.id : `prod_billz_${payload.billzId.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+
+    // New products always land in DRAFT status unless config.autoPublish is explicitly enabled
+    const status = isNew
+      ? (config.autoPublish ? 'PUBLISHED' : 'DRAFT')
+      : (existing.status || (existing.isPublished ? 'PUBLISHED' : 'DRAFT'));
+    const isPublished = status === 'PUBLISHED';
 
     const updatedProduct: Product = {
       id: productId,
@@ -303,6 +307,10 @@ export class N8nIntegrationService {
       colors,
       sizes,
       stock: calculatedTotalStock,
+      billzReportedStock,
+      stockDiscrepancy,
+      status,
+      isPublished,
       variants: finalVariants,
       rating: existing?.rating || 5.0,
       reviewCount: existing?.reviewCount || 1,
@@ -312,7 +320,6 @@ export class N8nIntegrationService {
       branchAvailability: payload.branchAvailability?.length ? payload.branchAvailability : existing?.branchAvailability,
       lastBillzSync: new Date().toISOString(),
       source: 'BILLZ',
-      isPublished: payload.isPublished !== undefined ? payload.isPublished : (existing ? existing.isPublished : true),
       createdAt: existing?.createdAt || new Date().toISOString(),
     };
 

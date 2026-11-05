@@ -158,13 +158,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addToCart = (product: Product, size: string, color: string, quantity = 1) => {
+    // Resolve variant ID and check available stock
+    const matchingVariant = product.variants?.find(
+      (v) =>
+        v.color.trim().toLowerCase() === color.trim().toLowerCase() &&
+        v.size.trim().toLowerCase() === size.trim().toLowerCase()
+    );
+    const variantId = matchingVariant?.id || matchingVariant?.sku || `${color}_${size}`;
+    const maxStock = matchingVariant !== undefined ? matchingVariant.stock : product.stock;
+
+    if (maxStock <= 0) {
+      showToast(`"${product.name}" (${color}, ${size}) omborda tugagan`, 'error');
+      return;
+    }
+
     setCart((prev) => {
       const existingIdx = prev.findIndex(
         (item) => item.productId === product.id && item.size === size && item.color === color
       );
       if (existingIdx >= 0) {
         const next = [...prev];
-        next[existingIdx].quantity += quantity;
+        const newQty = Math.min(maxStock, next[existingIdx].quantity + quantity);
+        next[existingIdx].quantity = newQty;
+        next[existingIdx].variantId = variantId;
         return next;
       } else {
         const newItem: CartItem = {
@@ -173,13 +189,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           product,
           size,
           color,
-          quantity,
+          quantity: Math.min(maxStock, quantity),
           unitPrice: product.price,
+          variantId,
         };
         return [...prev, newItem];
       }
     });
-    showToast(`"${product.name}" savatga qo‘shildi!`, 'success');
+    showToast(`"${product.name}" (${size}) savatga qo‘shildi!`, 'success');
   };
 
   const removeFromCart = (cartItemId: string) => {

@@ -2,7 +2,7 @@ import { db } from './db.ts';
 import { hashPassword, verifyPassword, getMasterRecoveryKey, verifyRecoveryKey, generateSixDigitCode } from './security.ts';
 import { billzService } from './billz.ts';
 import { n8nService } from './n8n.ts';
-import type { Banner, Branch, Category, Order, Product } from '../src/types/index.ts';
+import type { Banner, Branch, Category, Order, Product, ProductLifecycleStatus } from '../src/types/index.ts';
 
 
 async function runFullTestSuite() {
@@ -824,7 +824,8 @@ async function runFullTestSuite() {
            saved.price === 490000 &&
            saved.stock === 15 &&
            saved.sizes.includes('M') &&
-           saved.isPublished === true;
+           saved.status === 'DRAFT' &&
+           saved.isPublished === false;
   });
 
   // 43. BILLZ + n8n: Studiya rasmlarini himoya qilish (hasCustomImages: true bo‘lsa BILLZ rasmlari o‘chmasligi)
@@ -894,6 +895,141 @@ async function runFullTestSuite() {
     const logs = n8nService.getLogs(10);
     const hasLog = logs.some(l => l.type === 'SINGLE' || l.type === 'BULK');
     return hasLog;
+  });
+
+  // 46. BILLZ → n8n: Yangi kelgan mahsulot DRAFT (Qoralama) holatida saqlanishi va mijozlarga avtomatik ko‘rinmasligi
+  let draftTestBillzId = 'billz_draft_verify_' + Date.now();
+  let draftCreatedId = '';
+  await runTest(46, 'BILLZ Smart: Yangi mahsulot avtomatik QORALAMA (DRAFT) holatida saqlanishi va isPublished=false bo‘lishi', async () => {
+    // Ensure autoPublish is false
+    db.updateN8nConfig({ autoPublish: false });
+
+    const newDraftPayload = {
+      billzId: draftTestBillzId,
+      name: 'SHU Sinov Qoralama Ko‘ylak',
+      sku: 'SHU-DRAFT-001',
+      price: 350000,
+      stock: 60,
+      category: 'Koylak',
+    };
+
+    const res = await n8nService.upsertProduct(newDraftPayload, '127.0.0.1');
+    if (!res.success || !res.productId) return false;
+    draftCreatedId = res.productId;
+
+    const prod = db.getProductById(res.productId);
+    return !!prod &&
+           prod.status === 'DRAFT' &&
+           prod.isPublished === false &&
+           prod.billzReportedStock === 60;
+  });
+
+  // 47. Razmerlar va qoldiqlar mustaqil boshqaruvi: S (12), M (15), L (10), XL (23) jami 60 ta
+  await runTest(47, 'BILLZ Smart: Razmerlar mustaqil boshqaruvi (S: 12, M: 15, L: 10, XL: 23, jami: 60) va qoldiq farqi hisobi', async () => {
+    const prod = db.getProductById(draftCreatedId);
+    if (!prod) return false;
+
+    // Admin qo'lda razmerlarni kiritadi: S (12), M (15), L (10), XL (23) -> Jami 60
+    prod.colors = ['Oq'];
+    prod.sizes = ['S', 'M', 'L', 'XL'];
+    prod.variants = [
+      { id: 'Oq_S', color: 'Oq', size: 'S', stock: 12 },
+      { id: 'Oq_M', color: 'Oq', size: 'M', stock: 15 },
+      { id: 'Oq_L', color: 'Oq', size: 'L', stock: 10 },
+      { id: 'Oq_XL', color: 'Oq', size: 'XL', stock: 23 },
+    ];
+    prod.status = 'READY'; // Admin tahrirlab chiqarishga tayyor holatga o'tkazdi
+    db.saveProduct(prod);
+
+    const saved = db.getProductById(draftCreatedId);
+    if (!saved) return false;
+
+    const totalSum = (saved.variants || []).reduce((sum, v) => sum + v.stock, 0);
+    const isSum60 = totalSum === 60;
+    const isDiscrepancyZero = saved.stockDiscrepancy === 0;
+    const statusIsReady = saved.status === 'READY';
+
+    // Endi farqni tekshiramiz: agar S qoldig'i 10 qilib o'zgartirilsa (jami 58 bo'lib, farq -2 ta bo'ladi)
+    saved.variants![0].stock = 10;
+    db.saveProduct(saved);
+    const savedDiscrepancy = db.getProductById(draftCreatedId);
+    const hasMinus2Diff = savedDiscrepancy?.stockDiscrepancy === -2;
+
+    // Qayta tiklaymiz 12 ta qilib
+    saved.variants![0].stock = 12;
+    db.saveProduct(saved);
+
+    return isSum60 && isDiscrepancyZero && statusIsReady && hasMinus2Diff;
+  });
+
+  // 48. Tanlangan mahsulotlarni ommaviy saytga chiqarish (SAYTGA CHIQARISH)
+  await runTest(48, 'BILLZ Smart: Tanlangan mahsulotlarni ommaviy saytga chiqarish (PUBLISHED) va tasdiqlash', async () => {
+    const bulkRes = db.bulkUpdateProductStatus([draftCreatedId], 'PUBLISHED');
+    if (!bulkRes.success || bulkRes.count !== 1) return false;
+
+    const prod = db.getProductById(draftCreatedId);
+    return !!prod && prod.status === 'PUBLISHED' && prod.isPublished === true && !!prod.publishedAt;
+  });
+
+  // 49. Mahsulot tahrirlash: Chakana narx, chegirma narx, tavsif va rasmlar galereyasi
+  await runTest(49, 'BILLZ Smart: Mahsulot tahrirlash (Chakana narx, chegirma, tavsif va galereya saqlanishi)', async () => {
+    const prod = db.getProductById(draftCreatedId);
+    if (!prod) return false;
+
+    prod.name = 'SHU Eksklyuziv Oq Ko‘ylak (Yangilangan)';
+    prod.price = 420000;
+    prod.discountPrice = 380000;
+    prod.costPrice = 220000;
+    prod.description = '100% tabiiy paxtadan tayyorlangan nafis yozgi ko‘ylak';
+    prod.images = [
+      'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1000',
+      'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1000',
+    ];
+    prod.hasCustomImages = true;
+    db.saveProduct(prod);
+
+    const saved = db.getProductById(draftCreatedId);
+    return !!saved &&
+           saved.name === 'SHU Eksklyuziv Oq Ko‘ylak (Yangilangan)' &&
+           saved.price === 420000 &&
+           saved.discountPrice === 380000 &&
+           saved.costPrice === 220000 &&
+           saved.images.length === 2 &&
+           saved.hasCustomImages === true;
+  });
+
+  // 50. Saytdan xarid qilinganda aniq variant (razmer) qoldig‘idan kamayishi va takroriy ushlanishdan himoya
+  await runTest(50, 'BILLZ Smart: Xarid vaqtida aynan tanlangan XL razmerdan 1 dona kamayishi (23 -> 22) va ombor hisobi', async () => {
+    const prodBefore = db.getProductById(draftCreatedId);
+    if (!prodBefore) return false;
+
+    const xlVariantBefore = prodBefore.variants?.find(v => v.size === 'XL');
+    const xlStockBefore = xlVariantBefore ? xlVariantBefore.stock : 0; // 23 ta
+    const totalStockBefore = prodBefore.stock; // 60 ta
+
+    // XL dan 1 dona sotiladi
+    db.adjustVariantStock(
+      draftCreatedId,
+      'Oq',
+      'XL',
+      -1,
+      'ONLINE_ORDER_RESERVED',
+      'Sinov onlayn buyurtma uchun XL band qilindi',
+      prodBefore.price,
+      'Test Mijoz'
+    );
+
+    const prodAfter = db.getProductById(draftCreatedId);
+    if (!prodAfter) return false;
+
+    const xlVariantAfter = prodAfter.variants?.find(v => v.size === 'XL');
+    const xlStockAfter = xlVariantAfter ? xlVariantAfter.stock : 0; // 22 ta
+    const totalStockAfter = prodAfter.stock; // 59 ta
+
+    return xlStockBefore === 23 &&
+           xlStockAfter === 22 &&
+           totalStockBefore === 60 &&
+           totalStockAfter === 59;
   });
 
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

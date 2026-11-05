@@ -16,6 +16,7 @@ import type {
   Order,
   PaymentTransaction,
   Product,
+  ProductLifecycleStatus,
   ProductVariant,
   Review,
   SalesFinanceStats,
@@ -766,17 +767,75 @@ class Database {
     const cleanVariants = Array.from(uniqueMap.values());
     const totalStock = cleanVariants.reduce((sum, v) => sum + v.stock, 0);
 
+    const status: ProductLifecycleStatus = product.status || (product.isPublished === false ? 'DRAFT' : 'PUBLISHED');
+    const billzReportedStock = product.billzReportedStock !== undefined
+      ? product.billzReportedStock
+      : (product.source === 'BILLZ' ? (product.stock || totalStock) : totalStock);
+    const stockDiscrepancy = (product.billzReportedStock !== undefined || product.source === 'BILLZ')
+      ? totalStock - billzReportedStock
+      : 0;
+
     return {
       ...product,
       colors,
       sizes,
       variants: cleanVariants,
       stock: totalStock,
+      billzReportedStock,
+      stockDiscrepancy,
+      status,
+      isPublished: status === 'PUBLISHED',
     };
   }
 
   getProducts() {
     return this.data.products.map(p => this.sanitizeProduct(p));
+  }
+
+  getProductsByStatus(status?: ProductLifecycleStatus) {
+    const list = this.getProducts();
+    if (!status) return list;
+    return list.filter(p => p.status === status);
+  }
+
+  bulkUpdateProductStatus(productIds: string[], status: ProductLifecycleStatus) {
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      return { success: false, count: 0, message: 'Mahsulotlar tanlanmagan' };
+    }
+    const idSet = new Set(productIds);
+    let updatedCount = 0;
+    const now = new Date().toISOString();
+
+    this.data.products = this.data.products.map(p => {
+      if (idSet.has(p.id)) {
+        updatedCount++;
+        return {
+          ...p,
+          status,
+          isPublished: status === 'PUBLISHED',
+          publishedAt: status === 'PUBLISHED' ? now : (status === 'DRAFT' ? undefined : p.publishedAt),
+          readyForPublishAt: status === 'READY' ? now : p.readyForPublishAt,
+        };
+      }
+      return p;
+    });
+
+    this.saveData();
+
+    // Log action to audit
+    this.addAuditLog({
+      adminUsername: 'Admin',
+      adminRole: 'ADMIN',
+      action: `MAHSULOTLAR_HOLATI_${status}`,
+      details: `${updatedCount} ta mahsulot holati "${status}" ga o‘zgartirildi`,
+    });
+
+    return {
+      success: true,
+      count: updatedCount,
+      status,
+      message: `${updatedCount} ta mahsulot muvaffaqiyatli "${status}" holatiga o‘tkazildi!`,
+    };
   }
 
   getProductById(id: string) {
@@ -804,6 +863,38 @@ class Database {
   clearAllProducts() {
     this.data.products = [];
     this.saveData();
+  }
+
+  getBillzSyncSummary() {
+    const prods = this.getProducts();
+    const orders = this.getOrders();
+
+    const drafts = prods.filter(p => p.status === 'DRAFT');
+    const editing = prods.filter(p => p.status === 'EDITING');
+    const ready = prods.filter(p => p.status === 'READY');
+    const published = prods.filter(p => p.status === 'PUBLISHED' || (!p.status && p.isPublished !== false));
+    const archived = prods.filter(p => p.status === 'ARCHIVED');
+    const billzImported = prods.filter(p => p.source === 'BILLZ' || !!p.billzId);
+    const discrepancies = prods.filter(p => p.stockDiscrepancy !== undefined && p.stockDiscrepancy !== 0);
+
+    const syncedOrders = orders.filter(o => o.billzSaleId && !o.billzSaleId.startsWith('billz_pending_') && !o.billzSaleId.startsWith('billz_local_'));
+    const pendingOrders = orders.filter(o => !o.billzSaleId || o.billzSaleId.startsWith('billz_pending_'));
+    const failedOrders = orders.filter(o => o.billzSyncStatus === 'FAILED' || (o.statusHistory && o.statusHistory.some(h => h.comment?.includes('xatosi'))));
+
+    return {
+      totalProducts: prods.length,
+      billzImportedCount: billzImported.length,
+      draftsCount: drafts.length,
+      editingCount: editing.length,
+      readyCount: ready.length,
+      publishedCount: published.length,
+      archivedCount: archived.length,
+      discrepancyCount: discrepancies.length,
+      totalOrdersCount: orders.length,
+      syncedOrdersCount: syncedOrders.length,
+      pendingOrdersCount: pendingOrders.length,
+      failedOrdersCount: failedOrders.length,
+    };
   }
 
   // --- OMBOR (WAREHOUSE) INVENTORY METHODS ---

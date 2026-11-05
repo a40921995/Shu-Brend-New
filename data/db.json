@@ -108,6 +108,907 @@
   ],
   "products": [
     {
+      "id": "prod_billz_test_quick_1",
+      "name": "Test Prod",
+      "slug": "test-prod-ck_1",
+      "categorySlug": "all",
+      "categoryName": "HAMMASI",
+      "price": 100000,
+      "costPrice": 60000,
+      "description": "Test Prod. SHU BREND erkaklar kiyimlari kolleksiyasidan premium sifatli mahsulot.",
+      "images": [
+        "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "hasCustomImages": false,
+      "colors": [
+        "Qora"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "stock": 10,
+      "billzReportedStock": 10,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true,
+      "variants": [
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 3
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 3
+        }
+      ],
+      "rating": 5,
+      "reviewCount": 1,
+      "billzId": "test_quick_1",
+      "lastBillzSync": "2026-11-05T20:43:37.686Z",
+      "source": "BILLZ",
+      "createdAt": "2026-11-05T20:43:37.686Z"
+    },
+    {
+      "id": "prod_billz_billz_test_4332",
+      "name": "SHU BREND n8n Test Klassik Kurtka",
+      "slug": "shu-brend-n8n-test-klassik-kurtka-4332",
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "price": 899000,
+      "costPrice": 520000,
+      "discountPrice": 799000,
+      "description": "n8n workflow orqali avtomatik import qilingan sinov kiyimi. Sifatli mato va mukammal bichim.",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "hasCustomImages": false,
+      "colors": [
+        "Qora",
+        "To‘q ko‘k",
+        "Zaytun"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "stock": 14,
+      "billzReportedStock": 14,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true,
+      "variants": [
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 2,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 2,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "Qora_2XL",
+          "color": "Qora",
+          "size": "2XL",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "To‘q ko‘k_M",
+          "color": "To‘q ko‘k",
+          "size": "M",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "To‘q ko‘k_L",
+          "color": "To‘q ko‘k",
+          "size": "L",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "To‘q ko‘k_XL",
+          "color": "To‘q ko‘k",
+          "size": "XL",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "To‘q ko‘k_2XL",
+          "color": "To‘q ko‘k",
+          "size": "2XL",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "Zaytun_M",
+          "color": "Zaytun",
+          "size": "M",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "Zaytun_L",
+          "color": "Zaytun",
+          "size": "L",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "Zaytun_XL",
+          "color": "Zaytun",
+          "size": "XL",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        },
+        {
+          "id": "Zaytun_2XL",
+          "color": "Zaytun",
+          "size": "2XL",
+          "stock": 1,
+          "barcode": "4780005006180",
+          "sku": "SHU-N8N-195"
+        }
+      ],
+      "rating": 5,
+      "reviewCount": 1,
+      "sku": "SHU-N8N-195",
+      "barcode": "4780005006180",
+      "billzId": "billz_test_4332",
+      "branchAvailability": [
+        {
+          "branchId": "branch_central",
+          "branchName": "SHU BREND — Markaziy Ombor",
+          "stock": 10
+        },
+        {
+          "branchId": "branch_mingbuloq",
+          "branchName": "Shu brand Mingbuloq",
+          "stock": 4
+        }
+      ],
+      "lastBillzSync": "2026-11-05T20:43:25.595Z",
+      "source": "BILLZ",
+      "createdAt": "2026-11-05T20:43:25.595Z"
+    },
+    {
+      "id": "prod_billz_billz_bulk_2_0_11459193392519196",
+      "name": "SHU n8n Paxta Futbolka",
+      "slug": "shu-n8n-paxta-futbolka-9196",
+      "categorySlug": "all",
+      "categoryName": "HAMMASI",
+      "price": 190000,
+      "costPrice": 114000,
+      "description": "SHU n8n Paxta Futbolka. SHU BREND erkaklar kiyimlari kolleksiyasidan premium sifatli mahsulot.",
+      "images": [
+        "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "hasCustomImages": false,
+      "colors": [
+        "Qora"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "stock": 50,
+      "billzReportedStock": 50,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true,
+      "variants": [
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 17,
+          "sku": "SHU-N8N-FUT-1793911405576"
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 17,
+          "sku": "SHU-N8N-FUT-1793911405576"
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 16,
+          "sku": "SHU-N8N-FUT-1793911405576"
+        }
+      ],
+      "rating": 5,
+      "reviewCount": 1,
+      "sku": "SHU-N8N-FUT-1793911405576",
+      "billzId": "billz_bulk_2_0.11459193392519196",
+      "lastBillzSync": "2026-11-05T20:43:25.583Z",
+      "source": "BILLZ",
+      "createdAt": "2026-11-05T20:43:25.583Z"
+    },
+    {
+      "id": "prod_billz_billz_bulk_1_0_7741211310660723",
+      "name": "SHU n8n Klassik Shim",
+      "slug": "shu-n8n-klassik-shim-0723",
+      "categorySlug": "shim",
+      "categoryName": "SHIM",
+      "price": 380000,
+      "costPrice": 228000,
+      "description": "SHU n8n Klassik Shim. SHU BREND erkaklar kiyimlari kolleksiyasidan premium sifatli mahsulot.",
+      "images": [
+        "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "hasCustomImages": false,
+      "colors": [
+        "Qora"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "stock": 20,
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true,
+      "variants": [
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 7,
+          "sku": "SHU-N8N-SHIM-1793911405576"
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 7,
+          "sku": "SHU-N8N-SHIM-1793911405576"
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 6,
+          "sku": "SHU-N8N-SHIM-1793911405576"
+        }
+      ],
+      "rating": 5,
+      "reviewCount": 1,
+      "sku": "SHU-N8N-SHIM-1793911405576",
+      "billzId": "billz_bulk_1_0.7741211310660723",
+      "lastBillzSync": "2026-11-05T20:43:25.576Z",
+      "source": "BILLZ",
+      "createdAt": "2026-11-05T20:43:25.576Z"
+    },
+    {
+      "id": "prod_seasonal_1793911405246",
+      "name": "Mavsumiy Alyaska Kurtka",
+      "slug": "mavsumiy-alyaska-kurtka-1793911405246",
+      "price": 850000,
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "stock": 12,
+      "images": [
+        "/banners/hero-banner-1.png"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora"
+      ],
+      "description": "Mavsumiy sinov kiyimi",
+      "rating": 5,
+      "reviewCount": 1,
+      "createdAt": "2026-11-05T20:43:25.246Z",
+      "variants": [
+        {
+          "id": "v1",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "v2",
+          "color": "Qora",
+          "size": "L",
+          "stock": 4
+        },
+        {
+          "id": "v3",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 4
+        }
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
+    },
+    {
+      "id": "prod_ombor_test_1793911405176",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-11-05T20:43:25.176Z",
+      "billzReportedStock": 47,
+      "stockDiscrepancy": -27,
+      "status": "PUBLISHED",
+      "isPublished": true
+    },
+    {
+      "id": "prod_billz_billz_draft_verify_1793911386960",
+      "name": "SHU Eksklyuziv Oq Ko‘ylak (Yangilangan)",
+      "slug": "shu-sinov-qoralama-ko-ylak-6960",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 420000,
+      "costPrice": 220000,
+      "discountPrice": 380000,
+      "description": "100% tabiiy paxtadan tayyorlangan nafis yozgi ko‘ylak",
+      "images": [
+        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1000",
+        "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=1000"
+      ],
+      "hasCustomImages": true,
+      "colors": [
+        "Oq"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "stock": 59,
+      "billzReportedStock": 60,
+      "stockDiscrepancy": -1,
+      "status": "PUBLISHED",
+      "isPublished": true,
+      "variants": [
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 12
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 15
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 10
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 22
+        }
+      ],
+      "rating": 5,
+      "reviewCount": 1,
+      "sku": "SHU-DRAFT-001",
+      "billzId": "billz_draft_verify_1793911405603",
+      "lastBillzSync": "2026-11-05T20:43:25.606Z",
+      "source": "BILLZ",
+      "createdAt": "2026-11-05T20:43:06.962Z",
+      "publishedAt": "2026-11-05T20:43:25.621Z"
+    },
+    {
+      "id": "prod_billz_billz_test_2861",
+      "name": "SHU BREND n8n Test Klassik Kurtka",
+      "slug": "shu-brend-n8n-test-klassik-kurtka-2861",
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "price": 899000,
+      "costPrice": 520000,
+      "discountPrice": 799000,
+      "description": "n8n workflow orqali avtomatik import qilingan sinov kiyimi. Sifatli mato va mukammal bichim.",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "hasCustomImages": false,
+      "colors": [
+        "Qora",
+        "To‘q ko‘k",
+        "Zaytun"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "stock": 14,
+      "billzReportedStock": 14,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true,
+      "variants": [
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 2,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 2,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "Qora_2XL",
+          "color": "Qora",
+          "size": "2XL",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "To‘q ko‘k_M",
+          "color": "To‘q ko‘k",
+          "size": "M",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "To‘q ko‘k_L",
+          "color": "To‘q ko‘k",
+          "size": "L",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "To‘q ko‘k_XL",
+          "color": "To‘q ko‘k",
+          "size": "XL",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "To‘q ko‘k_2XL",
+          "color": "To‘q ko‘k",
+          "size": "2XL",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "Zaytun_M",
+          "color": "Zaytun",
+          "size": "M",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "Zaytun_L",
+          "color": "Zaytun",
+          "size": "L",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "Zaytun_XL",
+          "color": "Zaytun",
+          "size": "XL",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        },
+        {
+          "id": "Zaytun_2XL",
+          "color": "Zaytun",
+          "size": "2XL",
+          "stock": 1,
+          "barcode": "4780002448311",
+          "sku": "SHU-N8N-987"
+        }
+      ],
+      "rating": 5,
+      "reviewCount": 1,
+      "sku": "SHU-N8N-987",
+      "barcode": "4780002448311",
+      "billzId": "billz_test_2861",
+      "branchAvailability": [
+        {
+          "branchId": "branch_central",
+          "branchName": "SHU BREND — Markaziy Ombor",
+          "stock": 10
+        },
+        {
+          "branchId": "branch_mingbuloq",
+          "branchName": "Shu brand Mingbuloq",
+          "stock": 4
+        }
+      ],
+      "lastBillzSync": "2026-11-05T20:43:06.953Z",
+      "source": "BILLZ",
+      "createdAt": "2026-11-05T20:43:06.953Z"
+    },
+    {
+      "id": "prod_billz_billz_bulk_2_0_005511663893278174",
+      "name": "SHU n8n Paxta Futbolka",
+      "slug": "shu-n8n-paxta-futbolka-8174",
+      "categorySlug": "all",
+      "categoryName": "HAMMASI",
+      "price": 190000,
+      "costPrice": 114000,
+      "description": "SHU n8n Paxta Futbolka. SHU BREND erkaklar kiyimlari kolleksiyasidan premium sifatli mahsulot.",
+      "images": [
+        "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "hasCustomImages": false,
+      "colors": [
+        "Qora"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "stock": 50,
+      "billzReportedStock": 50,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true,
+      "variants": [
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 17,
+          "sku": "SHU-N8N-FUT-1793911386938"
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 17,
+          "sku": "SHU-N8N-FUT-1793911386938"
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 16,
+          "sku": "SHU-N8N-FUT-1793911386938"
+        }
+      ],
+      "rating": 5,
+      "reviewCount": 1,
+      "sku": "SHU-N8N-FUT-1793911386938",
+      "billzId": "billz_bulk_2_0.005511663893278174",
+      "lastBillzSync": "2026-11-05T20:43:06.944Z",
+      "source": "BILLZ",
+      "createdAt": "2026-11-05T20:43:06.944Z"
+    },
+    {
+      "id": "prod_billz_billz_bulk_1_0_8200122038267983",
+      "name": "SHU n8n Klassik Shim",
+      "slug": "shu-n8n-klassik-shim-7983",
+      "categorySlug": "shim",
+      "categoryName": "SHIM",
+      "price": 380000,
+      "costPrice": 228000,
+      "description": "SHU n8n Klassik Shim. SHU BREND erkaklar kiyimlari kolleksiyasidan premium sifatli mahsulot.",
+      "images": [
+        "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop"
+      ],
+      "hasCustomImages": false,
+      "colors": [
+        "Qora"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "stock": 20,
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true,
+      "variants": [
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 7,
+          "sku": "SHU-N8N-SHIM-1793911386938"
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 7,
+          "sku": "SHU-N8N-SHIM-1793911386938"
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 6,
+          "sku": "SHU-N8N-SHIM-1793911386938"
+        }
+      ],
+      "rating": 5,
+      "reviewCount": 1,
+      "sku": "SHU-N8N-SHIM-1793911386938",
+      "billzId": "billz_bulk_1_0.8200122038267983",
+      "lastBillzSync": "2026-11-05T20:43:06.938Z",
+      "source": "BILLZ",
+      "createdAt": "2026-11-05T20:43:06.938Z"
+    },
+    {
+      "id": "prod_seasonal_1793911386597",
+      "name": "Mavsumiy Alyaska Kurtka",
+      "slug": "mavsumiy-alyaska-kurtka-1793911386597",
+      "price": 850000,
+      "categorySlug": "kurtka",
+      "categoryName": "KURTKA",
+      "stock": 12,
+      "images": [
+        "/banners/hero-banner-1.png"
+      ],
+      "sizes": [
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora"
+      ],
+      "description": "Mavsumiy sinov kiyimi",
+      "rating": 5,
+      "reviewCount": 1,
+      "createdAt": "2026-11-05T20:43:06.597Z",
+      "variants": [
+        {
+          "id": "v1",
+          "color": "Qora",
+          "size": "M",
+          "stock": 4
+        },
+        {
+          "id": "v2",
+          "color": "Qora",
+          "size": "L",
+          "stock": 4
+        },
+        {
+          "id": "v3",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 4
+        }
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
+    },
+    {
+      "id": "prod_ombor_test_1793911386537",
+      "name": "SHU BREND Erkaklar Ko‘ylagi",
+      "slug": "erkaklar-koylagi-test",
+      "categorySlug": "koylak",
+      "categoryName": "KO‘YLAK",
+      "price": 450000,
+      "description": "Ombor sinov ko‘ylagi",
+      "images": [
+        "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000"
+      ],
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        "Qora",
+        "Oq"
+      ],
+      "variants": [
+        {
+          "id": "Qora_S",
+          "color": "Qora",
+          "size": "S",
+          "stock": 20
+        },
+        {
+          "id": "Qora_M",
+          "color": "Qora",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Qora_L",
+          "color": "Qora",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Qora_XL",
+          "color": "Qora",
+          "size": "XL",
+          "stock": 0
+        },
+        {
+          "id": "Oq_S",
+          "color": "Oq",
+          "size": "S",
+          "stock": 0
+        },
+        {
+          "id": "Oq_M",
+          "color": "Oq",
+          "size": "M",
+          "stock": 0
+        },
+        {
+          "id": "Oq_L",
+          "color": "Oq",
+          "size": "L",
+          "stock": 0
+        },
+        {
+          "id": "Oq_XL",
+          "color": "Oq",
+          "size": "XL",
+          "stock": 0
+        }
+      ],
+      "stock": 20,
+      "rating": 5,
+      "reviewCount": 0,
+      "createdAt": "2026-11-05T20:43:06.537Z",
+      "billzReportedStock": 47,
+      "stockDiscrepancy": -27,
+      "status": "PUBLISHED",
+      "isPublished": true
+    },
+    {
       "id": "prod_billz_billz_test_3906",
       "name": "SHU BREND n8n Test Klassik Kurtka",
       "slug": "shu-brend-n8n-test-klassik-kurtka-3906",
@@ -252,7 +1153,10 @@
       "lastBillzSync": "2026-11-05T17:50:17.022Z",
       "source": "BILLZ",
       "isPublished": true,
-      "createdAt": "2026-11-05T17:50:17.022Z"
+      "createdAt": "2026-11-05T17:50:17.022Z",
+      "billzReportedStock": 14,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED"
     },
     {
       "id": "prod_billz_billz_bulk_2_0_3159171249431414",
@@ -306,7 +1210,10 @@
       "lastBillzSync": "2026-11-05T17:50:17.013Z",
       "source": "BILLZ",
       "isPublished": true,
-      "createdAt": "2026-11-05T17:50:17.013Z"
+      "createdAt": "2026-11-05T17:50:17.013Z",
+      "billzReportedStock": 50,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED"
     },
     {
       "id": "prod_billz_billz_bulk_1_0_5374619812523358",
@@ -360,7 +1267,10 @@
       "lastBillzSync": "2026-11-05T17:50:17.007Z",
       "source": "BILLZ",
       "isPublished": true,
-      "createdAt": "2026-11-05T17:50:17.007Z"
+      "createdAt": "2026-11-05T17:50:17.007Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED"
     },
     {
       "id": "prod_billz_billz_test_1793901016991",
@@ -384,6 +1294,10 @@
         "XL"
       ],
       "stock": 12,
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true,
       "variants": [
         {
           "id": "Qora_M",
@@ -438,10 +1352,9 @@
       "reviewCount": 1,
       "sku": "SHU-N8N-001",
       "barcode": "998000112233",
-      "billzId": "billz_test_1793901016991",
-      "lastBillzSync": "2026-11-05T17:50:17.002Z",
+      "billzId": "billz_test_1793911405558",
+      "lastBillzSync": "2026-11-05T20:43:25.569Z",
       "source": "BILLZ",
-      "isPublished": true,
       "createdAt": "2026-11-05T17:50:16.992Z"
     },
     {
@@ -486,7 +1399,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793901016637",
@@ -562,7 +1479,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-11-05T17:50:16.637Z"
+      "createdAt": "2026-11-05T17:50:16.637Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_billz_billz_curl_bulk_202",
@@ -616,7 +1537,10 @@
       "lastBillzSync": "2026-11-05T17:49:19.214Z",
       "source": "BILLZ",
       "isPublished": true,
-      "createdAt": "2026-11-05T17:49:19.214Z"
+      "createdAt": "2026-11-05T17:49:19.214Z",
+      "billzReportedStock": 10,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED"
     },
     {
       "id": "prod_billz_billz_curl_bulk_201",
@@ -670,7 +1594,10 @@
       "lastBillzSync": "2026-11-05T17:49:19.205Z",
       "source": "BILLZ",
       "isPublished": true,
-      "createdAt": "2026-11-05T17:49:19.205Z"
+      "createdAt": "2026-11-05T17:49:19.205Z",
+      "billzReportedStock": 25,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED"
     },
     {
       "id": "prod_billz_billz_curl_live_101",
@@ -770,7 +1697,10 @@
       "lastBillzSync": "2026-11-05T17:49:11.956Z",
       "source": "BILLZ",
       "isPublished": true,
-      "createdAt": "2026-11-05T17:49:11.956Z"
+      "createdAt": "2026-11-05T17:49:11.956Z",
+      "billzReportedStock": 8,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED"
     },
     {
       "id": "prod_seasonal_1793786133083",
@@ -814,7 +1744,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793786132990",
@@ -890,7 +1824,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-11-04T09:55:32.990Z"
+      "createdAt": "2026-11-04T09:55:32.990Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793546165760",
@@ -934,7 +1872,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793546165696",
@@ -1010,7 +1952,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-11-01T15:16:05.696Z"
+      "createdAt": "2026-11-01T15:16:05.696Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793541703543",
@@ -1054,7 +2000,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793541703489",
@@ -1130,7 +2080,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-11-01T14:01:43.489Z"
+      "createdAt": "2026-11-01T14:01:43.489Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793539127077",
@@ -1174,7 +2128,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793539127028",
@@ -1250,7 +2208,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-11-01T13:18:47.028Z"
+      "createdAt": "2026-11-01T13:18:47.028Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793539090650",
@@ -1294,7 +2256,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793539090606",
@@ -1370,7 +2336,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-11-01T13:18:10.606Z"
+      "createdAt": "2026-11-01T13:18:10.606Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793444279582",
@@ -1414,7 +2384,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793444279539",
@@ -1490,7 +2464,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-31T10:57:59.539Z"
+      "createdAt": "2026-10-31T10:57:59.539Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793442423068",
@@ -1534,7 +2512,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793442423020",
@@ -1610,7 +2592,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-31T10:27:03.020Z"
+      "createdAt": "2026-10-31T10:27:03.020Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793440679118",
@@ -1654,7 +2640,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793440679079",
@@ -1730,7 +2720,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-31T09:57:59.079Z"
+      "createdAt": "2026-10-31T09:57:59.079Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793440524060",
@@ -1774,7 +2768,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793440524023",
@@ -1850,7 +2848,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-31T09:55:24.023Z"
+      "createdAt": "2026-10-31T09:55:24.023Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793360980071",
@@ -1894,7 +2896,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793360980038",
@@ -1970,7 +2976,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-30T11:49:40.038Z"
+      "createdAt": "2026-10-30T11:49:40.038Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793357010664",
@@ -2014,7 +3024,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793357010625",
@@ -2090,7 +3104,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-30T10:43:30.625Z"
+      "createdAt": "2026-10-30T10:43:30.625Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793356890123",
@@ -2131,7 +3149,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793356890093",
@@ -2207,7 +3229,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-30T10:41:30.093Z"
+      "createdAt": "2026-10-30T10:41:30.093Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793356820579",
@@ -2248,7 +3274,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793356820552",
@@ -2324,7 +3354,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-30T10:40:20.552Z"
+      "createdAt": "2026-10-30T10:40:20.552Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793356804227",
@@ -2365,7 +3399,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793356804202",
@@ -2441,7 +3479,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-30T10:40:04.202Z"
+      "createdAt": "2026-10-30T10:40:04.202Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793356057701",
@@ -2482,7 +3524,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793356057680",
@@ -2558,7 +3604,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-30T10:27:37.680Z"
+      "createdAt": "2026-10-30T10:27:37.680Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_seasonal_1793355918185",
@@ -2599,7 +3649,11 @@
           "size": "XL",
           "stock": 4
         }
-      ]
+      ],
+      "billzReportedStock": 12,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793355918158",
@@ -2675,7 +3729,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-30T10:25:18.158Z"
+      "createdAt": "2026-10-30T10:25:18.158Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1793355885884",
@@ -2751,7 +3809,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-30T10:24:45.884Z"
+      "createdAt": "2026-10-30T10:24:45.884Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1792986948224",
@@ -2827,7 +3889,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-26T03:55:48.224Z"
+      "createdAt": "2026-10-26T03:55:48.224Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1792986906749",
@@ -2903,7 +3969,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-26T03:55:06.749Z"
+      "createdAt": "2026-10-26T03:55:06.749Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1792986874636",
@@ -2979,7 +4049,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-26T03:54:34.636Z"
+      "createdAt": "2026-10-26T03:54:34.636Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1792923235289",
@@ -3055,7 +4129,11 @@
       "stock": 20,
       "rating": 5,
       "reviewCount": 0,
-      "createdAt": "2026-10-25T10:13:55.289Z"
+      "createdAt": "2026-10-25T10:13:55.289Z",
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     },
     {
       "id": "prod_ombor_test_1792923200416",
@@ -3131,10 +4209,92 @@
           "size": "XL",
           "stock": 0
         }
-      ]
+      ],
+      "billzReportedStock": 20,
+      "stockDiscrepancy": 0,
+      "status": "PUBLISHED",
+      "isPublished": true
     }
   ],
   "orders": [
+    {
+      "id": "ord_billz_sync_test_1793911405316",
+      "orderNumber": "#1099",
+      "customerName": "Sardor Rahimxon",
+      "customerPhone": "+998 90 777 88 99",
+      "region": "Toshkent shahri",
+      "city": "Yakkasaroy",
+      "address": "Shota Rustaveli ko‘chasi, 45-uy",
+      "items": [
+        {
+          "id": "item_billz_1",
+          "productId": "prod_2",
+          "productName": "Dvoyka kostyum-shim",
+          "productImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop",
+          "size": "52",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 1299000,
+          "totalPrice": 1299000
+        }
+      ],
+      "subtotal": 1299000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 1299000,
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-11-05T20:43:25.316Z"
+        }
+      ],
+      "createdAt": "2026-11-05T20:43:25.316Z",
+      "updatedAt": "2026-11-05T20:43:25.316Z",
+      "billzSaleId": "billz_sale_test_888",
+      "billzSyncedAt": "2026-11-05T20:43:25.318Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
+    {
+      "id": "ord_billz_sync_test_1793911386673",
+      "orderNumber": "#1099",
+      "customerName": "Sardor Rahimxon",
+      "customerPhone": "+998 90 777 88 99",
+      "region": "Toshkent shahri",
+      "city": "Yakkasaroy",
+      "address": "Shota Rustaveli ko‘chasi, 45-uy",
+      "items": [
+        {
+          "id": "item_billz_1",
+          "productId": "prod_2",
+          "productName": "Dvoyka kostyum-shim",
+          "productImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1000&auto=format&fit=crop",
+          "size": "52",
+          "color": "Qora",
+          "quantity": 1,
+          "unitPrice": 1299000,
+          "totalPrice": 1299000
+        }
+      ],
+      "subtotal": 1299000,
+      "discount": 0,
+      "deliveryFee": 0,
+      "total": 1299000,
+      "status": "YANGI",
+      "statusHistory": [
+        {
+          "status": "YANGI",
+          "changedAt": "2026-11-05T20:43:06.673Z"
+        }
+      ],
+      "createdAt": "2026-11-05T20:43:06.673Z",
+      "updatedAt": "2026-11-05T20:43:06.673Z",
+      "billzSaleId": "billz_sale_test_888",
+      "billzSyncedAt": "2026-11-05T20:43:06.675Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
+    },
     {
       "id": "ord_billz_sync_test_1793901016757",
       "orderNumber": "#1099",
@@ -3170,7 +4330,9 @@
       "createdAt": "2026-11-05T17:50:16.757Z",
       "updatedAt": "2026-11-05T17:50:16.757Z",
       "billzSaleId": "billz_sale_test_888",
-      "billzSyncedAt": "2026-11-05T17:50:16.758Z"
+      "billzSyncedAt": "2026-11-05T17:50:16.758Z",
+      "paymentMethod": "CLICK_CARD",
+      "paymentStatus": "KUTILMOQDA"
     },
     {
       "id": "ord_billz_sync_test_1793786133185",
@@ -4329,7 +5491,7 @@
     "telegramSettings": {
       "enabled": false,
       "status": "DISCONNECTED",
-      "botToken": "aes-gcm:eb00f8a2db5d5012271000e5:74b52079183c1a75f3fb864df8f5ccce:8673814f3b46463186c341cf50ec649aacb46c467ead0cc30bb479e53543f1bd37b82eab2af948dbeb1d1b",
+      "botToken": "aes-gcm:faa7aec0d52fb90e508e0391:c5171e4e0c70703ecc5973c8164a962a:ee629e0f649bfa7ba2c99c122931d85df738a795427d9c544dff2823f8df4cc71b713282b20c6314c0c47f",
       "chatId": "-1001234567890"
     }
   },
@@ -4346,6 +5508,434 @@
     }
   ],
   "inventoryLogs": [
+    {
+      "id": "inv_1793911405631_pqkj",
+      "timestamp": "2026-11-05T20:43:25.631Z",
+      "productId": "prod_billz_billz_draft_verify_1793911386960",
+      "productName": "SHU Eksklyuziv Oq Ko‘ylak (Yangilangan)",
+      "productImage": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -1,
+      "previousStock": 23,
+      "newStock": 22,
+      "type": "ONLINE_ORDER_RESERVED",
+      "price": 420000,
+      "note": "Sinov onlayn buyurtma uchun XL band qilindi",
+      "operator": "Test Mijoz"
+    },
+    {
+      "id": "inv_cancel_1793911405241",
+      "timestamp": "2026-11-05T20:43:25.241Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #7_rzfk (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405237_rzfk",
+      "timestamp": "2026-11-05T20:43:25.237Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793911405233_h0q2",
+      "timestamp": "2026-11-05T20:43:25.233Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405227_fw53",
+      "timestamp": "2026-11-05T20:43:25.227Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405221_0kdz",
+      "timestamp": "2026-11-05T20:43:25.221Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405218_omcn",
+      "timestamp": "2026-11-05T20:43:25.218Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405213_h7fr",
+      "timestamp": "2026-11-05T20:43:25.213Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405209_700f",
+      "timestamp": "2026-11-05T20:43:25.209Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405204_p5pr",
+      "timestamp": "2026-11-05T20:43:25.204Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405199_pvho",
+      "timestamp": "2026-11-05T20:43:25.199Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405192_o705",
+      "timestamp": "2026-11-05T20:43:25.192Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405188_evem",
+      "timestamp": "2026-11-05T20:43:25.188Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911405182_no7l",
+      "timestamp": "2026-11-05T20:43:25.182Z",
+      "productId": "prod_ombor_test_1793911405176",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386983_jazs",
+      "timestamp": "2026-11-05T20:43:06.983Z",
+      "productId": "prod_billz_billz_draft_verify_1793911386960",
+      "productName": "SHU Eksklyuziv Oq Ko‘ylak (Yangilangan)",
+      "productImage": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -1,
+      "previousStock": 23,
+      "newStock": 22,
+      "type": "ONLINE_ORDER_RESERVED",
+      "price": 420000,
+      "note": "Sinov onlayn buyurtma uchun XL band qilindi",
+      "operator": "Test Mijoz"
+    },
+    {
+      "id": "inv_cancel_1793911386593",
+      "timestamp": "2026-11-05T20:43:06.593Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 1,
+      "previousStock": 19,
+      "newStock": 20,
+      "type": "OFFLINE_SALE_CANCEL",
+      "note": "Bekor qilindi: Log #9_41bn (SHU BREND Erkaklar Ko‘ylagi Qora S)",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386589_41bn",
+      "timestamp": "2026-11-05T20:43:06.589Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 20,
+      "newStock": 19,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test sotuv",
+      "operator": "Admin",
+      "cancelled": true
+    },
+    {
+      "id": "inv_1793911386584_0dmb",
+      "timestamp": "2026-11-05T20:43:06.584Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 10,
+      "newStock": 20,
+      "type": "RESTOCK",
+      "note": "Yangi partiya olib kelindi",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386581_vk6w",
+      "timestamp": "2026-11-05T20:43:06.581Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": 10,
+      "previousStock": 0,
+      "newStock": 10,
+      "type": "RESTOCK",
+      "note": "Restored",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386576_3oig",
+      "timestamp": "2026-11-05T20:43:06.576Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "XL",
+      "delta": -2,
+      "previousStock": 2,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386572_ru3o",
+      "timestamp": "2026-11-05T20:43:06.572Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "L",
+      "delta": -5,
+      "previousStock": 5,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386568_h9h7",
+      "timestamp": "2026-11-05T20:43:06.568Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "M",
+      "delta": -7,
+      "previousStock": 7,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386564_bwbg",
+      "timestamp": "2026-11-05T20:43:06.564Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Oq",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386560_utr2",
+      "timestamp": "2026-11-05T20:43:06.560Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "XL",
+      "delta": -6,
+      "previousStock": 6,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386556_u7pj",
+      "timestamp": "2026-11-05T20:43:06.556Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "L",
+      "delta": -8,
+      "previousStock": 8,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386552_3x5f",
+      "timestamp": "2026-11-05T20:43:06.552Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "M",
+      "delta": -10,
+      "previousStock": 10,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386548_ojyc",
+      "timestamp": "2026-11-05T20:43:06.548Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -4,
+      "previousStock": 4,
+      "newStock": 0,
+      "type": "MANUAL_ADJUST",
+      "note": "Test 0 stock",
+      "operator": "Admin"
+    },
+    {
+      "id": "inv_1793911386543_ebly",
+      "timestamp": "2026-11-05T20:43:06.543Z",
+      "productId": "prod_ombor_test_1793911386537",
+      "productName": "SHU BREND Erkaklar Ko‘ylagi",
+      "productImage": "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=1000",
+      "color": "Qora",
+      "size": "S",
+      "delta": -1,
+      "previousStock": 5,
+      "newStock": 4,
+      "type": "OFFLINE_SALE",
+      "price": 450000,
+      "note": "Test do‘konda oflayn sotildi",
+      "operator": "Admin"
+    },
     {
       "id": "inv_cancel_1793901016684",
       "timestamp": "2026-11-05T17:50:16.684Z",
@@ -8922,13 +10512,57 @@
     "syncImages": true,
     "syncPrices": true,
     "syncStock": true,
-    "encryptedApiKey": "aes-gcm:69163cc159d4af7bebfb0c8c:eb969ab72105a5b5900cffa00662bd69:6b281359041a6b591e9b13fb50ab6d29fd2766aec5274ead204cfdb216566643ef4a8a7e2c2813",
-    "encryptedPlatformId": "aes-gcm:77aeb0f7aa9f1b9792c67204:2d2ca778ef4e0b162127644a8d7a3991:0c63cda12535df6772b14349ece748170d952b8f8a7d087ffcea",
+    "encryptedApiKey": "aes-gcm:3165d35695bd8bebb7d5f3a2:fcfc0cec81445bdf8cfd7fbc76ab45f0:3a9eaad7b4087198141a770cada574f435a1e9a0bc69ae70c375ac6f564f5b9dfe4825010cec1d",
+    "encryptedPlatformId": "aes-gcm:62da92581da6193ca24faf16:df272b97e84cdc2e37c7413e444c3340:6a533c510ba9b0590f749a8ad93a9cca5760d946eddc005969b1",
     "lastError": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling.",
-    "lastSyncAt": "2026-11-05T17:37:02.792Z",
+    "lastSyncAt": "2026-11-05T20:32:48.348Z",
     "lastSyncStatus": "FAILED"
   },
   "billzLogs": [
+    {
+      "id": "blog_1793911406410_m2ax6",
+      "timestamp": "2026-11-05T20:43:26.410Z",
+      "type": "TEST_CONNECTION",
+      "status": "FAILED",
+      "details": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling.",
+      "error": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling.",
+      "durationMs": 1141
+    },
+    {
+      "id": "blog_1793911405321_c5pn5",
+      "timestamp": "2026-11-05T20:43:25.321Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "SUCCESS",
+      "details": "Test avtomatik sinxronizatsiya: 45 ta tovar yangilandi",
+      "itemsCount": 45,
+      "durationMs": 320
+    },
+    {
+      "id": "blog_1793911387777_nhbgc",
+      "timestamp": "2026-11-05T20:43:07.777Z",
+      "type": "TEST_CONNECTION",
+      "status": "FAILED",
+      "details": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling.",
+      "error": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling.",
+      "durationMs": 1154
+    },
+    {
+      "id": "blog_1793911386677_xq10t",
+      "timestamp": "2026-11-05T20:43:06.677Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "SUCCESS",
+      "details": "Test avtomatik sinxronizatsiya: 45 ta tovar yangilandi",
+      "itemsCount": 45,
+      "durationMs": 320
+    },
+    {
+      "id": "blog_1793910768350_69dt4",
+      "timestamp": "2026-11-05T20:32:48.350Z",
+      "type": "IMPORT_PRODUCTS",
+      "status": "FAILED",
+      "details": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling.",
+      "error": "BILLZ autentifikatsiya xatosi (HTTP 401): Kiritilgan Secret Token noto‘g‘ri yoki BILLZ hisobida mavjud emas. BILLZ shaxsiy kabinetingizdan (Sozlamalar → Kompaniya sozlamalari → Integratsiya kalitlari) yangi kalit oling."
+    },
     {
       "id": "blog_1793901017798_6l3r0",
       "timestamp": "2026-11-05T17:50:17.798Z",
@@ -9372,95 +11006,32 @@
   "billzStagingProducts": [],
   "adminSecurity": {
     "username": "admin",
-    "passwordHash": "scrypt:e9004081c70b6ceb9e07ca9c29755b44:f40476dd8617e0898d6ff77b6875685664fafa2b2fa9668ebd7f27d3d3832fd2a9ef3b7b24144799f4639131934deffad4f4c4eee1a63607063e9200c1ec2c9b",
-    "sessionTokenVersion": 19,
-    "lastPasswordChange": "2026-11-05T17:50:16.541Z"
+    "passwordHash": "scrypt:c2b8c1bb550366a47077fb692f312597:d12a6a2c08cffd497e155f3f9d20aee60a37e9b1c24616dbb881bd76dfb73c27c1c2f08b9b20c80621f6ccd6c4dd00aad7d286106134501c880d64864412b5c5",
+    "sessionTokenVersion": 21,
+    "lastPasswordChange": "2026-11-05T20:43:25.069Z"
   },
-  "statisticalPeriods": [
-    {
-      "id": "period_initial",
-      "name": "Boshlang‘ich hisobot davri",
-      "startedAt": "2025-01-01T00:00:00.000Z"
-    }
-  ],
-  "currentPeriodId": "period_initial",
   "n8nConfig": {
-    "apiKey": "n8n_live_shubrend_mf0xin49khlfdgr05xkv",
+    "apiKey": "n8n_live_shubrend_t63bh0435w25po6bzzoj",
     "enabled": true,
-    "totalSyncedProducts": 5,
+    "totalSyncedProducts": 1,
     "totalErrors": 0,
     "autoPublish": true,
     "preserveCustomImages": true,
     "lastWebhookStatus": "SUCCESS",
     "logs": [
       {
-        "id": "n8n_log_1793901017026_75p1m",
-        "timestamp": "2026-11-05T17:50:17.026Z",
+        "id": "n8n_log_1793911417698_q54jz",
+        "timestamp": "2026-11-05T20:43:37.698Z",
         "type": "SINGLE",
         "status": "SUCCESS",
         "productsReceived": 1,
         "productsUpserted": 1,
         "errorCount": 0,
-        "details": "Yangi qo‘shildi: SHU BREND n8n Test Klassik Kurtka (ID: billz_test_3906, Narx: 899000 so‘m, Qoldiq: 14 ta)",
-        "sourceIp": "admin_panel_simulator"
-      },
-      {
-        "id": "n8n_log_1793901017019_wemxy",
-        "timestamp": "2026-11-05T17:50:17.019Z",
-        "type": "BULK",
-        "status": "SUCCESS",
-        "productsReceived": 2,
-        "productsUpserted": 2,
-        "errorCount": 0,
-        "details": "Jami yuborilgan: 2 ta. Yangi: 2 ta, Yangilandi: 0 ta, Xatolar: 0 ta.",
-        "sourceIp": "127.0.0.1"
-      },
-      {
-        "id": "n8n_log_1793901017016_gs40b",
-        "timestamp": "2026-11-05T17:50:17.016Z",
-        "type": "SINGLE",
-        "status": "SUCCESS",
-        "productsReceived": 1,
-        "productsUpserted": 1,
-        "errorCount": 0,
-        "details": "Yangi qo‘shildi: SHU n8n Paxta Futbolka (ID: billz_bulk_2_0.3159171249431414, Narx: 190000 so‘m, Qoldiq: 50 ta)",
-        "sourceIp": "127.0.0.1"
-      },
-      {
-        "id": "n8n_log_1793901017011_8d2a2",
-        "timestamp": "2026-11-05T17:50:17.011Z",
-        "type": "SINGLE",
-        "status": "SUCCESS",
-        "productsReceived": 1,
-        "productsUpserted": 1,
-        "errorCount": 0,
-        "details": "Yangi qo‘shildi: SHU n8n Klassik Shim (ID: billz_bulk_1_0.5374619812523358, Narx: 380000 so‘m, Qoldiq: 20 ta)",
-        "sourceIp": "127.0.0.1"
-      },
-      {
-        "id": "n8n_log_1793901017005_cstng",
-        "timestamp": "2026-11-05T17:50:17.005Z",
-        "type": "SINGLE",
-        "status": "SUCCESS",
-        "productsReceived": 1,
-        "productsUpserted": 1,
-        "errorCount": 0,
-        "details": "Yangilandi: SHU n8n Premium Kofta (Yangilangan narx) (ID: billz_test_1793901016991, Narx: 520000 so‘m, Qoldiq: 12 ta)",
-        "sourceIp": "127.0.0.1"
-      },
-      {
-        "id": "n8n_log_1793901016998_frif8",
-        "timestamp": "2026-11-05T17:50:16.998Z",
-        "type": "SINGLE",
-        "status": "SUCCESS",
-        "productsReceived": 1,
-        "productsUpserted": 1,
-        "errorCount": 0,
-        "details": "Yangi qo‘shildi: SHU n8n Premium Kofta (ID: billz_test_1793901016991, Narx: 490000 so‘m, Qoldiq: 15 ta)",
+        "details": "Yangi qo‘shildi: Test Prod (ID: test_quick_1, Narx: 100000 so‘m, Qoldiq: 10 ta)",
         "sourceIp": "127.0.0.1"
       }
     ],
-    "lastWebhookAt": "2026-11-05T17:50:17.024Z",
-    "lastWebhookMessage": "Mahsulot yaratildi: SHU BREND n8n Test Klassik Kurtka (BILLZ ID: billz_test_3906)"
+    "lastWebhookAt": "2026-11-05T20:43:37.691Z",
+    "lastWebhookMessage": "Mahsulot yaratildi: Test Prod (BILLZ ID: test_quick_1)"
   }
 }

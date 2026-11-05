@@ -18,7 +18,7 @@ import {
 import { billzService } from './server/billz.ts';
 import { supabaseAdapter } from './server/supabase.ts';
 import { n8nService } from './server/n8n.ts';
-import type { Banner, Branch, Category, Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus, PaymentTransaction, Product, Review, User } from './src/types/index.ts';
+import type { Banner, Branch, Category, Order, OrderItem, OrderStatus, PaymentMethod, PaymentStatus, PaymentTransaction, Product, ProductLifecycleStatus, Review, User } from './src/types/index.ts';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -275,7 +275,15 @@ app.delete('/api/categories/:id', (req: Request, res: Response) => {
 app.get('/api/products', (req: Request, res: Response) => {
   let products = db.getProducts();
 
-  const { category, search, minPrice, maxPrice, size, color, sort, includeHidden } = req.query;
+  const { category, search, minPrice, maxPrice, size, color, sort, includeHidden, status } = req.query;
+
+  // Filter by lifecycle status if requested
+  if (status && typeof status === 'string' && status !== 'ALL') {
+    products = products.filter(p => p.status === status);
+  } else if (includeHidden !== 'true') {
+    // For storefront customer views: only show published products!
+    products = products.filter(p => p.status === 'PUBLISHED' || (!p.status && p.isPublished !== false));
+  }
 
   // For customer views (when includeHidden !== 'true'), hide products from hidden seasonal categories
   if (includeHidden !== 'true') {
@@ -327,12 +335,71 @@ app.get('/api/products', (req: Request, res: Response) => {
   res.json(products);
 });
 
+// Bulk product lifecycle status update (DRAFT, EDITING, READY, PUBLISHED, ARCHIVED)
+app.post('/api/products/bulk-status', (req: Request, res: Response) => {
+  const { productIds, status } = req.body;
+  if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+    return res.status(400).json({ error: 'Kamida bitta mahsulot tanlanishi shart' });
+  }
+  const validStatuses = ['DRAFT', 'EDITING', 'READY', 'PUBLISHED', 'ARCHIVED'];
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Noto‘g‘ri mahsulot holati: DRAFT, EDITING, READY, PUBLISHED yoki ARCHIVED bo‘lishi kerak' });
+  }
+  const result = db.bulkUpdateProductStatus(productIds, status);
+  res.json(result);
+});
+
+// Single product status update
+app.post('/api/products/:id/status', (req: Request, res: Response) => {
+  const { status } = req.body;
+  const prod = db.getProductById(req.params.id);
+  if (!prod) return res.status(404).json({ error: 'Mahsulot topilmadi' });
+  const validStatuses = ['DRAFT', 'EDITING', 'READY', 'PUBLISHED', 'ARCHIVED'];
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Noto‘g‘ri status ko‘rsatildi' });
+  }
+  prod.status = status;
+  prod.isPublished = status === 'PUBLISHED';
+  if (status === 'PUBLISHED') {
+    prod.publishedAt = new Date().toISOString();
+  } else if (status === 'READY') {
+    prod.readyForPublishAt = new Date().toISOString();
+  }
+  const saved = db.saveProduct(prod);
+  res.json({ success: true, product: saved });
+});
+
+// BILLZ sync summary
+app.get('/api/admin/billz-sync/summary', (_req: Request, res: Response) => {
+  try {
+    const summary = db.getBillzSyncSummary();
+    res.json(summary);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Retry BILLZ sales sync for an order
+app.post('/api/orders/:id/retry-billz-sync', async (req: Request, res: Response) => {
+  try {
+    const order = db.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Buyurtma topilmadi' });
+    const syncRes = await billzService.syncSaleOrder(order);
+    res.json(syncRes);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/products/:id', (req: Request, res: Response) => {
   const prod = db.getProductById(req.params.id);
   if (!prod) return res.status(404).json({ error: 'Mahsulot topilmadi' });
   const isHiddenCat = db.getCategories(true).some(c => c.slug === prod.categorySlug && c.isHidden);
   if (isHiddenCat && req.query.includeHidden !== 'true') {
     return res.status(404).json({ error: 'Ushbu mahsulot hozirgi mavsumda onlayn sotuvga yopiq' });
+  }
+  if (req.query.includeHidden !== 'true' && prod.status && prod.status !== 'PUBLISHED') {
+    return res.status(404).json({ error: 'Ushbu mahsulot hozirda sotuvda mavjud emas yoki qoralama holatida' });
   }
   res.json(prod);
 });
@@ -400,22 +467,54 @@ app.put('/api/products/:id', (req: Request, res: Response) => {
     : (body.discountPrice === null || body.discountPrice === '' ? undefined : prod.discountPrice);
   const cleanDiscount = rawDiscount && rawDiscount > 0 ? rawDiscount : undefined;
 
-  const cleanStock = body.stock !== undefined ? Number(String(body.stock).replace(/[^\d]/g, '')) : prod.stock;
+  const cleanCostPrice = body.costPrice !== undefined ? Number(String(body.costPrice).replace(/[^\d.]/g, '')) : prod.costPrice;
+
+  const images = Array.isArray(body.images) && body.images.length > 0 ? body.images : prod.images;
+  const colors = Array.isArray(body.colors) && body.colors.length > 0 ? body.colors : prod.colors;
+  const sizes = Array.isArray(body.sizes) && body.sizes.length > 0 ? body.sizes : prod.sizes;
+
+  let variants = prod.variants;
+  if (Array.isArray(body.variants) && body.variants.length > 0) {
+    variants = body.variants.map((v: any) => ({
+      id: v.id || `${v.color}_${v.size}`,
+      color: v.color,
+      size: v.size,
+      stock: Math.max(0, Number(v.stock) || 0),
+      barcode: v.barcode || prod.barcode,
+      sku: v.sku || prod.sku,
+    }));
+  }
+
+  const cleanStock = variants && variants.length > 0
+    ? variants.reduce((sum, v) => sum + v.stock, 0)
+    : (body.stock !== undefined ? Number(String(body.stock).replace(/[^\d]/g, '')) : prod.stock);
+
+  const status = (body.status as ProductLifecycleStatus) || prod.status || (prod.isPublished ? 'PUBLISHED' : 'DRAFT');
 
   const updated: Product = {
     ...prod,
     ...body,
     name: body.name ? String(body.name).trim() : prod.name,
+    description: body.description !== undefined ? String(body.description).trim() : prod.description,
+    categorySlug: body.categorySlug || prod.categorySlug,
+    categoryName: body.categoryName || prod.categoryName,
     price: !isNaN(cleanPrice) && cleanPrice > 0 ? cleanPrice : prod.price,
+    costPrice: cleanCostPrice !== undefined && !isNaN(cleanCostPrice) && cleanCostPrice >= 0 ? cleanCostPrice : prod.costPrice,
     discountPrice: cleanDiscount,
     stock: !isNaN(cleanStock) ? cleanStock : prod.stock,
-    images: Array.isArray(body.images) && body.images.length > 0 ? body.images : prod.images,
-    sizes: Array.isArray(body.sizes) && body.sizes.length > 0 ? body.sizes : prod.sizes,
-    colors: Array.isArray(body.colors) && body.colors.length > 0 ? body.colors : prod.colors,
+    images,
+    sizes,
+    colors,
+    variants,
+    status,
+    isPublished: status === 'PUBLISHED',
+    hasCustomImages: body.hasCustomImages !== undefined ? Boolean(body.hasCustomImages) : prod.hasCustomImages,
+    publishedAt: status === 'PUBLISHED' ? (prod.publishedAt || new Date().toISOString()) : prod.publishedAt,
+    readyForPublishAt: status === 'READY' ? (prod.readyForPublishAt || new Date().toISOString()) : prod.readyForPublishAt,
   };
 
-  db.saveProduct(updated);
-  res.json(updated);
+  const saved = db.saveProduct(updated);
+  res.json(saved);
 });
 
 app.delete('/api/products/:id', (req: Request, res: Response) => {
@@ -1456,6 +1555,7 @@ app.post('/api/orders', async (req: Request, res: Response) => {
       quantity: qty,
       unitPrice,
       totalPrice: itemTotal,
+      variantId: item.variantId || `${chosenColor}_${chosenSize}`,
     });
 
     // Safely deduct from unified warehouse variant & record log
